@@ -1,93 +1,87 @@
-# Cowork Skills
+# Claude Skills System
 
-Claude Code skills and task templates for professional design, document generation, AI workflows, and game development.
+A modular system for creating, managing, and syncing Claude AI skill templates. Includes a file watcher, bidirectional sync engine, GitHub integration, and a themed WPF desktop UI with console fallback.
 
-## Quick Setup
-
-Clone this repo on any machine, then run the setup script to install skills globally:
+## Quick Start
 
 ```bash
-# Clone
-git clone https://github.com/daley/cowork-skills.git
-cd cowork-skills
+# Install dependencies
+pip install -r scripts/requirements.txt
 
-# Install (Linux/macOS/Git Bash)
-./setup.sh
+# Preview current state
+python scripts/main.py --preview
 
-# Install (Windows PowerShell)
-.\setup.ps1
+# Start the file watcher
+python scripts/main.py --watch
+
+# Run a sync cycle
+python scripts/main.py --sync --confirm
+
+# Push to GitHub
+python scripts/main.py --github --confirm
 ```
 
-Skills install to `~/.claude/skills/` and are available in **all** Claude Code sessions on that machine.
-
-To update: `git pull && ./setup.sh`
-
-## Skills
-
-### design-system (auto-loaded)
-Foundational design principles applied automatically to all visual and document tasks.
-- Color theory (WCAG contrast, 60-30-10 rule, 6 ready-to-use palettes)
-- Typography (font pairings, type scale, readability rules)
-- Layout (8px grid, 12-column system, composition patterns)
-- Accessibility standards
-
-### canva-designer (invoke with `/canva-designer`)
-Canva-specific prompt engineering for higher quality design generation.
-- Query templates for every design type (logo, presentation, poster, social media)
-- Platform dimensions reference (Instagram, LinkedIn, YouTube, print, etc.)
-- Quality checklist for pre-commit review
-
-### document-designer (auto-loaded)
-Professional formatting for Excel, Word, PowerPoint, and PDF generation.
-- Excel: sheet organization, data formatting, dashboard patterns
-- Word: memo, report, proposal, meeting minutes templates
-- PowerPoint: 6x6 rule, slide templates, content writing rules
-- PDF: layout standards, document type templates
-
-## Task Templates
-
-Pre-built task checklists for common workflows:
-
-| Category | File | What's Included |
-|----------|------|-----------------|
-| App Development | `tasks/app-development/tasks.md` | Feature implementation, bug fixes, UI upgrades, API endpoints, deployment |
-| AI Workflows | `tasks/ai-workflows/tasks.md` | Canva generation, document creation, prompt engineering, agent safety review |
-| Game Development | `tasks/game-development/tasks.md` | Level design, Unreal Blueprints, AI agents, HUD/UI, multiplayer, optimization |
-
-## How It Works
-
-**Background skills** (`design-system`, `document-designer`) load automatically whenever Claude detects a relevant task. You don't need to do anything.
-
-**User-invocable skills** (`canva-designer`) are triggered by typing the slash command in Claude Code:
-```
-/canva-designer
-```
-
-**Task templates** are reference checklists. Copy the relevant section into your project or reference them when planning work.
-
-## Structure
+## Folder Structure
 
 ```
-cowork-skills/
-  skills/
-    design-system/        # Color, typography, layout, accessibility
-    canva-designer/       # Canva prompt engineering & quality review
-    document-designer/    # Excel, Word, PPT, PDF best practices
-  tasks/
-    app-development/      # Feature dev, bug fix, UI upgrade, API, deploy
-    ai-workflows/         # Design gen, doc creation, prompt eng, safety
-    game-development/     # Level design, Unreal, AI, HUD, multiplayer
-  setup.sh                # Linux/macOS/Git Bash installer
-  setup.ps1               # Windows PowerShell installer
+C:/ClaudeSkills/
+  README.md                           # This file
+  Skill_Creator/                      # Meta-template for creating new skills
+    SKILL.md                          #   Canonical skill template
+    README.md                         #   How to create new skills
+  Example_Skills/                     # Pre-built skill definitions
+    frontend-ui-helper/               #   Front-end UI generation
+    backend-workflow-helper/           #   Back-end API and workflow help
+    game-dev-helper/                  #   UE5, Unity, Godot assistance
+    workflow-productivity/            #   Automation and scripting
+    documentation-blog-generator/     #   Docs and blog content generation
+    notion-figma-integration/         #   Notion/Figma bridge workflows
+  Blog_Automation_Prompt/             # Blog generation prompt template
+    prompt_template.md                #   Ready-to-use blog prompt
+    README.md
+  cloud/                              # Sync registry
+    main_cloud.json                   #   Skill metadata, hashes, timestamps
+  config/                             # Configuration
+    watch_config.json                 #   Watch paths and filters
+  scripts/                            # Python scripts
+    main.py                           #   CLI entry point
+    observer.py                       #   File watcher (watchdog)
+    broadcaster.py                    #   Sync engine
+    sync_utils.py                     #   Shared utilities
+    github_sync.py                    #   GitHub integration
+    ui_launcher.py                    #   WPF UI launcher
+    ui_console_fallback.py            #   Console fallback UI
+    requirements.txt                  #   Python dependencies
+  UI_Templates/                       # WPF XAML templates
+    frontend-ui-template.xaml         #   Main skill manager window
+    progress-bar-template.xaml        #   Sync progress dialog
+  Installation_Workflow_Guide/        # Documentation
+    guide.md                          #   Full installation and usage guide
+  backups/                            # Timestamped file backups
+  logs/                               # Sync log files
+  dist/                               # Distribution packages
 ```
 
-## Multi-Machine Sync
+## Key Features
 
-1. Push changes from any machine: `git add -A && git commit -m "update skills" && git push`
-2. Pull on other machine: `git pull && ./setup.sh`
+- **File Watcher**: Monitors skill directories for changes using watchdog
+- **Bidirectional Sync**: Updates cloud registry from disk and vice versa, with hash-based change detection
+- **GitHub Integration**: Commit, push, pull with auto-conflict resolution (skill files prefer local)
+- **Themed UI**: Submarine/Harry Potter themed WPF desktop UI with gold-on-navy color scheme
+- **Console Fallback**: Full-featured console UI with ANSI colors when WPF is not available
+- **Desktop Notifications**: Optional toast notifications via plyer on sync events
+- **Backup & Rollback**: Timestamped backups before overwrites, with CLI restore command
+- **Atomic Writes**: All file operations use temp-then-rename for crash safety
+- **File Locking**: Advisory locks prevent concurrent write corruption
 
-That's it. Both machines stay in sync.
+## Requirements
 
-## License
+- Python 3.10+
+- Git 2.x+ (for GitHub sync)
+- .NET Runtime 6.0+ (optional, for WPF UI)
 
-MIT
+## Documentation
+
+See [Installation_Workflow_Guide/guide.md](Installation_Workflow_Guide/guide.md) for detailed setup, configuration, and troubleshooting instructions.
+
+See [Skill_Creator/README.md](Skill_Creator/README.md) for how to create new skills.

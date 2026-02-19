@@ -1,0 +1,6 @@
+{
+  "watched_paths": ["C:/ClaudeSkills"],
+  "ignored_patterns": ["__pycache__", ".git", "*.pyc", "backups", "logs", "dist"],
+  "sync_interval": 5,
+  "enabled_skills": []
+}
