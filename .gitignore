@@ -13,6 +13,9 @@ Desktop.ini
 .DS_Store
 NUL
 
+# Secrets
+.env
+
 # IDE
 .vscode/
 .idea/

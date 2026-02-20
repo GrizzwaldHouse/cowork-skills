@@ -1,5 +1,7 @@
 # Frontend UI Helper
 
+**Version:** 1.1.0
+
 ## Name
 
 Frontend UI Helper

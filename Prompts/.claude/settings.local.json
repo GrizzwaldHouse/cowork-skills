@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "Bash(curl:*)",
+      "Bash(python -c:*)",
+      "Bash(python:*)",
+      "Bash(gh api:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(dir:*)",
+      "Bash(git fetch:*)",
+      "Bash(git checkout:*)",
+      "Bash(ren:*)",
+      "Bash(git add:*)",
+      "Bash(pip install:*)",
+      "Bash(echo:*)"
+    ]
+  }
+}

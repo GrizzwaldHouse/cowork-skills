@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Owl Alert: wide open eyes, slightly raised feathers - changes detected -->
+
+  <!-- Body - slightly taller, more upright -->
+  <ellipse cx="64" cy="70" rx="34" ry="40" fill="#1B2838"/>
+
+  <!-- Belly patch -->
+  <ellipse cx="64" cy="80" rx="20" ry="24" fill="#2A3F54"/>
+
+  <!-- Belly feather marks -->
+  <path d="M54 70 Q64 74 74 70" stroke="#3A5068" stroke-width="1.2" fill="none"/>
+  <path d="M52 78 Q64 82 76 78" stroke="#3A5068" stroke-width="1.2" fill="none"/>
+  <path d="M54 86 Q64 90 74 86" stroke="#3A5068" stroke-width="1.2" fill="none"/>
+
+  <!-- Head - slightly raised -->
+  <ellipse cx="64" cy="35" rx="28" ry="22" fill="#1B2838"/>
+
+  <!-- Ear tufts - more erect -->
+  <polygon points="40,20 34,4 48,17" fill="#1B2838"/>
+  <polygon points="88,20 94,4 80,17" fill="#1B2838"/>
+  <!-- Tuft highlights -->
+  <polygon points="40,20 36,8 44,18" fill="#243446"/>
+  <polygon points="88,20 92,8 84,18" fill="#243446"/>
+
+  <!-- Facial disc - left -->
+  <ellipse cx="50" cy="36" rx="14" ry="13" fill="#2A3F54"/>
+  <!-- Facial disc - right -->
+  <ellipse cx="78" cy="36" rx="14" ry="13" fill="#2A3F54"/>
+
+  <!-- Eyes - wide open -->
+  <circle cx="50" cy="36" r="10" fill="#F5E6C8"/>
+  <circle cx="78" cy="36" r="10" fill="#F5E6C8"/>
+
+  <!-- Iris - bright gold -->
+  <circle cx="50" cy="36" r="7" fill="#D4AF37"/>
+  <circle cx="78" cy="36" r="7" fill="#D4AF37"/>
+
+  <!-- Pupils - focused -->
+  <circle cx="50" cy="36" r="4" fill="#0F1C28"/>
+  <circle cx="78" cy="36" r="4" fill="#0F1C28"/>
+
+  <!-- Eye shine -->
+  <circle cx="47" cy="34" r="2" fill="white" opacity="0.8"/>
+  <circle cx="75" cy="34" r="2" fill="white" opacity="0.8"/>
+  <circle cx="52" cy="38" r="1" fill="white" opacity="0.5"/>
+  <circle cx="80" cy="38" r="1" fill="white" opacity="0.5"/>
+
+  <!-- Beak -->
+  <polygon points="64,42 59,48 69,48" fill="#D4AF37"/>
+
+  <!-- Wings slightly raised -->
+  <path d="M28 55 Q20 70 30 94 Q33 86 35 76 Q30 66 28 55Z" fill="#243446"/>
+  <path d="M100 55 Q108 70 98 94 Q95 86 93 76 Q98 66 100 55Z" fill="#243446"/>
+
+  <!-- Wing accent feathers -->
+  <path d="M28 65 Q24 72 30 82" stroke="#C9A94E" stroke-width="0.8" fill="none" opacity="0.6"/>
+  <path d="M100 65 Q104 72 98 82" stroke="#C9A94E" stroke-width="0.8" fill="none" opacity="0.6"/>
+
+  <!-- Feet -->
+  <g fill="#D4AF37">
+    <path d="M50 108 L46 114 L50 112 L54 114 L50 108Z"/>
+    <path d="M78 108 L74 114 L78 112 L82 114 L78 108Z"/>
+  </g>
+
+  <!-- Branch -->
+  <rect x="16" y="108" width="96" height="6" rx="3" fill="#5D4037"/>
+  <rect x="12" y="109" width="8" height="4" rx="2" fill="#4E342E"/>
+  <rect x="108" y="109" width="8" height="4" rx="2" fill="#4E342E"/>
+
+  <!-- Small branch detail -->
+  <line x1="90" y1="108" x2="100" y2="100" stroke="#5D4037" stroke-width="3" stroke-linecap="round"/>
+</svg>

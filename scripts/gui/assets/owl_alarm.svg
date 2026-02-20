@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Owl Alarm: alarmed expression, raised tufts, red accent - security alert -->
+
+  <!-- Body - puffed up -->
+  <ellipse cx="64" cy="70" rx="36" ry="40" fill="#1B2838"/>
+
+  <!-- Belly patch -->
+  <ellipse cx="64" cy="80" rx="22" ry="24" fill="#2A3F54"/>
+
+  <!-- Belly feather marks - ruffled -->
+  <path d="M52 68 Q58 73 64 70 Q70 73 76 68" stroke="#3A5068" stroke-width="1.2" fill="none"/>
+  <path d="M50 76 Q58 81 64 78 Q70 81 78 76" stroke="#3A5068" stroke-width="1.2" fill="none"/>
+  <path d="M52 84 Q58 89 64 86 Q70 89 76 84" stroke="#3A5068" stroke-width="1.2" fill="none"/>
+
+  <!-- Head - raised higher -->
+  <ellipse cx="64" cy="33" rx="30" ry="23" fill="#1B2838"/>
+
+  <!-- Ear tufts - fully raised, spiky -->
+  <polygon points="39,18 32,0 48,14" fill="#1B2838"/>
+  <polygon points="89,18 96,0 80,14" fill="#1B2838"/>
+  <!-- Inner tuft accent -->
+  <polygon points="39,18 34,4 44,15" fill="#E74C3C" opacity="0.4"/>
+  <polygon points="89,18 94,4 84,15" fill="#E74C3C" opacity="0.4"/>
+
+  <!-- Facial disc - left -->
+  <ellipse cx="49" cy="34" rx="15" ry="14" fill="#2A3F54"/>
+  <!-- Facial disc - right -->
+  <ellipse cx="79" cy="34" rx="15" ry="14" fill="#2A3F54"/>
+
+  <!-- Red alert ring around eyes -->
+  <circle cx="49" cy="34" r="12" fill="none" stroke="#E74C3C" stroke-width="1.5" opacity="0.5"/>
+  <circle cx="79" cy="34" r="12" fill="none" stroke="#E74C3C" stroke-width="1.5" opacity="0.5"/>
+
+  <!-- Eyes - wide open, alarmed -->
+  <circle cx="49" cy="34" r="11" fill="#F5E6C8"/>
+  <circle cx="79" cy="34" r="11" fill="#F5E6C8"/>
+
+  <!-- Iris - amber/warning -->
+  <circle cx="49" cy="34" r="8" fill="#E6A817"/>
+  <circle cx="79" cy="34" r="8" fill="#E6A817"/>
+
+  <!-- Pupils - constricted (alarmed) -->
+  <circle cx="49" cy="34" r="3" fill="#0F1C28"/>
+  <circle cx="79" cy="34" r="3" fill="#0F1C28"/>
+
+  <!-- Eye shine -->
+  <circle cx="46" cy="31" r="2.5" fill="white" opacity="0.9"/>
+  <circle cx="76" cy="31" r="2.5" fill="white" opacity="0.9"/>
+
+  <!-- Beak - open, calling out -->
+  <polygon points="64,41 58,46 70,46" fill="#D4AF37"/>
+  <polygon points="64,46 60,50 68,50" fill="#C9A94E"/>
+
+  <!-- Wings spread out -->
+  <path d="M26 52 Q16 68 26 96 Q30 86 33 74 Q28 64 26 52Z" fill="#243446"/>
+  <path d="M102 52 Q112 68 102 96 Q98 86 95 74 Q100 64 102 52Z" fill="#243446"/>
+
+  <!-- Wing alert accents -->
+  <path d="M26 62 Q20 72 28 86" stroke="#E74C3C" stroke-width="1" fill="none" opacity="0.4"/>
+  <path d="M102 62 Q108 72 100 86" stroke="#E74C3C" stroke-width="1" fill="none" opacity="0.4"/>
+
+  <!-- Feet - gripping tighter -->
+  <g fill="#D4AF37">
+    <path d="M50 108 L44 115 L50 112 L56 115 L50 108Z"/>
+    <path d="M78 108 L72 115 L78 112 L84 115 L78 108Z"/>
+  </g>
+
+  <!-- Branch -->
+  <rect x="16" y="108" width="96" height="6" rx="3" fill="#5D4037"/>
+  <rect x="12" y="109" width="8" height="4" rx="2" fill="#4E342E"/>
+  <rect x="108" y="109" width="8" height="4" rx="2" fill="#4E342E"/>
+
+  <!-- Alert indicator - small exclamation -->
+  <circle cx="104" cy="14" r="10" fill="#E74C3C" opacity="0.9"/>
+  <text x="104" y="19" text-anchor="middle" fill="white" font-size="16" font-weight="bold" font-family="sans-serif">!</text>
+</svg>
