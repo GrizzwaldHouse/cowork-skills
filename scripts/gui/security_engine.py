@@ -11,6 +11,7 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import re
 import stat
 import time
 from collections import defaultdict
@@ -40,6 +41,15 @@ SUSPICIOUS_EXTENSIONS: frozenset[str] = frozenset({
     ".exe", ".dll", ".bat", ".cmd", ".ps1",
     ".vbs", ".js", ".scr", ".com", ".msi",
 })
+
+# Patterns for transient files produced by atomic writes, file locks, and
+# tooling (e.g. Claude Code).  These are safe operational artifacts and
+# should never generate security alerts.
+_TRANSIENT_FILE_RE = re.compile(
+    r"(^\.tmp_[a-z0-9_]+\..+$)"      # sync_utils atomic writes: .tmp_<rand>.json
+    r"|(\.tmp\.\d+\.\d+$)"            # Claude Code atomic writes: *.tmp.<pid>.<ts>
+    r"|(\.lock$)",                     # advisory lock sidecars: *.lock
+)
 
 MAX_AUDIT_ENTRIES = 10_000
 DEFAULT_LARGE_FILE_BYTES = 50 * 1024 * 1024  # 50 MB
@@ -278,6 +288,18 @@ class SecurityEngine:
         path = Path(file_path)
         now_iso = _now_iso()
         alert: SecurityAlert | None = None
+
+        # 0. Skip transient files (atomic writes, locks, tooling artifacts).
+        if _TRANSIENT_FILE_RE.search(path.name):
+            return None
+
+        # 0b. Skip files inside the security directory (our own audit logs)
+        # to prevent a write→detect→write feedback loop.
+        try:
+            path.relative_to(SECURITY_DIR)
+            return None
+        except ValueError:
+            pass
 
         # Always log the event to the audit trail.
         size: int | None = None
@@ -684,8 +706,13 @@ def _now_iso() -> str:
 
 
 def _is_suspicious_path(path_str: str) -> bool:
-    """Return True if the file path has a suspicious extension or is hidden."""
+    """Return True if the file path has a suspicious extension or is hidden.
+
+    Transient files from atomic writes, locks, and tooling are excluded.
+    """
     path = Path(path_str)
+    if _TRANSIENT_FILE_RE.search(path.name):
+        return False
     if path.suffix.lower() in SUSPICIOUS_EXTENSIONS:
         return True
     if path.name.startswith("."):

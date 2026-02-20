@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import signal
 import time
 from datetime import datetime, timezone
@@ -26,6 +27,14 @@ from watchdog.observers import Observer
 BASE_DIR = Path("C:/ClaudeSkills")
 CONFIG_PATH = BASE_DIR / "config" / "watch_config.json"
 SYNC_LOG_PATH = BASE_DIR / "logs" / "sync_log.json"
+SECURITY_DIR = BASE_DIR / "security"
+
+# Patterns for transient files that should never be processed by the watcher.
+_TRANSIENT_FILE_RE = re.compile(
+    r"(^\.tmp_[a-z0-9_]+\..+$)"      # sync_utils atomic writes
+    r"|(\.tmp\.\d+\.\d+$)"            # Claude Code atomic writes
+    r"|(\.lock$)",                     # advisory lock sidecars
+)
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -189,6 +198,15 @@ class SkillChangeHandler(FileSystemEventHandler):
 
     def _should_process(self, path: Path) -> bool:
         """Apply ignore/enable filters and throttle."""
+        # Skip transient files from atomic writes, locks, and tooling.
+        if _TRANSIENT_FILE_RE.search(path.name):
+            return False
+        # Skip the security directory to prevent audit-log feedback loops.
+        try:
+            path.relative_to(SECURITY_DIR)
+            return False
+        except ValueError:
+            pass
         if _matches_ignored(path, self.ignored_patterns):
             return False
         if not _matches_enabled_skills(path, self.enabled_skills):
