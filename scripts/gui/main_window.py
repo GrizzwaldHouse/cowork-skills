@@ -358,6 +358,9 @@ class MainWindow(QMainWindow):
 
     def _build_ui(self) -> None:
         """Construct all child widgets and lay them out."""
+        # Menu bar
+        self._build_menu_bar()
+
         central = QWidget(self)
         central.setObjectName("centralWidget")
         self.setCentralWidget(central)
@@ -386,6 +389,64 @@ class MainWindow(QMainWindow):
 
         # --- System tray ---
         self._build_system_tray()
+
+    # -- Menu Bar ---------------------------------------------------------
+
+    def _build_menu_bar(self) -> None:
+        """Build the application menu bar."""
+        menu_bar = self.menuBar()
+
+        # File menu
+        file_menu = menu_bar.addMenu("&File")
+
+        settings_action = QAction("&Settings...", self)
+        settings_action.setShortcut("Ctrl+,")
+        settings_action.triggered.connect(self._on_settings)
+        file_menu.addAction(settings_action)
+
+        file_menu.addSeparator()
+
+        exit_action = QAction("E&xit", self)
+        exit_action.setShortcut("Ctrl+Q")
+        exit_action.triggered.connect(self.close)
+        file_menu.addAction(exit_action)
+
+        # Help menu
+        help_menu = menu_bar.addMenu("&Help")
+
+        about_action = QAction("&About OwlWatcher", self)
+        about_action.triggered.connect(self._on_about)
+        help_menu.addAction(about_action)
+
+    def _on_settings(self) -> None:
+        """Show the Settings dialog."""
+        from gui.settings_dialog import SettingsDialog
+
+        dialog = SettingsDialog(self)
+        if dialog.exec():
+            new_config = dialog.get_config()
+            # Save config to watch_config.json
+            from pathlib import Path
+            import json
+            config_path = Path("C:/ClaudeSkills/config/watch_config.json")
+            with config_path.open("w", encoding="utf-8") as fh:
+                json.dump(new_config, fh, indent=2)
+            QMessageBox.information(
+                self,
+                "Settings Saved",
+                "Settings have been saved. Restart OwlWatcher for changes to take effect.",
+            )
+
+    def _on_about(self) -> None:
+        """Show the About dialog."""
+        QMessageBox.about(
+            self,
+            "About OwlWatcher",
+            "<h3>OwlWatcher File Security Monitor</h3>"
+            "<p>Version 1.0</p>"
+            "<p>Developer: Marcus Daley</p>"
+            "<p>A themed file security monitor with real-time threat detection.</p>",
+        )
 
     # -- Header -----------------------------------------------------------
 
