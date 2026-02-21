@@ -34,7 +34,7 @@ from PyQt6.QtWidgets import QLabel, QVBoxLayout, QWidget
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-ASSETS_DIR: Final[Path] = Path(__file__).resolve().parent.parent / "assets"
+from gui.paths import ASSETS_DIR
 
 _STATE_SVG_MAP: Final[dict[str, str]] = {
     "idle": "owl_idle.svg",

@@ -25,6 +25,7 @@ from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QApplication, QMessageBox
 
 from gui.main_window import MainWindow
+from gui.paths import ASSETS_DIR, BASE_DIR
 from gui.security_engine import SecurityEngine
 from gui.tray_icon import OwlTrayIcon
 from gui.watcher_thread import WatcherThread
@@ -32,8 +33,6 @@ from gui.watcher_thread import WatcherThread
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-BASE_DIR = Path("C:/ClaudeSkills")
-ASSETS_DIR = Path(__file__).resolve().parent / "assets"
 TRAY_ICON_SVG = ASSETS_DIR / "owl_tray.svg"
 
 # ---------------------------------------------------------------------------

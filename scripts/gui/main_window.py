@@ -51,14 +51,12 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from gui.paths import ASSETS_DIR, BASE_DIR, CONFIG_PATH
 from gui.widgets.owl_widget import OwlWidget
 
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-BASE_DIR = Path("C:/ClaudeSkills")
-CONFIG_PATH = BASE_DIR / "config" / "watch_config.json"
-ASSETS_DIR = Path(__file__).resolve().parent / "assets"
 TRAY_ICON_PATH = ASSETS_DIR / "owl_tray.svg"
 
 # ---------------------------------------------------------------------------

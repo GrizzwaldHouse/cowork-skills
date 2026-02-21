@@ -21,10 +21,7 @@ from PyQt6.QtGui import QAction, QIcon, QPixmap
 from PyQt6.QtSvg import QSvgRenderer
 from PyQt6.QtWidgets import QMenu, QSystemTrayIcon, QWidget
 
-# ---------------------------------------------------------------------------
-# Paths
-# ---------------------------------------------------------------------------
-ASSETS_DIR = Path(__file__).resolve().parent / "assets"
+from gui.paths import ASSETS_DIR
 
 # ---------------------------------------------------------------------------
 # Logging

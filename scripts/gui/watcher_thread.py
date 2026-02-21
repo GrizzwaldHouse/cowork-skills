@@ -39,9 +39,7 @@ logger = logging.getLogger("watcher_thread")
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-BASE_DIR = Path("C:/ClaudeSkills")
-CONFIG_PATH = BASE_DIR / "config" / "watch_config.json"
-SECURITY_DIR = BASE_DIR / "security"
+from gui.paths import BASE_DIR, CONFIG_PATH, SECURITY_DIR
 
 # Patterns for transient files that should never be processed by the watcher.
 # These are created by atomic writes, file locks, and external tooling.
