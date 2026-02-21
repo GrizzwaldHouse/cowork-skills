@@ -47,11 +47,34 @@ C:/ClaudeSkills/
     main.py                           #   CLI entry point
     observer.py                       #   File watcher (watchdog)
     broadcaster.py                    #   Sync engine
-    sync_utils.py                     #   Shared utilities
+    sync_utils.py                     #   Shared utilities (hashing, atomic writes, locking)
     github_sync.py                    #   GitHub integration
+    config_manager.py                 #   Centralized config loading
+    log_config.py                     #   Centralized logging setup
+    watcher_core.py                   #   Shared filtering logic (transient files, ignored patterns)
     ui_launcher.py                    #   WPF UI launcher
     ui_console_fallback.py            #   Console fallback UI
     requirements.txt                  #   Python dependencies
+    gui/                              #   Desktop GUI modules (PyQt6)
+      app.py                          #     Main GUI application orchestrator
+      main_window.py                  #     Primary dashboard window
+      owl_state_machine.py            #     8-state owl mascot FSM
+      security_engine.py              #     Threat detection and integrity checking
+      watcher_thread.py               #     Background file watcher thread
+      tray_icon.py                    #     System tray icon with badges
+      sound_manager.py                #     Sound effect playback
+      speech_messages.py              #     Randomized owl messages
+      generate_sounds.py              #     Procedural WAV generation
+      constants.py                    #     All magic numbers, colors, thresholds
+      paths.py                        #     Path constants (BASE_DIR, ASSETS_DIR)
+      widgets/                        #     Dashboard widgets
+        owl_widget.py                 #       Animated owl mascot
+        stats_strip.py                #       Composite stats bar
+        sparkline_widget.py           #       Event frequency chart
+        donut_widget.py               #       File type breakdown
+        gauge_widget.py               #       Threat score arc
+        flame_widget.py               #       Uptime intensity
+        ambient_widget.py             #       Night-sky background
   UI_Templates/                       # WPF XAML templates
     frontend-ui-template.xaml         #   Main skill manager window
     progress-bar-template.xaml        #   Sync progress dialog
@@ -74,11 +97,44 @@ C:/ClaudeSkills/
 - **Atomic Writes**: All file operations use temp-then-rename for crash safety
 - **File Locking**: Advisory locks prevent concurrent write corruption
 
+## Architecture
+
+### Core Principles (CLAUDE.md Standards)
+
+All code follows strict architectural standards:
+- **Configuration-Driven**: No hardcoded values. All constants in `scripts/gui/constants.py` and config loaded via `config_manager.py`
+- **Signal-Based Communication**: Qt signals for all inter-component messaging (no polling loops)
+- **Graceful Degradation**: Sound system works without QtMultimedia, security engine is optional
+- **Atomic Operations**: All file writes use temp-then-rename for crash safety
+- **Advisory Locking**: Prevents concurrent write corruption
+
+### Centralized Modules
+
+Refactored from duplicate implementations to single sources of truth:
+
+- **`config_manager.py`**: Loads `watch_config.json` with defaults. Used by observer, watcher_thread, and main.
+- **`log_config.py`**: Configures logging format once. Idempotent (safe to call multiple times).
+- **`watcher_core.py`**: Shared filtering logic (`is_transient()`, `matches_ignored()`, `should_process()`). Eliminates duplication between observer and watcher_thread.
+- **`gui/constants.py`**: All magic numbers, colors, thresholds. Extracted from 20+ files during refactoring.
+- **`gui/paths.py`**: Path constants (BASE_DIR, ASSETS_DIR) for all GUI modules.
+
+### OwlWatcher GUI (PyQt6)
+
+The desktop GUI is a themed file security monitor with an animated owl mascot:
+
+- **8-State FSM**: `SLEEPING → WAKING → SCANNING → CURIOUS/ALERT/ALARM/PROUD` with auto-return transitions
+- **Real-Time Monitoring**: Background QThread runs watchdog observer, emits Qt signals for events
+- **Threat Detection**: SHA-256 integrity baselines, burst detection, suspicious extension checks
+- **Dashboard Widgets**: Sparkline charts, donut breakdowns, arc gauges, flame uptime, ambient night-sky
+- **Sound Effects**: Procedurally generated WAV files (startup_hoot, alert_chirp, alarm_hoot, allclear_settle)
+- **Speech Bubbles**: Randomized owl messages for each state, with 5% humor variants
+
 ## Requirements
 
 - Python 3.10+
 - Git 2.x+ (for GitHub sync)
-- .NET Runtime 6.0+ (optional, for WPF UI)
+- PyQt6 6.x+ (for OwlWatcher GUI)
+- .NET Runtime 6.0+ (optional, for legacy WPF UI)
 
 ## Documentation
 

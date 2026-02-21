@@ -25,6 +25,11 @@ import sys
 from pathlib import Path
 from typing import Any
 
+# Ensure scripts directory is on sys.path for gui.X imports.
+_SCRIPTS_DIR = Path(__file__).resolve().parent.parent
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
+
 from PyQt6.QtCore import QSettings, QSharedMemory, QTimer
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QApplication, QMessageBox
