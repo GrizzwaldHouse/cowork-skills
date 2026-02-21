@@ -338,6 +338,7 @@ class MainWindow(QMainWindow):
         self._settings = QSettings(QSETTINGS_ORG, QSETTINGS_APP)
 
         self.setWindowTitle("OwlWatcher - File Security Monitor")
+        self.setWindowIcon(QIcon(str(ASSETS_DIR / "owl_tray.svg")))
         self.setMinimumSize(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)
 
         self.setStyleSheet(_STYLESHEET)

@@ -46,7 +46,8 @@ class StatsStrip(QWidget):
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self.setFixedHeight(_STRIP_HEIGHT)
-        self.setStyleSheet(f"background-color: {DARK_PANEL};")
+        # Semi-transparent background to blend with ambient night-sky
+        self.setStyleSheet("background-color: rgba(13, 27, 42, 0.4);")
 
         layout = QHBoxLayout(self)
         layout.setContentsMargins(12, 4, 12, 4)

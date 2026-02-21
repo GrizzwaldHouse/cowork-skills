@@ -69,8 +69,8 @@ MONO_FONT = "'Consolas', 'Cascadia Code', monospace"
 # ---------------------------------------------------------------------------
 # Window layout
 # ---------------------------------------------------------------------------
-MIN_WINDOW_WIDTH = 900
-MIN_WINDOW_HEIGHT = 600
+MIN_WINDOW_WIDTH = 600
+MIN_WINDOW_HEIGHT = 400
 HEADER_HEIGHT = 80
 OWL_HEADER_SIZE = 56
 OWL_DEFAULT_SIZE = 128
