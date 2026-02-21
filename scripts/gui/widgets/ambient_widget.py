@@ -24,10 +24,11 @@ import math
 import random
 from datetime import date
 
-from PyQt6.QtCore import QPointF, QRectF, QTimer, Qt
+from PyQt6.QtCore import QPointF, QRectF, QTimer, Qt, pyqtSignal
 from PyQt6.QtGui import (
     QBrush,
     QColor,
+    QMouseEvent,
     QFont,
     QLinearGradient,
     QPainter,
@@ -107,11 +108,21 @@ class _Star:
 class AmbientBackgroundWidget(QWidget):
     """Night-sky gradient background with drifting gold stars and moon phase.
 
+    The moon glyph in the top-right is clickable and emits theme_toggle_requested
+    when clicked.
+
+    Signals
+    -------
+    theme_toggle_requested:
+        Emitted when the user clicks the moon button.
+
     Parameters
     ----------
     parent:
         Optional parent widget.
     """
+
+    theme_toggle_requested = pyqtSignal()
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -119,6 +130,7 @@ class AmbientBackgroundWidget(QWidget):
         self._stars: list[_Star] = []
         self._moon_char = _moon_char(_moon_phase())
         self._moon_font = QFont("Segoe UI Emoji", _MOON_SIZE)
+        self._moon_rect = QRectF()  # Stores moon clickable area
 
         # Animation timer for star drift
         self._dt = AMBIENT_FRAME_MS / 1000.0
@@ -126,6 +138,9 @@ class AmbientBackgroundWidget(QWidget):
         self._timer.setInterval(AMBIENT_FRAME_MS)
         self._timer.timeout.connect(self._tick)
         self._timer.start()
+
+        # Enable mouse tracking for hover cursor
+        self.setMouseTracking(True)
 
     def _ensure_stars(self) -> None:
         """Create stars if not yet initialized or if widget was resized."""
@@ -176,9 +191,29 @@ class AmbientBackgroundWidget(QWidget):
         # --- Moon phase glyph (top-right) ---
         painter.setFont(self._moon_font)
         painter.setPen(QPen(QColor(255, 255, 255, 180)))
-        moon_rect = QRectF(w - _MOON_SIZE - 12, 4, _MOON_SIZE + 8, _MOON_SIZE + 8)
+        self._moon_rect = QRectF(w - _MOON_SIZE - 12, 4, _MOON_SIZE + 8, _MOON_SIZE + 8)
         painter.drawText(
-            moon_rect, int(Qt.AlignmentFlag.AlignCenter), self._moon_char,
+            self._moon_rect, int(Qt.AlignmentFlag.AlignCenter), self._moon_char,
         )
 
         painter.end()
+
+    def mousePressEvent(self, event: QMouseEvent) -> None:
+        """Detect clicks on the moon to toggle theme."""
+        if self._moon_rect.contains(event.pos()):
+            self.theme_toggle_requested.emit()
+        super().mousePressEvent(event)
+
+    def enterEvent(self, event: object) -> None:
+        """Show pointer cursor when hovering over moon."""
+        if hasattr(event, 'pos') and self._moon_rect.contains(event.pos()):
+            self.setCursor(Qt.CursorShape.PointingHandCursor)
+        super().enterEvent(event)
+
+    def mouseMoveEvent(self, event: QMouseEvent) -> None:
+        """Update cursor when moving over moon."""
+        if self._moon_rect.contains(event.pos()):
+            self.setCursor(Qt.CursorShape.PointingHandCursor)
+        else:
+            self.setCursor(Qt.CursorShape.ArrowCursor)
+        super().mouseMoveEvent(event)

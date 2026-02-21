@@ -96,6 +96,7 @@ from gui.constants import (
     UPTIME_TICK_MS,
 )
 from gui.paths import ASSETS_DIR, BASE_DIR
+from gui.theme import ThemeManager
 from gui.widgets.ambient_widget import AmbientBackgroundWidget
 from gui.widgets.owl_widget import OwlWidget
 from gui.widgets.stats_strip import StatsStrip
@@ -336,6 +337,7 @@ class MainWindow(QMainWindow):
         self._minimize_to_tray = True
 
         self._settings = QSettings(QSETTINGS_ORG, QSETTINGS_APP)
+        self._theme_manager = ThemeManager()
 
         self.setWindowTitle("OwlWatcher - File Security Monitor")
         self.setWindowIcon(QIcon(str(ASSETS_DIR / "owl_tray.svg")))
@@ -452,10 +454,11 @@ class MainWindow(QMainWindow):
 
     def _build_header(self) -> QWidget:
         """Build the header bar with ambient night-sky background."""
-        header = AmbientBackgroundWidget()
-        header.setFixedHeight(HEADER_HEIGHT)
+        self._header = AmbientBackgroundWidget()
+        self._header.setFixedHeight(HEADER_HEIGHT)
+        self._header.theme_toggle_requested.connect(self._on_theme_toggle)
 
-        layout = QHBoxLayout(header)
+        layout = QHBoxLayout(self._header)
         layout.setContentsMargins(12, 4, 12, 4)
 
         # Owl widget (small version in header)
@@ -505,7 +508,13 @@ class MainWindow(QMainWindow):
         self._sound_check.toggled.connect(self.sound_toggled.emit)
         layout.addWidget(self._sound_check)
 
-        return header
+        return self._header
+
+    def _on_theme_toggle(self) -> None:
+        """Handle theme toggle request from moon button."""
+        new_theme = self._theme_manager.toggle_theme()
+        theme_name = "Light" if new_theme.value == "light" else "Dark"
+        self.statusBar().showMessage(f"Switched to {theme_name} theme", 2000)
 
     # -- Folder tree ------------------------------------------------------
 
