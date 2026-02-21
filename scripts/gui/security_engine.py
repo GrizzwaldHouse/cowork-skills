@@ -1,3 +1,8 @@
+# security_engine.py
+# Developer: Marcus Daley
+# Date: 2026-02-20
+# Purpose: Detect suspicious file activity and maintain integrity baselines to protect monitored directories
+
 """
 Security audit engine for the Claude Skills system.
 
@@ -11,7 +16,6 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
-import re
 import stat
 import time
 from collections import defaultdict
@@ -21,11 +25,19 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
+from gui.constants import (
+    BURST_THRESHOLD,
+    BURST_WINDOW_SECONDS,
+    DEFAULT_LARGE_FILE_BYTES,
+    MAX_AUDIT_ENTRIES,
+    SUSPICIOUS_EXTENSIONS,
+)
+from watcher_core import SECURITY_DIR, is_security_dir, is_transient
+
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
 BASE_DIR = Path("C:/ClaudeSkills")
-SECURITY_DIR = BASE_DIR / "security"
 INTEGRITY_DB_PATH = SECURITY_DIR / "integrity_db.json"
 AUDIT_LOG_PATH = SECURITY_DIR / "audit_log.json"
 
@@ -33,28 +45,6 @@ AUDIT_LOG_PATH = SECURITY_DIR / "audit_log.json"
 # Logging
 # ---------------------------------------------------------------------------
 logger = logging.getLogger("security_engine")
-
-# ---------------------------------------------------------------------------
-# Constants
-# ---------------------------------------------------------------------------
-SUSPICIOUS_EXTENSIONS: frozenset[str] = frozenset({
-    ".exe", ".dll", ".bat", ".cmd", ".ps1",
-    ".vbs", ".js", ".scr", ".com", ".msi",
-})
-
-# Patterns for transient files produced by atomic writes, file locks, and
-# tooling (e.g. Claude Code).  These are safe operational artifacts and
-# should never generate security alerts.
-_TRANSIENT_FILE_RE = re.compile(
-    r"(^\.tmp_[a-z0-9_]+\..+$)"      # sync_utils atomic writes: .tmp_<rand>.json
-    r"|(\.tmp\.\d+\.\d+$)"            # Claude Code atomic writes: *.tmp.<pid>.<ts>
-    r"|(\.lock$)",                     # advisory lock sidecars: *.lock
-)
-
-MAX_AUDIT_ENTRIES = 10_000
-DEFAULT_LARGE_FILE_BYTES = 50 * 1024 * 1024  # 50 MB
-BURST_THRESHOLD = 10
-BURST_WINDOW_SECONDS = 5.0
 
 
 # ---------------------------------------------------------------------------
@@ -290,16 +280,13 @@ class SecurityEngine:
         alert: SecurityAlert | None = None
 
         # 0. Skip transient files (atomic writes, locks, tooling artifacts).
-        if _TRANSIENT_FILE_RE.search(path.name):
+        if is_transient(path):
             return None
 
         # 0b. Skip files inside the security directory (our own audit logs)
-        # to prevent a write→detect→write feedback loop.
-        try:
-            path.relative_to(SECURITY_DIR)
+        # to prevent a write->detect->write feedback loop.
+        if is_security_dir(path):
             return None
-        except ValueError:
-            pass
 
         # Always log the event to the audit trail.
         size: int | None = None
@@ -539,11 +526,8 @@ class SecurityEngine:
             if not file_path.is_file():
                 continue
             # Skip the security directory itself to avoid circular tracking.
-            try:
-                file_path.relative_to(SECURITY_DIR)
+            if is_security_dir(file_path):
                 continue
-            except ValueError:
-                pass
 
             try:
                 file_hash = _file_sha256(file_path)
@@ -711,7 +695,7 @@ def _is_suspicious_path(path_str: str) -> bool:
     Transient files from atomic writes, locks, and tooling are excluded.
     """
     path = Path(path_str)
-    if _TRANSIENT_FILE_RE.search(path.name):
+    if is_transient(path):
         return False
     if path.suffix.lower() in SUSPICIOUS_EXTENSIONS:
         return True

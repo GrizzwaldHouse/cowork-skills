@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Owl Proud: chest puffed, head tilted up, content expression, gold sparkle -->
+
+  <!-- Body - wider, chest puffed out -->
+  <ellipse cx="64" cy="68" rx="38" ry="42" fill="#1B2838"/>
+
+  <!-- Belly patch - expanded -->
+  <ellipse cx="64" cy="78" rx="24" ry="26" fill="#2A3F54"/>
+
+  <!-- Belly feather marks - smooth and proud -->
+  <path d="M50 68 Q64 72 78 68" stroke="#3A5068" stroke-width="1.2" fill="none"/>
+  <path d="M48 76 Q64 80 80 76" stroke="#3A5068" stroke-width="1.2" fill="none"/>
+  <path d="M50 84 Q64 88 78 84" stroke="#3A5068" stroke-width="1.2" fill="none"/>
+
+  <!-- Head - tilted slightly up -->
+  <g transform="rotate(3 64 32)">
+    <ellipse cx="64" cy="32" rx="28" ry="22" fill="#1B2838"/>
+
+    <!-- Ear tufts - upright and proud -->
+    <polygon points="40,18 34,3 48,15" fill="#1B2838"/>
+    <polygon points="88,18 94,3 80,15" fill="#1B2838"/>
+    <polygon points="40,18 36,6 44,16" fill="#243446"/>
+    <polygon points="88,18 92,6 84,16" fill="#243446"/>
+
+    <!-- Facial disc -->
+    <ellipse cx="50" cy="33" rx="14" ry="13" fill="#2A3F54"/>
+    <ellipse cx="78" cy="33" rx="14" ry="13" fill="#2A3F54"/>
+
+    <!-- Eyes - content, slightly narrowed (happy) -->
+    <ellipse cx="50" cy="33" rx="9" ry="7" fill="#F5E6C8"/>
+    <ellipse cx="78" cy="33" rx="9" ry="7" fill="#F5E6C8"/>
+
+    <!-- Iris - warm gold -->
+    <ellipse cx="50" cy="33" rx="6" ry="5" fill="#D4AF37"/>
+    <ellipse cx="78" cy="33" rx="6" ry="5" fill="#D4AF37"/>
+
+    <!-- Pupils - relaxed -->
+    <ellipse cx="50" cy="33" rx="3" ry="2.5" fill="#0F1C28"/>
+    <ellipse cx="78" cy="33" rx="3" ry="2.5" fill="#0F1C28"/>
+
+    <!-- Happy eye creases (bottom) -->
+    <path d="M42 37 Q50 40 58 37" stroke="#2A3F54" stroke-width="1.5" fill="none"/>
+    <path d="M70 37 Q78 40 86 37" stroke="#2A3F54" stroke-width="1.5" fill="none"/>
+
+    <!-- Eye shine -->
+    <circle cx="47" cy="31" r="2" fill="white" opacity="0.8"/>
+    <circle cx="75" cy="31" r="2" fill="white" opacity="0.8"/>
+
+    <!-- Beak - slight smile shape -->
+    <polygon points="64,40 59,45 69,45" fill="#D4AF37"/>
+  </g>
+
+  <!-- Wings held out slightly - proud posture -->
+  <path d="M26 52 Q18 68 28 96 Q32 86 34 74 Q28 64 26 52Z" fill="#243446"/>
+  <path d="M102 52 Q110 68 100 96 Q96 86 94 74 Q100 64 102 52Z" fill="#243446"/>
+
+  <!-- Gold accent feathers on wings -->
+  <path d="M26 62 Q22 72 28 82" stroke="#C9A94E" stroke-width="1" fill="none" opacity="0.7"/>
+  <path d="M102 62 Q106 72 100 82" stroke="#C9A94E" stroke-width="1" fill="none" opacity="0.7"/>
+
+  <!-- Feet -->
+  <g fill="#D4AF37">
+    <path d="M50 108 L46 114 L50 112 L54 114 L50 108Z"/>
+    <path d="M78 108 L74 114 L78 112 L82 114 L78 108Z"/>
+  </g>
+
+  <!-- Branch -->
+  <rect x="16" y="108" width="96" height="6" rx="3" fill="#5D4037"/>
+  <rect x="12" y="109" width="8" height="4" rx="2" fill="#4E342E"/>
+  <rect x="108" y="109" width="8" height="4" rx="2" fill="#4E342E"/>
+
+  <!-- Gold sparkle -->
+  <g fill="#C9A94E" opacity="0.7">
+    <polygon points="104,8 106,14 112,14 107,18 109,24 104,20 99,24 101,18 96,14 102,14" transform="scale(0.6) translate(60 -2)"/>
+  </g>
+  <g fill="#C9A94E" opacity="0.4">
+    <polygon points="20,12 21,15 24,15 22,17 23,20 20,18 17,20 18,17 16,15 19,15"/>
+  </g>
+</svg>

@@ -1,3 +1,8 @@
+# watcher_thread.py
+# Developer: Marcus Daley
+# Date: 2026-02-20
+# Purpose: Run the watchdog observer on a background QThread to keep the GUI responsive during file monitoring
+
 """
 QThread wrapper for the watchdog file observer.
 
@@ -20,7 +25,6 @@ Usage::
 from __future__ import annotations
 
 import logging
-import re
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -31,6 +35,9 @@ from PyQt6.QtCore import QThread, pyqtSignal
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
 
+from config_manager import load_config
+from watcher_core import should_process
+
 # ---------------------------------------------------------------------------
 # Logging
 # ---------------------------------------------------------------------------
@@ -39,15 +46,7 @@ logger = logging.getLogger("watcher_thread")
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-from gui.paths import BASE_DIR, CONFIG_PATH, SECURITY_DIR
-
-# Patterns for transient files that should never be processed by the watcher.
-# These are created by atomic writes, file locks, and external tooling.
-_TRANSIENT_FILE_RE = re.compile(
-    r"(^\.tmp_[a-z0-9_]+\..+$)"      # sync_utils atomic writes: .tmp_<rand>.json
-    r"|(\.tmp\.\d+\.\d+$)"            # Claude Code atomic writes: *.tmp.<pid>.<ts>
-    r"|(\.lock$)",                     # advisory lock sidecars: *.lock
-)
+from gui.paths import BASE_DIR
 
 
 # ---------------------------------------------------------------------------
@@ -85,36 +84,14 @@ class _QtChangeHandler(FileSystemEventHandler):
     # -- filtering --------------------------------------------------------
 
     def _should_process(self, path: Path) -> bool:
-        path_str = str(path)
-
-        # Skip transient files from atomic writes, locks, and tooling.
-        if _TRANSIENT_FILE_RE.search(path.name):
-            return False
-
-        # Skip the security directory to prevent audit-log feedback loops.
-        try:
-            path.relative_to(SECURITY_DIR)
-            return False
-        except ValueError:
-            pass
-
-        for pattern in self._ignored_patterns:
-            if pattern in path.parts:
-                return False
-            if pattern.startswith("*") and path_str.endswith(pattern[1:]):
-                return False
-
-        if self._enabled_skills:
-            if not any(part in self._enabled_skills for part in path.parts):
-                return False
-
-        now = time.monotonic()
-        key = str(path)
-        last = self._last_event_time.get(key, 0.0)
-        if now - last < self._sync_interval:
-            return False
-        self._last_event_time[key] = now
-        return True
+        """Delegate to shared watcher_core filter."""
+        return should_process(
+            path,
+            self._ignored_patterns,
+            self._enabled_skills,
+            self._sync_interval,
+            self._last_event_time,
+        )
 
     # -- event dispatch ---------------------------------------------------
 
@@ -139,7 +116,7 @@ class _QtChangeHandler(FileSystemEventHandler):
         try:
             from broadcaster import broadcast_change
             broadcast_change(event_type, str(file_path))
-        except Exception:
+        except (ImportError, OSError, ValueError):
             pass
 
         # Run security scan
@@ -204,24 +181,8 @@ class WatcherThread(QThread):
 
     @staticmethod
     def _load_config() -> dict[str, Any]:
-        """Load watch configuration from the standard config path."""
-        import json
-
-        if CONFIG_PATH.exists():
-            try:
-                with CONFIG_PATH.open("r", encoding="utf-8") as fh:
-                    return json.load(fh)
-            except Exception as exc:
-                logger.warning("Could not read config: %s", exc)
-
-        return {
-            "watched_paths": [str(BASE_DIR)],
-            "ignored_patterns": [
-                "__pycache__", ".git", "*.pyc", "backups", "logs", "dist",
-            ],
-            "sync_interval": 5,
-            "enabled_skills": [],
-        }
+        """Load watch configuration via shared config_manager."""
+        return load_config()
 
     # -- security engine --------------------------------------------------
 
@@ -230,7 +191,7 @@ class WatcherThread(QThread):
         try:
             from gui.security_engine import SecurityEngine
             self._security_engine = SecurityEngine()
-        except Exception as exc:
+        except (ImportError, OSError) as exc:
             logger.warning("SecurityEngine not available: %s", exc)
             self._security_engine = None
 
@@ -242,7 +203,7 @@ class WatcherThread(QThread):
             alert = self._security_engine.scan_event(event_type, file_path)
             if alert is not None:
                 self.security_alert.emit(alert.to_dict())
-        except Exception as exc:
+        except (OSError, ValueError) as exc:
             logger.debug("Security scan error: %s", exc)
 
     # -- thread run -------------------------------------------------------
@@ -281,7 +242,7 @@ class WatcherThread(QThread):
 
         try:
             observer.start()
-        except Exception as exc:
+        except OSError as exc:
             self.error_occurred.emit(f"Observer failed to start: {exc}")
             return
 
@@ -292,7 +253,7 @@ class WatcherThread(QThread):
         try:
             while not self.isInterruptionRequested():
                 time.sleep(0.5)
-        except Exception as exc:
+        except (OSError, RuntimeError) as exc:
             self.error_occurred.emit(str(exc))
         finally:
             observer.stop()

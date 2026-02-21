@@ -1,3 +1,8 @@
+# observer.py
+# Developer: Marcus Daley
+# Date: 2026-02-20
+# Purpose: Real-time file system monitoring using watchdog to trigger sync operations on detected changes
+
 """
 File watcher and observer for the Claude Skills system.
 
@@ -11,7 +16,6 @@ from __future__ import annotations
 
 import json
 import logging
-import re
 import signal
 import time
 from datetime import datetime, timezone
@@ -21,51 +25,21 @@ from typing import Any
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
 
+from config_manager import load_config
+from log_config import configure_logging
+from watcher_core import should_process
+
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
 BASE_DIR = Path("C:/ClaudeSkills")
-CONFIG_PATH = BASE_DIR / "config" / "watch_config.json"
 SYNC_LOG_PATH = BASE_DIR / "logs" / "sync_log.json"
-SECURITY_DIR = BASE_DIR / "security"
-
-# Patterns for transient files that should never be processed by the watcher.
-_TRANSIENT_FILE_RE = re.compile(
-    r"(^\.tmp_[a-z0-9_]+\..+$)"      # sync_utils atomic writes
-    r"|(\.tmp\.\d+\.\d+$)"            # Claude Code atomic writes
-    r"|(\.lock$)",                     # advisory lock sidecars
-)
 
 # ---------------------------------------------------------------------------
 # Logging
 # ---------------------------------------------------------------------------
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s - %(message)s",
-    datefmt="%Y-%m-%dT%H:%M:%S",
-)
+configure_logging()
 logger = logging.getLogger("observer")
-
-# ---------------------------------------------------------------------------
-# Configuration
-# ---------------------------------------------------------------------------
-
-def load_config(path: Path = CONFIG_PATH) -> dict[str, Any]:
-    """Load watch configuration from JSON file."""
-    if not path.exists():
-        logger.warning("Config file not found at %s, using defaults", path)
-        return {
-            "watched_paths": [str(BASE_DIR)],
-            "ignored_patterns": [
-                "__pycache__", ".git", "*.pyc", "backups", "logs", "dist",
-            ],
-            "sync_interval": 5,
-            "enabled_skills": [],
-        }
-    with path.open("r", encoding="utf-8") as fh:
-        config: dict[str, Any] = json.load(fh)
-    logger.info("Loaded config from %s", path)
-    return config
 
 
 # ---------------------------------------------------------------------------
@@ -145,36 +119,6 @@ def _notify_broadcaster(event_type: str, file_path: str) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Pattern matching helpers
-# ---------------------------------------------------------------------------
-
-def _matches_ignored(path: Path, patterns: list[str]) -> bool:
-    """Return True if *path* matches any of the ignored patterns."""
-    path_str = str(path)
-    for pattern in patterns:
-        # Direct name match (e.g. "__pycache__", ".git", "backups")
-        if pattern in path.parts:
-            return True
-        # Glob-style extension match (e.g. "*.pyc")
-        if pattern.startswith("*") and path_str.endswith(pattern[1:]):
-            return True
-    return False
-
-
-def _matches_enabled_skills(path: Path, enabled_skills: list[str]) -> bool:
-    """Return True if *path* belongs to an enabled skill folder.
-
-    If *enabled_skills* is empty every path is considered enabled.
-    """
-    if not enabled_skills:
-        return True
-    for part in path.parts:
-        if part in enabled_skills:
-            return True
-    return False
-
-
-# ---------------------------------------------------------------------------
 # Watchdog event handler
 # ---------------------------------------------------------------------------
 
@@ -191,34 +135,17 @@ class SkillChangeHandler(FileSystemEventHandler):
         self.ignored_patterns = ignored_patterns
         self.enabled_skills = enabled_skills
         self.sync_interval = sync_interval
-        # Track the last time we processed an event per path to throttle.
         self._last_event_time: dict[str, float] = {}
 
-    # -- internal helpers --------------------------------------------------
-
     def _should_process(self, path: Path) -> bool:
-        """Apply ignore/enable filters and throttle."""
-        # Skip transient files from atomic writes, locks, and tooling.
-        if _TRANSIENT_FILE_RE.search(path.name):
-            return False
-        # Skip the security directory to prevent audit-log feedback loops.
-        try:
-            path.relative_to(SECURITY_DIR)
-            return False
-        except ValueError:
-            pass
-        if _matches_ignored(path, self.ignored_patterns):
-            return False
-        if not _matches_enabled_skills(path, self.enabled_skills):
-            return False
-        now = time.monotonic()
-        key = str(path)
-        last = self._last_event_time.get(key, 0.0)
-        if now - last < self.sync_interval:
-            logger.debug("Throttled event for %s", path)
-            return False
-        self._last_event_time[key] = now
-        return True
+        """Delegate to shared watcher_core filter."""
+        return should_process(
+            path,
+            self.ignored_patterns,
+            self.enabled_skills,
+            self.sync_interval,
+            self._last_event_time,
+        )
 
     def _handle_event(self, event: FileSystemEvent, event_type: str) -> None:
         """Central handler called for every relevant event type."""

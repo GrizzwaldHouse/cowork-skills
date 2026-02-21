@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Owl Curious: head tilted 8deg, one eyebrow raised, asymmetric eyes -->
+
+  <!-- Body -->
+  <ellipse cx="64" cy="70" rx="34" ry="40" fill="#1B2838"/>
+
+  <!-- Belly patch -->
+  <ellipse cx="64" cy="80" rx="20" ry="24" fill="#2A3F54"/>
+
+  <!-- Belly feather marks -->
+  <path d="M54 70 Q64 74 74 70" stroke="#3A5068" stroke-width="1.2" fill="none"/>
+  <path d="M52 78 Q64 82 76 78" stroke="#3A5068" stroke-width="1.2" fill="none"/>
+  <path d="M54 86 Q64 90 74 86" stroke="#3A5068" stroke-width="1.2" fill="none"/>
+
+  <!-- Head - tilted 8 degrees -->
+  <g transform="rotate(-8 64 36)">
+    <ellipse cx="64" cy="36" rx="28" ry="22" fill="#1B2838"/>
+
+    <!-- Ear tufts -->
+    <polygon points="40,20 35,5 48,17" fill="#1B2838"/>
+    <polygon points="88,20 93,5 80,17" fill="#1B2838"/>
+    <polygon points="40,20 37,8 44,18" fill="#243446"/>
+    <polygon points="88,20 91,8 84,18" fill="#243446"/>
+
+    <!-- Facial disc -->
+    <ellipse cx="50" cy="36" rx="14" ry="13" fill="#2A3F54"/>
+    <ellipse cx="78" cy="36" rx="14" ry="13" fill="#2A3F54"/>
+
+    <!-- Left eye - wider (raised eyebrow) -->
+    <circle cx="50" cy="36" r="10" fill="#F5E6C8"/>
+    <circle cx="50" cy="36" r="7" fill="#D4AF37"/>
+    <circle cx="50" cy="36" r="4" fill="#0F1C28"/>
+    <circle cx="47" cy="34" r="2" fill="white" opacity="0.8"/>
+
+    <!-- Left eyebrow raised -->
+    <path d="M40 26 Q50 22 60 27" stroke="#2A3F54" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+    <!-- Right eye - slightly squinted (asymmetric) -->
+    <ellipse cx="78" cy="37" rx="9" ry="8" fill="#F5E6C8"/>
+    <circle cx="78" cy="37" r="6" fill="#D4AF37"/>
+    <circle cx="78" cy="37" r="3.5" fill="#0F1C28"/>
+    <circle cx="76" cy="35" r="1.5" fill="white" opacity="0.7"/>
+
+    <!-- Beak -->
+    <polygon points="64,42 59,48 69,48" fill="#D4AF37"/>
+  </g>
+
+  <!-- Wings slightly open -->
+  <path d="M28 55 Q20 70 30 94 Q33 86 35 76 Q30 66 28 55Z" fill="#243446"/>
+  <path d="M100 55 Q108 70 98 94 Q95 86 93 76 Q98 66 100 55Z" fill="#243446"/>
+
+  <!-- Feet -->
+  <g fill="#D4AF37">
+    <path d="M50 108 L46 114 L50 112 L54 114 L50 108Z"/>
+    <path d="M78 108 L74 114 L78 112 L82 114 L78 108Z"/>
+  </g>
+
+  <!-- Branch -->
+  <rect x="16" y="108" width="96" height="6" rx="3" fill="#5D4037"/>
+  <rect x="12" y="109" width="8" height="4" rx="2" fill="#4E342E"/>
+  <rect x="108" y="109" width="8" height="4" rx="2" fill="#4E342E"/>
+
+  <!-- Small question mark indicator -->
+  <text x="106" y="18" fill="#C9A94E" font-family="sans-serif" font-size="16" font-weight="bold" opacity="0.6">?</text>
+</svg>

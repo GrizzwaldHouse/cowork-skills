@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Owl Waking: eyes half-open, gold iris partially visible, head rising -->
+
+  <!-- Body - transitioning upward -->
+  <ellipse cx="64" cy="72" rx="34" ry="38" fill="#1B2838"/>
+
+  <!-- Belly patch -->
+  <ellipse cx="64" cy="82" rx="20" ry="22" fill="#2A3F54"/>
+
+  <!-- Belly feather marks -->
+  <path d="M54 72 Q64 76 74 72" stroke="#3A5068" stroke-width="1.2" fill="none"/>
+  <path d="M52 80 Q64 84 76 80" stroke="#3A5068" stroke-width="1.2" fill="none"/>
+  <path d="M54 88 Q64 92 74 88" stroke="#3A5068" stroke-width="1.2" fill="none"/>
+
+  <!-- Head - rising slightly -->
+  <ellipse cx="64" cy="38" rx="28" ry="22" fill="#1B2838"/>
+
+  <!-- Ear tufts - halfway up -->
+  <polygon points="40,22 37,9 48,20" fill="#1B2838"/>
+  <polygon points="88,22 91,9 80,20" fill="#1B2838"/>
+
+  <!-- Facial disc - left -->
+  <ellipse cx="50" cy="38" rx="14" ry="12" fill="#2A3F54"/>
+  <!-- Facial disc - right -->
+  <ellipse cx="78" cy="38" rx="14" ry="12" fill="#2A3F54"/>
+
+  <!-- Eyes - half open ovals -->
+  <ellipse cx="50" cy="39" rx="8" ry="5" fill="#F5E6C8"/>
+  <ellipse cx="78" cy="39" rx="8" ry="5" fill="#F5E6C8"/>
+
+  <!-- Iris - gold, partially visible -->
+  <ellipse cx="50" cy="40" rx="5" ry="3.5" fill="#D4AF37"/>
+  <ellipse cx="78" cy="40" rx="5" ry="3.5" fill="#D4AF37"/>
+
+  <!-- Pupils - still adjusting -->
+  <ellipse cx="50" cy="40" rx="2.5" ry="2" fill="#0F1C28"/>
+  <ellipse cx="78" cy="40" rx="2.5" ry="2" fill="#0F1C28"/>
+
+  <!-- Heavy eyelids drooping from top -->
+  <path d="M42 37 Q50 32 58 37" fill="#1B2838"/>
+  <path d="M70 37 Q78 32 86 37" fill="#1B2838"/>
+
+  <!-- Eye shine -->
+  <circle cx="48" cy="38" r="1" fill="white" opacity="0.5"/>
+  <circle cx="76" cy="38" r="1" fill="white" opacity="0.5"/>
+
+  <!-- Beak -->
+  <polygon points="64,44 60,49 68,49" fill="#C9A94E"/>
+
+  <!-- Wings tucked at sides -->
+  <path d="M30 58 Q24 72 32 92 Q34 86 36 78 Q32 70 30 58Z" fill="#243446"/>
+  <path d="M98 58 Q104 72 96 92 Q94 86 92 78 Q96 70 98 58Z" fill="#243446"/>
+
+  <!-- Feet -->
+  <g fill="#C9A94E">
+    <path d="M50 108 L46 114 L50 112 L54 114 L50 108Z"/>
+    <path d="M78 108 L74 114 L78 112 L82 114 L78 108Z"/>
+  </g>
+
+  <!-- Branch -->
+  <rect x="16" y="108" width="96" height="6" rx="3" fill="#5D4037"/>
+  <rect x="12" y="109" width="8" height="4" rx="2" fill="#4E342E"/>
+  <rect x="108" y="109" width="8" height="4" rx="2" fill="#4E342E"/>
+
+  <!-- Small branch detail -->
+  <line x1="90" y1="108" x2="100" y2="100" stroke="#5D4037" stroke-width="3" stroke-linecap="round"/>
+</svg>

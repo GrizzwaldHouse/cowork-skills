@@ -1,3 +1,8 @@
+# main.py
+# Developer: Marcus Daley
+# Date: 2026-02-20
+# Purpose: CLI orchestrator coordinating watcher, sync, UI, and GitHub operations from single entry point
+
 """
 Main entry point for the Claude Skills system.
 
@@ -34,14 +39,12 @@ BACKUP_DIR = BASE_DIR / "backups"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
+from log_config import configure_logging
+
 # ---------------------------------------------------------------------------
 # Logging
 # ---------------------------------------------------------------------------
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s - %(message)s",
-    datefmt="%Y-%m-%dT%H:%M:%S",
-)
+configure_logging()
 logger = logging.getLogger("claude-skills")
 
 

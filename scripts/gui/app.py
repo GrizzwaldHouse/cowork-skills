@@ -1,3 +1,8 @@
+# app.py
+# Developer: Marcus Daley
+# Date: 2026-02-20
+# Purpose: Bootstrap the GUI application and wire all components together via Qt signals
+
 """
 Main entry point for the OwlWatcher GUI application.
 
@@ -20,15 +25,20 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from PyQt6.QtCore import QSharedMemory
+from PyQt6.QtCore import QSettings, QSharedMemory, QTimer
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QApplication, QMessageBox
 
+from gui.constants import QSETTINGS_APP, QSETTINGS_ORG
 from gui.main_window import MainWindow
+from gui.owl_state_machine import OwlState, OwlStateMachine
 from gui.paths import ASSETS_DIR, BASE_DIR
 from gui.security_engine import SecurityEngine
+from gui.sound_manager import SoundManager
+from gui.speech_messages import get_alert_message, get_message
 from gui.tray_icon import OwlTrayIcon
 from gui.watcher_thread import WatcherThread
+from log_config import configure_logging
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -38,11 +48,7 @@ TRAY_ICON_SVG = ASSETS_DIR / "owl_tray.svg"
 # ---------------------------------------------------------------------------
 # Logging
 # ---------------------------------------------------------------------------
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s - %(message)s",
-    datefmt="%Y-%m-%dT%H:%M:%S",
-)
+configure_logging()
 logger = logging.getLogger("owl_app")
 
 # ---------------------------------------------------------------------------
@@ -125,10 +131,19 @@ class OwlWatcherApp:
         # -- Main window ------------------------------------------------------
         self._window = MainWindow()
 
+        # -- Sound manager ----------------------------------------------------
+        self._sounds = SoundManager()
+
+        # -- Owl state machine ------------------------------------------------
+        self._state_machine = OwlStateMachine()
+        self._state_machine.state_changed.connect(self._window._owl.set_state)
+        self._state_machine.state_changed.connect(self._on_state_changed)
+
         # -- System tray icon -------------------------------------------------
         self._tray: OwlTrayIcon | None = None
         if not args.no_tray:
             self._tray = OwlTrayIcon(self._window)
+            self._state_machine.state_changed.connect(self._tray.set_state)
 
         # -- Watcher thread ---------------------------------------------------
         self._watcher = WatcherThread()
@@ -136,6 +151,9 @@ class OwlWatcherApp:
         # -- Wire signals -----------------------------------------------------
         self._connect_watcher(self._watcher)
         self._connect_tray()
+
+        # Sound toggle from UI
+        self._window.sound_toggled.connect(self._on_sound_toggled)
 
     # -- signal wiring --------------------------------------------------------
 
@@ -151,12 +169,24 @@ class OwlWatcherApp:
         watcher.stopped_watching.connect(window.watch_stopped.emit)
         watcher.error_occurred.connect(self._on_watcher_error)
 
+        # Watcher -> State machine
+        watcher.started_watching.connect(
+            self._state_machine.command_start_watching
+        )
+        watcher.stopped_watching.connect(
+            self._state_machine.command_stop_watching
+        )
+        watcher.file_event.connect(
+            lambda _evt: self._state_machine.command_file_event()
+        )
+        watcher.security_alert.connect(self._on_security_alert_state)
+
         if tray is not None:
             watcher.started_watching.connect(lambda: tray.set_watching(True))
             watcher.stopped_watching.connect(lambda: tray.set_watching(False))
-            watcher.started_watching.connect(lambda: tray.set_state("alert"))
-            watcher.stopped_watching.connect(lambda: tray.set_state("idle"))
-            watcher.file_event.connect(lambda _evt: tray.increment_event_count())
+            watcher.file_event.connect(
+                lambda evt: tray.increment_event_count(evt.get("path", ""))
+            )
             watcher.security_alert.connect(self._on_security_alert_tray)
 
     def _connect_tray(self) -> None:
@@ -218,8 +248,43 @@ class OwlWatcherApp:
     def _on_watcher_error(self, message: str) -> None:
         """Handle watcher thread errors."""
         logger.error("Watcher error: %s", message)
-        self._window._owl.set_state("alarm")
+        self._state_machine.command_security_alert("CRITICAL")
         self._window._owl.say(f"Error: {message}", 6000)
+
+    # State -> sound name mapping
+    _STATE_SOUNDS: dict[str, str] = {
+        "waking": "startup",
+        "alert": "alert",
+        "alarm": "alarm",
+        "proud": "allclear",
+    }
+
+    def _on_state_changed(self, state: str) -> None:
+        """Show an ambient speech bubble and play sounds on state change."""
+        # Play state-specific sound
+        sound_name = self._STATE_SOUNDS.get(state)
+        if sound_name:
+            self._sounds.play(sound_name)
+
+        # Skip speech for rapid transitions (waking auto-goes to scanning)
+        if state in ("waking",):
+            return
+        msg = get_message(state)
+        if msg:
+            self._window._owl.say(msg)
+
+    def _on_sound_toggled(self, enabled: bool) -> None:
+        """Handle the sound toggle checkbox in the UI."""
+        self._sounds.enabled = enabled
+
+    def _on_security_alert_state(self, alert: dict[str, Any]) -> None:
+        """Route security alerts through the state machine and show message."""
+        level = alert.get("level", "INFO")
+        detail = alert.get("message", "")
+        self._state_machine.command_security_alert(level)
+        msg = get_alert_message(level, detail)
+        if msg:
+            self._window._owl.say(msg, 8000 if level == "CRITICAL" else 5000)
 
     def _on_security_alert_tray(self, alert: dict[str, Any]) -> None:
         """Show a tray balloon notification for security alerts."""
@@ -234,9 +299,7 @@ class OwlWatcherApp:
         }
         icon_type = icon_map.get(level, "info")
         self._tray.notify(f"OwlWatcher [{level}]", message, icon_type)
-
-        if level == "CRITICAL":
-            self._tray.set_state("alarm")
+        self._tray.add_unacked_alert(level)
 
     def _quit(self) -> None:
         """Gracefully shut down the application."""
@@ -260,12 +323,25 @@ class OwlWatcherApp:
         if self._tray is not None:
             self._tray.show()
 
-        # Show or hide the main window
-        if self._args.visible or self._args.no_tray:
-            self._window.show()
+        settings = QSettings(QSETTINGS_ORG, QSETTINGS_APP)
+        first_run = not settings.value("firstRunComplete_v2", False, type=bool)
 
-        # Auto-start the watcher
-        self._watcher.start()
+        if first_run:
+            # First run: show window, start owl sleeping, don't auto-start watcher
+            self._window.show()
+            self._state_machine.command_go_to_sleep()
+            self._window._owl.say(
+                "Welcome to OwlWatcher! Click Start to begin watching your files.",
+                8000,
+            )
+            settings.setValue("firstRunComplete_v2", True)
+            logger.info("First-run experience shown.")
+        else:
+            # Normal launch
+            if self._args.visible or self._args.no_tray:
+                self._window.show()
+            # Auto-start the watcher
+            self._watcher.start()
 
         # Ensure clean shutdown on app exit
         app = QApplication.instance()

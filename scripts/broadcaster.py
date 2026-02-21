@@ -1,3 +1,8 @@
+# broadcaster.py
+# Developer: Marcus Daley
+# Date: 2026-02-20
+# Purpose: Bidirectional sync engine managing main_cloud.json registry with rollback support
+
 """
 Broadcaster and sync engine for the Claude Skills system.
 
@@ -17,6 +22,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from log_config import configure_logging
 from sync_utils import (
     BASE_DIR,
     CLOUD_PATH,
@@ -34,11 +40,7 @@ from sync_utils import (
 # ---------------------------------------------------------------------------
 # Logging
 # ---------------------------------------------------------------------------
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s - %(message)s",
-    datefmt="%Y-%m-%dT%H:%M:%S",
-)
+configure_logging()
 logger = logging.getLogger("broadcaster")
 
 # ---------------------------------------------------------------------------

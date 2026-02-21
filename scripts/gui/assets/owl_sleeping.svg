@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Owl Sleeping: eyes fully closed, relaxed posture, zzz -->
+
+  <!-- Body - relaxed, slightly wider and lower -->
+  <ellipse cx="64" cy="74" rx="35" ry="36" fill="#1B2838"/>
+
+  <!-- Belly patch -->
+  <ellipse cx="64" cy="84" rx="20" ry="20" fill="#2A3F54"/>
+
+  <!-- Belly feather marks - smooth, relaxed -->
+  <path d="M54 74 Q64 78 74 74" stroke="#3A5068" stroke-width="1.2" fill="none"/>
+  <path d="M52 82 Q64 86 76 82" stroke="#3A5068" stroke-width="1.2" fill="none"/>
+  <path d="M54 90 Q64 94 74 90" stroke="#3A5068" stroke-width="1.2" fill="none"/>
+
+  <!-- Head - lowered, resting -->
+  <ellipse cx="64" cy="42" rx="28" ry="22" fill="#1B2838"/>
+
+  <!-- Ear tufts - droopy, relaxed -->
+  <polygon points="40,26 38,12 48,24" fill="#1B2838"/>
+  <polygon points="88,26 90,12 80,24" fill="#1B2838"/>
+
+  <!-- Facial disc - left -->
+  <ellipse cx="50" cy="42" rx="14" ry="12" fill="#2A3F54"/>
+  <!-- Facial disc - right -->
+  <ellipse cx="78" cy="42" rx="14" ry="12" fill="#2A3F54"/>
+
+  <!-- Eyes - fully closed, gentle arcs -->
+  <path d="M42 42 Q50 46 58 42" stroke="#F5E6C8" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M70 42 Q78 46 86 42" stroke="#F5E6C8" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+  <!-- Eyelid top arcs -->
+  <path d="M42 42 Q50 38 58 42" fill="#1B2838"/>
+  <path d="M70 42 Q78 38 86 42" fill="#1B2838"/>
+
+  <!-- Beak - closed, peaceful -->
+  <polygon points="64,47 60,52 68,52" fill="#C9A94E"/>
+
+  <!-- Wings tucked tightly -->
+  <path d="M30 60 Q26 74 32 92 Q34 86 35 78 Q32 70 30 60Z" fill="#243446"/>
+  <path d="M98 60 Q102 74 96 92 Q94 86 93 78 Q96 70 98 60Z" fill="#243446"/>
+
+  <!-- Feet -->
+  <g fill="#C9A94E">
+    <path d="M50 108 L46 114 L50 112 L54 114 L50 108Z"/>
+    <path d="M78 108 L74 114 L78 112 L82 114 L78 108Z"/>
+  </g>
+
+  <!-- Branch -->
+  <rect x="16" y="108" width="96" height="6" rx="3" fill="#5D4037"/>
+  <rect x="12" y="109" width="8" height="4" rx="2" fill="#4E342E"/>
+  <rect x="108" y="109" width="8" height="4" rx="2" fill="#4E342E"/>
+
+  <!-- Zzz text -->
+  <text x="92" y="24" fill="#C9A94E" font-family="sans-serif" font-size="10" font-weight="bold" opacity="0.7">z</text>
+  <text x="98" y="16" fill="#C9A94E" font-family="sans-serif" font-size="12" font-weight="bold" opacity="0.5">z</text>
+  <text x="106" y="8" fill="#C9A94E" font-family="sans-serif" font-size="14" font-weight="bold" opacity="0.3">z</text>
+</svg>

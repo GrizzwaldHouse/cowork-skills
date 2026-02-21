@@ -1,3 +1,8 @@
+# sync_utils.py
+# Developer: Marcus Daley
+# Date: 2026-02-20
+# Purpose: Crash-safe file operations with atomic writes and advisory locking to prevent sync corruption
+
 """
 Shared utilities for the Claude Skills sync system.
 
@@ -87,8 +92,17 @@ def relative_skill_path(full_path: Path) -> str:
 
 
 def resolve_from_base(relative: str) -> Path:
-    """Resolve a relative POSIX path back to an absolute Path."""
-    return BASE_DIR / relative
+    """Resolve a relative POSIX path back to an absolute Path.
+
+    Raises :class:`ValueError` if the resolved path escapes *BASE_DIR*
+    (e.g. via ``../`` traversal).
+    """
+    resolved = (BASE_DIR / relative).resolve()
+    if not resolved.is_relative_to(BASE_DIR.resolve()):
+        raise ValueError(
+            f"Path traversal blocked: {relative!r} resolves outside BASE_DIR"
+        )
+    return resolved
 
 
 # ---------------------------------------------------------------------------

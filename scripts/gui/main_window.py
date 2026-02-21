@@ -1,3 +1,8 @@
+# main_window.py
+# Developer: Marcus Daley
+# Date: 2026-02-20
+# Purpose: Primary UI dashboard integrating owl mascot, event log, and security monitoring
+
 """
 Main dashboard window for the OwlWatcher file security monitor.
 
@@ -15,7 +20,6 @@ Usage::
 
 from __future__ import annotations
 
-import json
 import logging
 from datetime import datetime, timezone
 from pathlib import Path
@@ -32,6 +36,7 @@ from PyQt6.QtGui import QAction, QCloseEvent, QColor, QFileSystemModel, QIcon
 from PyQt6.QtWidgets import (
     QAbstractItemView,
     QApplication,
+    QCheckBox,
     QComboBox,
     QHBoxLayout,
     QHeaderView,
@@ -51,8 +56,49 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from gui.paths import ASSETS_DIR, BASE_DIR, CONFIG_PATH
+from config_manager import load_config, watched_paths
+from gui.constants import (
+    DARK_PANEL,
+    EVENT_MAX_ROWS,
+    EVENT_TYPE_LABELS,
+    FILE_TYPE_GLYPHS,
+    FONT_FAMILY,
+    GOLD,
+    HEADER_BG,
+    HEADER_HEIGHT,
+    LEFT_BORDER_CRITICAL,
+    LEFT_BORDER_INFO,
+    LEFT_BORDER_WARNING,
+    LEFT_BORDER_WIDTH,
+    MID_PANEL,
+    MIN_WINDOW_HEIGHT,
+    MIN_WINDOW_WIDTH,
+    MONO_FONT,
+    NAVY,
+    OWL_HEADER_SIZE,
+    PARCHMENT,
+    QSETTINGS_APP,
+    QSETTINGS_ORG,
+    PRESSED_BTN_COLOR,
+    ROW_BG_CRITICAL,
+    ROW_BG_INFO,
+    ROW_BG_WARNING,
+    ROW_HIGHLIGHT_COLOR,
+    ROW_HIGHLIGHT_MS,
+    STOP_BTN_COLOR,
+    TEAL,
+    THREAT_CRITICAL_MULTIPLIER,
+    THREAT_WARNING_MULTIPLIER,
+    TEXT_CRITICAL,
+    TEXT_INFO,
+    TEXT_WARNING,
+    TIME_CLUSTER_GAP_SECONDS,
+    UPTIME_TICK_MS,
+)
+from gui.paths import ASSETS_DIR, BASE_DIR
+from gui.widgets.ambient_widget import AmbientBackgroundWidget
 from gui.widgets.owl_widget import OwlWidget
+from gui.widgets.stats_strip import StatsStrip
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -65,208 +111,193 @@ TRAY_ICON_PATH = ASSETS_DIR / "owl_tray.svg"
 logger = logging.getLogger("main_window")
 
 # ---------------------------------------------------------------------------
-# Theme constants
-# ---------------------------------------------------------------------------
-_NAVY = "#1B2838"
-_GOLD = "#C9A94E"
-_PARCHMENT = "#F5E6C8"
-_TEAL = "#1A3C40"
-_DARK_PANEL = "#0D1117"
-_MID_PANEL = "#162230"
-_HEADER_BG = "#142030"
-
-_EVENT_MAX_ROWS = 1000
-
-# ---------------------------------------------------------------------------
 # QSS Stylesheet
 # ---------------------------------------------------------------------------
 _STYLESHEET = f"""
 QMainWindow {{
-    background-color: {_NAVY};
+    background-color: {NAVY};
 }}
 QWidget#centralWidget {{
-    background-color: {_NAVY};
+    background-color: {NAVY};
 }}
 QSplitter::handle {{
-    background-color: {_TEAL};
+    background-color: {TEAL};
     width: 3px;
 }}
 QTreeView {{
-    background-color: {_DARK_PANEL};
-    color: {_PARCHMENT};
-    border: 1px solid {_TEAL};
-    font-family: 'Segoe UI';
+    background-color: {DARK_PANEL};
+    color: {PARCHMENT};
+    border: 1px solid {TEAL};
+    font-family: '{FONT_FAMILY}';
     font-size: 12px;
-    selection-background-color: {_TEAL};
-    selection-color: {_GOLD};
+    selection-background-color: {TEAL};
+    selection-color: {GOLD};
 }}
 QTreeView::item:hover {{
-    background-color: {_MID_PANEL};
+    background-color: {MID_PANEL};
 }}
 QHeaderView::section {{
-    background-color: {_HEADER_BG};
-    color: {_GOLD};
-    border: 1px solid {_TEAL};
+    background-color: {HEADER_BG};
+    color: {GOLD};
+    border: 1px solid {TEAL};
     padding: 4px 8px;
-    font-family: 'Segoe UI';
+    font-family: '{FONT_FAMILY}';
     font-size: 11px;
     font-weight: bold;
 }}
 QTableWidget {{
-    background-color: {_DARK_PANEL};
-    color: {_PARCHMENT};
-    border: 1px solid {_TEAL};
-    gridline-color: {_TEAL};
-    font-family: 'Consolas', 'Cascadia Code', monospace;
+    background-color: {DARK_PANEL};
+    color: {PARCHMENT};
+    border: 1px solid {TEAL};
+    gridline-color: {TEAL};
+    font-family: {MONO_FONT};
     font-size: 11px;
-    selection-background-color: {_TEAL};
-    selection-color: {_GOLD};
+    selection-background-color: {TEAL};
+    selection-color: {GOLD};
 }}
 QTableWidget::item {{
     padding: 2px 6px;
 }}
 QPushButton {{
-    background-color: {_TEAL};
-    color: {_PARCHMENT};
-    border: 1px solid {_GOLD};
+    background-color: {TEAL};
+    color: {PARCHMENT};
+    border: 1px solid {GOLD};
     border-radius: 4px;
     padding: 6px 16px;
-    font-family: 'Segoe UI';
+    font-family: '{FONT_FAMILY}';
     font-size: 12px;
     font-weight: bold;
 }}
 QPushButton:hover {{
-    background-color: {_GOLD};
-    color: {_NAVY};
+    background-color: {GOLD};
+    color: {NAVY};
 }}
 QPushButton:pressed {{
-    background-color: #A8892F;
-    color: {_NAVY};
+    background-color: {PRESSED_BTN_COLOR};
+    color: {NAVY};
 }}
 QPushButton#stopBtn {{
-    border-color: #E74C3C;
+    border-color: {STOP_BTN_COLOR};
 }}
 QPushButton#stopBtn:hover {{
-    background-color: #E74C3C;
+    background-color: {STOP_BTN_COLOR};
     color: white;
 }}
 QLineEdit {{
-    background-color: {_MID_PANEL};
-    color: {_PARCHMENT};
-    border: 1px solid {_TEAL};
+    background-color: {MID_PANEL};
+    color: {PARCHMENT};
+    border: 1px solid {TEAL};
     border-radius: 3px;
     padding: 4px 8px;
-    font-family: 'Segoe UI';
+    font-family: '{FONT_FAMILY}';
     font-size: 11px;
 }}
 QLineEdit:focus {{
-    border-color: {_GOLD};
+    border-color: {GOLD};
 }}
 QComboBox {{
-    background-color: {_MID_PANEL};
-    color: {_PARCHMENT};
-    border: 1px solid {_TEAL};
+    background-color: {MID_PANEL};
+    color: {PARCHMENT};
+    border: 1px solid {TEAL};
     border-radius: 3px;
     padding: 4px 8px;
-    font-family: 'Segoe UI';
+    font-family: '{FONT_FAMILY}';
     font-size: 11px;
 }}
 QComboBox:hover {{
-    border-color: {_GOLD};
+    border-color: {GOLD};
 }}
 QComboBox QAbstractItemView {{
-    background-color: {_DARK_PANEL};
-    color: {_PARCHMENT};
-    selection-background-color: {_TEAL};
-    selection-color: {_GOLD};
+    background-color: {DARK_PANEL};
+    color: {PARCHMENT};
+    selection-background-color: {TEAL};
+    selection-color: {GOLD};
 }}
 QComboBox::drop-down {{
     border: none;
     width: 20px;
 }}
 QStatusBar {{
-    background-color: {_HEADER_BG};
-    color: {_PARCHMENT};
-    font-family: 'Segoe UI';
+    background-color: {HEADER_BG};
+    color: {PARCHMENT};
+    font-family: '{FONT_FAMILY}';
     font-size: 11px;
-    border-top: 1px solid {_TEAL};
+    border-top: 1px solid {TEAL};
 }}
 QLabel {{
-    color: {_PARCHMENT};
-    font-family: 'Segoe UI';
+    color: {PARCHMENT};
+    font-family: '{FONT_FAMILY}';
 }}
 QMenu {{
-    background-color: {_DARK_PANEL};
-    color: {_PARCHMENT};
-    border: 1px solid {_TEAL};
+    background-color: {DARK_PANEL};
+    color: {PARCHMENT};
+    border: 1px solid {TEAL};
 }}
 QMenu::item:selected {{
-    background-color: {_TEAL};
-    color: {_GOLD};
+    background-color: {TEAL};
+    color: {GOLD};
 }}
 QScrollBar:vertical {{
-    background: {_DARK_PANEL};
+    background: {DARK_PANEL};
     width: 10px;
     border: none;
 }}
 QScrollBar::handle:vertical {{
-    background: {_TEAL};
+    background: {TEAL};
     min-height: 30px;
     border-radius: 5px;
 }}
 QScrollBar::handle:vertical:hover {{
-    background: {_GOLD};
+    background: {GOLD};
 }}
 QScrollBar:horizontal {{
-    background: {_DARK_PANEL};
+    background: {DARK_PANEL};
     height: 10px;
     border: none;
 }}
 QScrollBar::handle:horizontal {{
-    background: {_TEAL};
+    background: {TEAL};
     min-width: 30px;
     border-radius: 5px;
 }}
 QScrollBar::handle:horizontal:hover {{
-    background: {_GOLD};
+    background: {GOLD};
 }}
 QScrollBar::add-line, QScrollBar::sub-line {{
     height: 0px;
     width: 0px;
 }}
 QToolTip {{
-    background-color: {_HEADER_BG};
-    color: {_PARCHMENT};
-    border: 1px solid {_GOLD};
+    background-color: {HEADER_BG};
+    color: {PARCHMENT};
+    border: 1px solid {GOLD};
     padding: 4px;
-    font-family: 'Segoe UI';
+    font-family: '{FONT_FAMILY}';
 }}
 """
 
 # ---------------------------------------------------------------------------
-# Row colours for security levels
+# Row colours for security levels (QColor from constants)
 # ---------------------------------------------------------------------------
 _ROW_COLORS: dict[str, QColor] = {
-    "INFO": QColor(_DARK_PANEL),
-    "WARNING": QColor("#332D00"),
-    "CRITICAL": QColor("#3D1010"),
+    "INFO": QColor(ROW_BG_INFO),
+    "WARNING": QColor(ROW_BG_WARNING),
+    "CRITICAL": QColor(ROW_BG_CRITICAL),
 }
 
 _LEVEL_TEXT_COLORS: dict[str, QColor] = {
-    "INFO": QColor(_PARCHMENT),
-    "WARNING": QColor("#FFD54F"),
-    "CRITICAL": QColor("#FF6B6B"),
+    "INFO": QColor(TEXT_INFO),
+    "WARNING": QColor(TEXT_WARNING),
+    "CRITICAL": QColor(TEXT_CRITICAL),
 }
 
-# ---------------------------------------------------------------------------
-# Event type icons (text-based for simplicity)
-# ---------------------------------------------------------------------------
-_EVENT_TYPE_LABELS: dict[str, str] = {
-    "created": "[NEW]",
-    "modified": "[MOD]",
-    "deleted": "[DEL]",
-    "moved": "[MOV]",
+_LEFT_BORDER_COLORS: dict[str, str] = {
+    "INFO": LEFT_BORDER_INFO,
+    "WARNING": LEFT_BORDER_WARNING,
+    "CRITICAL": LEFT_BORDER_CRITICAL,
 }
+
+_HIGHLIGHT_BG = QColor(ROW_HIGHLIGHT_COLOR)
 
 
 # ---------------------------------------------------------------------------
@@ -291,6 +322,7 @@ class MainWindow(QMainWindow):
     security_alert_received = pyqtSignal(dict)
     watch_started = pyqtSignal()
     watch_stopped = pyqtSignal()
+    sound_toggled = pyqtSignal(bool)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -299,13 +331,14 @@ class MainWindow(QMainWindow):
         self._event_count = 0
         self._alert_count = 0
         self._start_time: datetime | None = None
+        self._last_event_dt: datetime | None = None
         self._minimize_to_tray_asked = False
         self._minimize_to_tray = True
 
-        self._settings = QSettings("ClaudeSkills", "OwlWatcher")
+        self._settings = QSettings(QSETTINGS_ORG, QSETTINGS_APP)
 
         self.setWindowTitle("OwlWatcher - File Security Monitor")
-        self.setMinimumSize(900, 600)
+        self.setMinimumSize(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)
 
         self.setStyleSheet(_STYLESHEET)
 
@@ -315,7 +348,7 @@ class MainWindow(QMainWindow):
 
         # Uptime timer (updates status bar every second)
         self._uptime_timer = QTimer(self)
-        self._uptime_timer.setInterval(1000)
+        self._uptime_timer.setInterval(UPTIME_TICK_MS)
         self._uptime_timer.timeout.connect(self._update_status_bar)
 
     # =====================================================================
@@ -335,6 +368,10 @@ class MainWindow(QMainWindow):
         # --- Header bar ---
         root_layout.addWidget(self._build_header())
 
+        # --- Stats strip ---
+        self._stats_strip = StatsStrip()
+        root_layout.addWidget(self._stats_strip)
+
         # --- Main area (splitter) ---
         self._splitter = QSplitter(Qt.Orientation.Horizontal)
         self._splitter.addWidget(self._build_folder_tree())
@@ -352,29 +389,28 @@ class MainWindow(QMainWindow):
     # -- Header -----------------------------------------------------------
 
     def _build_header(self) -> QWidget:
-        """Build the header bar with owl, title, and control buttons."""
-        header = QWidget()
-        header.setStyleSheet(f"background-color: {_HEADER_BG};")
-        header.setFixedHeight(80)
+        """Build the header bar with ambient night-sky background."""
+        header = AmbientBackgroundWidget()
+        header.setFixedHeight(HEADER_HEIGHT)
 
         layout = QHBoxLayout(header)
         layout.setContentsMargins(12, 4, 12, 4)
 
         # Owl widget (small version in header)
-        self._owl = OwlWidget(owl_size=56)
+        self._owl = OwlWidget(owl_size=OWL_HEADER_SIZE)
         layout.addWidget(self._owl)
 
         # Title
         title = QLabel("OwlWatcher")
         title.setStyleSheet(
-            f"color: {_GOLD}; font-size: 22px; font-weight: bold; "
-            f"font-family: 'Segoe UI';"
+            f"color: {GOLD}; font-size: 22px; font-weight: bold; "
+            f"font-family: '{FONT_FAMILY}';"
         )
         layout.addWidget(title)
 
         subtitle = QLabel("File Security Monitor")
         subtitle.setStyleSheet(
-            f"color: {_PARCHMENT}; font-size: 12px; font-family: 'Segoe UI';"
+            f"color: {PARCHMENT}; font-size: 12px; font-family: '{FONT_FAMILY}';"
         )
         layout.addWidget(subtitle)
 
@@ -396,6 +432,17 @@ class MainWindow(QMainWindow):
         self._export_btn.setFixedWidth(120)
         layout.addWidget(self._export_btn)
 
+        # Sound toggle
+        self._sound_check = QCheckBox("Sound")
+        self._sound_check.setStyleSheet(
+            f"color: {PARCHMENT}; font-size: 10px; font-family: '{FONT_FAMILY}';"
+        )
+        self._sound_check.setChecked(
+            self._settings.value("soundEnabled", False, type=bool),
+        )
+        self._sound_check.toggled.connect(self.sound_toggled.emit)
+        layout.addWidget(self._sound_check)
+
         return header
 
     # -- Folder tree ------------------------------------------------------
@@ -409,7 +456,7 @@ class MainWindow(QMainWindow):
 
         panel_label = QLabel("Watched Folders")
         panel_label.setStyleSheet(
-            f"color: {_GOLD}; font-size: 12px; font-weight: bold; padding: 4px;"
+            f"color: {GOLD}; font-size: 12px; font-weight: bold; padding: 4px;"
         )
         layout.addWidget(panel_label)
 
@@ -457,7 +504,7 @@ class MainWindow(QMainWindow):
 
         filter_label = QLabel("Events")
         filter_label.setStyleSheet(
-            f"color: {_GOLD}; font-size: 12px; font-weight: bold; padding: 4px;"
+            f"color: {GOLD}; font-size: 12px; font-weight: bold; padding: 4px;"
         )
         filter_bar.addWidget(filter_label)
 
@@ -482,10 +529,10 @@ class MainWindow(QMainWindow):
 
         layout.addLayout(filter_bar)
 
-        # Event table
-        self._event_table = QTableWidget(0, 5)
+        # Event table (6 columns: severity border, time, type, path, details, level)
+        self._event_table = QTableWidget(0, 6)
         self._event_table.setHorizontalHeaderLabels(
-            ["Time", "Type", "Path", "Details", "Level"],
+            ["", "Time", "Type", "Path", "Details", "Level"],
         )
         self._event_table.setSelectionBehavior(
             QAbstractItemView.SelectionBehavior.SelectRows,
@@ -496,11 +543,13 @@ class MainWindow(QMainWindow):
         self._event_table.verticalHeader().setVisible(False)
 
         header = self._event_table.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
+        header.resizeSection(0, LEFT_BORDER_WIDTH)
         header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
-        header.setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)
         header.setSectionResizeMode(4, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(5, QHeaderView.ResizeMode.ResizeToContents)
 
         layout.addWidget(self._event_table, stretch=1)
         return panel
@@ -592,8 +641,7 @@ class MainWindow(QMainWindow):
         self._status_watch_label.setText(
             f"Watching {len(self._watched_paths)} dir(s)",
         )
-        self._owl.set_state("alert")
-        self._owl.say("Watching your files...", 3000)
+        # Owl state is now managed by OwlStateMachine in app.py
         self._uptime_timer.start()
 
     def _on_watch_stopped(self) -> None:
@@ -602,8 +650,7 @@ class MainWindow(QMainWindow):
         self._start_btn.setEnabled(True)
         self._stop_btn.setEnabled(False)
         self._status_watch_label.setText("Stopped")
-        self._owl.set_state("idle")
-        self._owl.say("Watcher stopped.", 3000)
+        # Owl state is now managed by OwlStateMachine in app.py
         self._uptime_timer.stop()
 
     def _on_file_event(self, event: dict[str, Any]) -> None:
@@ -619,6 +666,11 @@ class MainWindow(QMainWindow):
         self._add_event_row(event)
         self._status_events_label.setText(f"{self._event_count} events")
 
+        # Feed stats strip
+        file_path = event.get("path", "")
+        ext = Path(file_path).suffix.lower() if file_path else ""
+        self._stats_strip.record_event(ext)
+
     def _on_security_alert(self, alert: dict[str, Any]) -> None:
         """Handle a security alert from the security engine.
 
@@ -629,7 +681,7 @@ class MainWindow(QMainWindow):
         """
         self._alert_count += 1
         self._status_alerts_label.setText(f"{self._alert_count} alerts")
-        self._status_alerts_label.setStyleSheet("color: #FF6B6B;")
+        self._status_alerts_label.setStyleSheet(f"color: {TEXT_CRITICAL};")
 
         level = alert.get("level", "WARNING")
         message = alert.get("message", "Unknown alert")
@@ -644,21 +696,19 @@ class MainWindow(QMainWindow):
         }
         self._add_event_row(event_row)
 
-        # Update owl state based on severity
-        if level == "CRITICAL":
-            self._owl.set_state("alarm")
-            self._owl.say(message, 8000)
-            # Notify via tray when window is hidden
-            if not self.isVisible() and self._tray_icon.isVisible():
-                self._tray_icon.showMessage(
-                    "OwlWatcher Security Alert",
-                    message,
-                    QSystemTrayIcon.MessageIcon.Critical,
-                    5000,
-                )
-        else:
-            self._owl.set_state("alert")
-            self._owl.say(message, 5000)
+        # Feed threat score to stats strip (weighted by severity for visual urgency)
+        threat_score = min(100, self._alert_count * THREAT_CRITICAL_MULTIPLIER if level == "CRITICAL" else self._alert_count * THREAT_WARNING_MULTIPLIER)
+        self._stats_strip.set_threat_score(threat_score)
+
+        # Owl state transitions are handled by OwlStateMachine in app.py.
+        # Notify via tray when window is hidden.
+        if level == "CRITICAL" and not self.isVisible() and self._tray_icon.isVisible():
+            self._tray_icon.showMessage(
+                "OwlWatcher Security Alert",
+                message,
+                QSystemTrayIcon.MessageIcon.Critical,
+                5000,
+            )
 
     def _on_export_audit(self) -> None:
         """Handle Export Audit button click."""
@@ -681,37 +731,61 @@ class MainWindow(QMainWindow):
     def _add_event_row(self, event: dict[str, Any]) -> None:
         """Add one row to the event table.
 
-        Caps the table at ``_EVENT_MAX_ROWS`` rows by removing the oldest.
+        Includes: severity left-border, file type glyphs, time cluster
+        separators, and brief highlight animation on insert.
+        Caps the table at ``EVENT_MAX_ROWS`` rows by removing the oldest.
         """
         table = self._event_table
         row_count = table.rowCount()
 
         # Cap at max rows
-        if row_count >= _EVENT_MAX_ROWS:
+        if row_count >= EVENT_MAX_ROWS:
             table.removeRow(0)
             row_count -= 1
 
-        row = row_count
-        table.insertRow(row)
-
-        # Parse fields
+        # Parse timestamp
         timestamp = event.get("timestamp", "")
+        event_dt: datetime | None = None
         if timestamp:
             try:
-                dt = datetime.fromisoformat(timestamp)
-                time_str = dt.strftime("%H:%M:%S")
+                event_dt = datetime.fromisoformat(timestamp)
+                time_str = event_dt.strftime("%H:%M:%S")
             except (ValueError, TypeError):
                 time_str = str(timestamp)
         else:
-            time_str = datetime.now(timezone.utc).strftime("%H:%M:%S")
+            event_dt = datetime.now(timezone.utc)
+            time_str = event_dt.strftime("%H:%M:%S")
 
+        # --- 3C: Time cluster separator ---
+        if self._last_event_dt is not None and event_dt is not None:
+            gap = (event_dt - self._last_event_dt).total_seconds()
+            if gap > TIME_CLUSTER_GAP_SECONDS:
+                self._insert_time_separator(table, gap)
+        self._last_event_dt = event_dt
+
+        # Parse fields
         event_type = event.get("event_type", "")
-        type_label = _EVENT_TYPE_LABELS.get(event_type, f"[{event_type.upper()}]")
         file_path = event.get("path", "")
         details = event.get("details", "")
         level = event.get("level", "INFO")
 
-        # Create items
+        # --- 3D: File type glyph ---
+        ext = Path(file_path).suffix.lower() if file_path else ""
+        glyph = FILE_TYPE_GLYPHS.get(ext, "")
+        type_label = EVENT_TYPE_LABELS.get(event_type, f"[{event_type.upper()}]")
+        if glyph:
+            type_label = f"{glyph} {type_label}"
+
+        row = table.rowCount()
+        table.insertRow(row)
+
+        # --- 3B: Color-coded left border (column 0) ---
+        border_item = QTableWidgetItem("")
+        border_color = QColor(_LEFT_BORDER_COLORS.get(level, LEFT_BORDER_INFO))
+        border_item.setBackground(border_color)
+        table.setItem(row, 0, border_item)
+
+        # Content columns (1-5)
         items = [
             QTableWidgetItem(time_str),
             QTableWidgetItem(type_label),
@@ -720,11 +794,12 @@ class MainWindow(QMainWindow):
             QTableWidgetItem(level),
         ]
 
-        # Apply row colouring
-        bg = _ROW_COLORS.get(level, _ROW_COLORS["INFO"])
+        # Row text color per severity
         fg = _LEVEL_TEXT_COLORS.get(level, _LEVEL_TEXT_COLORS["INFO"])
+        # Use dark background for all rows (border provides severity color)
+        bg = QColor(DARK_PANEL)
 
-        for col, item in enumerate(items):
+        for col, item in enumerate(items, start=1):
             item.setBackground(bg)
             item.setForeground(fg)
             table.setItem(row, col, item)
@@ -732,8 +807,47 @@ class MainWindow(QMainWindow):
         # Store raw event data for filtering
         items[0].setData(Qt.ItemDataRole.UserRole, event)
 
+        # --- 3A: Animated row highlight ---
+        self._highlight_row(table, row)
+
         # Auto-scroll to bottom
         table.scrollToBottom()
+
+    def _insert_time_separator(self, table: QTableWidget, gap: float) -> None:
+        """Insert a thin gold separator row indicating a time gap."""
+        row = table.rowCount()
+        table.insertRow(row)
+        table.setRowHeight(row, 16)
+
+        gap_text = f"-- {int(gap)}s gap --"
+        sep_bg = QColor(GOLD)
+        sep_fg = QColor(NAVY)
+
+        for col in range(table.columnCount()):
+            item = QTableWidgetItem(gap_text if col == 3 else "")
+            item.setBackground(sep_bg)
+            item.setForeground(sep_fg)
+            item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsSelectable)
+            table.setItem(row, col, item)
+
+    def _highlight_row(self, table: QTableWidget, row: int) -> None:
+        """Briefly highlight a new row then fade to normal background."""
+        # Apply highlight color to content columns
+        highlight = _HIGHLIGHT_BG
+        for col in range(1, table.columnCount()):
+            item = table.item(row, col)
+            if item is not None:
+                item.setBackground(highlight)
+
+        # Schedule fade back to normal after ROW_HIGHLIGHT_MS
+        def _fade_back() -> None:
+            normal_bg = QColor(DARK_PANEL)
+            for c in range(1, table.columnCount()):
+                it = table.item(row, c)
+                if it is not None:
+                    it.setBackground(normal_bg)
+
+        QTimer.singleShot(ROW_HIGHLIGHT_MS, _fade_back)
 
     def _apply_filters(self) -> None:
         """Show/hide event log rows based on current filter settings."""
@@ -742,7 +856,8 @@ class MainWindow(QMainWindow):
         type_filter = self._type_filter.currentText()
 
         for row in range(self._event_table.rowCount()):
-            time_item = self._event_table.item(row, 0)
+            # Time item is in column 1 (column 0 is the severity border)
+            time_item = self._event_table.item(row, 1)
             if time_item is None:
                 continue
 
@@ -841,13 +956,17 @@ class MainWindow(QMainWindow):
     # =====================================================================
 
     def _update_status_bar(self) -> None:
-        """Update the uptime display in the status bar."""
+        """Update the uptime display in the status bar and flame widget."""
         if self._start_time is None:
             return
         elapsed = datetime.now(timezone.utc) - self._start_time
-        hours, remainder = divmod(int(elapsed.total_seconds()), 3600)
+        total_seconds = elapsed.total_seconds()
+        hours, remainder = divmod(int(total_seconds), 3600)
         minutes, seconds = divmod(remainder, 60)
         self._status_uptime_label.setText(f"Uptime: {hours:02d}:{minutes:02d}:{seconds:02d}")
+
+        # Feed uptime to flame widget
+        self._stats_strip.set_uptime_hours(total_seconds / 3600.0)
 
     # =====================================================================
     # Config helpers
@@ -855,15 +974,7 @@ class MainWindow(QMainWindow):
 
     def _load_watched_paths(self) -> list[str]:
         """Load the list of watched directories from watch_config.json."""
-        if not CONFIG_PATH.exists():
-            return [str(BASE_DIR)]
-        try:
-            with CONFIG_PATH.open("r", encoding="utf-8") as fh:
-                config = json.load(fh)
-            return config.get("watched_paths", [str(BASE_DIR)])
-        except (json.JSONDecodeError, OSError) as exc:
-            logger.warning("Could not read config: %s", exc)
-            return [str(BASE_DIR)]
+        return watched_paths()
 
     # =====================================================================
     # Window state persistence
