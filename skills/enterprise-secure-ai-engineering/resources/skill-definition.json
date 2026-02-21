@@ -1,0 +1,110 @@
+{
+  "skill_name": "enterprise_secure_ai_engineering",
+  "version": "1.0.0",
+  "description": "Enforces enterprise-grade runtime, security, dependency, and AI-assisted coding guardrails aligned with industry best practices (OWASP, NIST SSDF, SLSA, SOC2-aligned SDLC).",
+  "activation": {
+    "auto_apply": true,
+    "applies_to": ["nextjs", "typescript", "react", "node", "fullstack", "ai-assisted"]
+  },
+  "directives": {
+    "runtime_framework": {
+      "supported_runtime_required": true,
+      "no_eol_versions": true,
+      "no_deprecated_frameworks": true,
+      "no_obsolete_language_features": true
+    },
+    "dependencies": {
+      "document_all_dependencies": true,
+      "require_version_lock": true,
+      "no_latest_tags": true,
+      "reject_abandoned_packages": true,
+      "block_known_critical_vulnerabilities": true,
+      "enable_dependabot": true
+    },
+    "secure_coding": {
+      "require_parameterized_queries": true,
+      "forbid_dynamic_sql": true,
+      "server_side_validation_required": true,
+      "no_custom_crypto": true,
+      "no_custom_auth_logic": true,
+      "no_sensitive_logs": true,
+      "hide_stack_traces_production": true,
+      "debug_disabled_in_prod": true
+    },
+    "configuration_secrets": {
+      "no_hardcoded_credentials": true,
+      "separate_config_from_logic": true,
+      "no_env_specific_paths": true,
+      "no_secrets_in_repo": true
+    },
+    "version_control_deployment": {
+      "approved_git_repo_only": true,
+      "no_direct_production_edits": true,
+      "environment_separation_required": true,
+      "reproducible_build_required": true
+    },
+    "vulnerability_management": {
+      "track_in_issue_system": true,
+      "assign_severity": true,
+      "block_release_if_critical": true,
+      "root_cause_analysis_required": true
+    },
+    "security_testing": {
+      "static_analysis_required": true,
+      "significant_findings_must_be_resolved": true,
+      "security_review_for_critical_apps": true,
+      "non_production_testing_required": true
+    },
+    "secure_design": {
+      "disable_unused_services": true,
+      "least_privilege_required": true,
+      "no_unnecessary_exposed_endpoints": true,
+      "no_client_side_validation_only": true
+    },
+    "ai_generated_code_governance": {
+      "review_ai_output_manually": true,
+      "flag_code_over_350_lines_for_review": true,
+      "detect_pseudocode_or_placeholders": true,
+      "scan_for_race_conditions": true,
+      "scan_for_edge_cases": true,
+      "scan_for_surface_attack_vectors": true
+    },
+    "web_app_protections": {
+      "require_rate_limiting": true,
+      "require_arcjet_or_equivalent": true,
+      "protect_nextjs_server_actions": true,
+      "require_proxy_middleware": true,
+      "validate_inputs_with_zod": true
+    },
+    "state_management": {
+      "recommended_client_state": "zustand",
+      "recommended_data_fetching": "tanstack-query",
+      "warn_on_suspense_latency_risk": true
+    },
+    "architecture_patterns": {
+      "folder_structure": {
+        "root": "main_app",
+        "auth": "authentication_pages",
+        "marketing": "landing_pages",
+        "resources": "legal_docs_blogs_backlog"
+      },
+      "require_atomic_design": true,
+      "prefer_drizzle_for_typesafe_db": true
+    }
+  },
+  "external_tools_recommended": [
+    "CodeRabbit",
+    "Dependabot",
+    "Arcjet",
+    "Zod",
+    "Drizzle ORM",
+    "Zustand",
+    "TanStack Query"
+  ],
+  "compliance_alignment": [
+    "OWASP Top 10",
+    "NIST Secure Software Development Framework (SSDF)",
+    "SLSA Supply Chain Levels",
+    "SOC2 Change Management Controls"
+  ]
+}
