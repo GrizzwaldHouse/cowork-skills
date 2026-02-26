@@ -1,143 +1,162 @@
-# Claude Skills System
+# Cowork Skills
 
-A modular system for creating, managing, and syncing Claude AI skill templates. Includes a file watcher, bidirectional sync engine, GitHub integration, and a themed WPF desktop UI with console fallback.
+Claude Code skills and task templates for professional design, document generation, coding standards, security engineering, desktop UI development, and game development.
 
-## Quick Start
+## Quick Setup
+
+Clone this repo on any machine, then run the setup script to install skills globally:
 
 ```bash
-# Install dependencies
-pip install -r scripts/requirements.txt
+# Clone
+git clone https://github.com/GrizzwaldHouse/cowork-skills.git
+cd cowork-skills
 
-# Preview current state
-python scripts/main.py --preview
+# Install (Linux/macOS/Git Bash)
+./setup.sh
 
-# Start the file watcher
-python scripts/main.py --watch
-
-# Run a sync cycle
-python scripts/main.py --sync --confirm
-
-# Push to GitHub
-python scripts/main.py --github --confirm
+# Install (Windows PowerShell)
+.\setup.ps1
 ```
 
-## Folder Structure
+Skills install to `~/.claude/skills/` and are available in **all** Claude Code sessions on that machine.
+
+To update: `git pull && ./setup.sh`
+
+## Skills
+
+### Background Skills (auto-loaded)
+
+These skills load automatically when Claude detects a relevant task. No invocation needed.
+
+#### design-system
+Foundational design principles applied automatically to all visual and document tasks.
+- Color theory (WCAG contrast, 60-30-10 rule, 6 ready-to-use palettes)
+- Typography (font pairings, type scale, readability rules)
+- Layout (8px grid, 12-column system, composition patterns)
+- Accessibility standards
+
+#### document-designer
+Professional formatting for Excel, Word, PowerPoint, and PDF generation.
+- Excel: sheet organization, data formatting, dashboard patterns
+- Word: memo, report, proposal, meeting minutes templates
+- PowerPoint: 6x6 rule, slide templates, content writing rules
+- PDF: layout standards, document type templates
+
+#### universal-coding-standards
+Non-negotiable coding rules that apply to every project across all languages.
+- Access control and encapsulation (most restrictive access by default)
+- Initialization discipline (all defaults at construction, no magic numbers)
+- Event-driven communication (Observer pattern, never polling)
+- Dependency management and comment standards
+- Language-specific guidance for C++, C#, Python, TypeScript, Rust, Java, Go, React
+
+#### architecture-patterns
+Design patterns, file organization, and UI architecture standards.
+- Six core patterns: Observer, composition, interface-driven, data-driven, repository, separation of concerns
+- UI architecture rules (MVC/MVVM separation)
+- File organization conventions by project type
+- Language-specific implementations for each pattern
+
+#### dev-workflow
+Development workflow standards and session management.
+- Brainstorm-first methodology (research before code)
+- Build/tooling rules and testing philosophy
+- Version control conventions and logging standards
+- Systematic debugging methodology
+- Problem Tracker and Lessons Learned templates
+
+#### enterprise-secure-ai-engineering
+Enterprise-grade security guardrails aligned with OWASP, NIST SSDF, SLSA, and SOC2.
+- Runtime safety and dependency hygiene
+- Secure coding practices (parameterized queries, Zod validation, no custom crypto)
+- Web application protections (rate limiting, server action hardening)
+- AI-generated code governance (review thresholds, placeholder detection)
+
+### User-Invocable Skills
+
+These skills are triggered by typing the slash command in Claude Code.
+
+#### canva-designer (`/canva-designer`)
+Canva-specific prompt engineering for higher quality design generation.
+- Query templates for every design type (logo, presentation, poster, social media)
+- Platform dimensions reference (Instagram, LinkedIn, YouTube, print, etc.)
+- Quality checklist for pre-commit review
+
+#### desktop-ui-designer (`/desktop-ui-designer`)
+Design and implement modern desktop applications using PyQt6/PySide6.
+- Main windows, dialogs, custom widgets, themes, animations
+- Event-driven architecture with signals/slots
+- System tray integration and cross-platform compatibility
+- Minimal app template and requirements included
+
+#### pyqt6-ui-debugger (`/pyqt6-ui-debugger`)
+Systematic debugging for PyQt6 user interface issues.
+- Layout constraint analysis and size policy debugging
+- Widget visibility, clipping, and z-order troubleshooting
+- Signal/slot connection verification
+- Debug helpers and common issues checklist included
+
+#### python-code-reviewer (`/python-code-reviewer`)
+Automated Python code review against universal coding standards.
+- Severity-rated violation reports with line numbers
+- Checks access control, initialization, type hints, error handling
+- Identifies anti-patterns and security issues
+- Example files for access control, initialization, communication, and error handling
+
+## Task Templates
+
+Pre-built task checklists for common workflows:
+
+| Category | File | What's Included |
+|----------|------|-----------------|
+| App Development | `tasks/app-development/tasks.md` | Feature implementation, bug fixes, UI upgrades, API endpoints, deployment |
+| AI Workflows | `tasks/ai-workflows/tasks.md` | Canva generation, document creation, prompt engineering, agent safety review |
+| Game Development | `tasks/game-development/tasks.md` | Level design, Unreal Blueprints, AI agents, HUD/UI, multiplayer, optimization |
+
+## How It Works
+
+**Background skills** (`design-system`, `document-designer`, `universal-coding-standards`, `architecture-patterns`, `dev-workflow`, `enterprise-secure-ai-engineering`) load automatically whenever Claude detects a relevant task. You don't need to do anything.
+
+**User-invocable skills** (`canva-designer`, `desktop-ui-designer`, `pyqt6-ui-debugger`, `python-code-reviewer`) are triggered by typing the slash command in Claude Code:
+```
+/canva-designer
+/desktop-ui-designer
+/pyqt6-ui-debugger
+/python-code-reviewer
+```
+
+**Task templates** are reference checklists. Copy the relevant section into your project or reference them when planning work.
+
+## Structure
 
 ```
-C:/ClaudeSkills/
-  README.md                           # This file
-  Skill_Creator/                      # Meta-template for creating new skills
-    SKILL.md                          #   Canonical skill template
-    README.md                         #   How to create new skills
-  Example_Skills/                     # Pre-built skill definitions
-    frontend-ui-helper/               #   Front-end UI generation
-    backend-workflow-helper/           #   Back-end API and workflow help
-    game-dev-helper/                  #   UE5, Unity, Godot assistance
-    workflow-productivity/            #   Automation and scripting
-    documentation-blog-generator/     #   Docs and blog content generation
-    notion-figma-integration/         #   Notion/Figma bridge workflows
-  Blog_Automation_Prompt/             # Blog generation prompt template
-    prompt_template.md                #   Ready-to-use blog prompt
-    README.md
-  cloud/                              # Sync registry
-    main_cloud.json                   #   Skill metadata, hashes, timestamps
-  config/                             # Configuration
-    watch_config.json                 #   Watch paths and filters
-  scripts/                            # Python scripts
-    main.py                           #   CLI entry point
-    observer.py                       #   File watcher (watchdog)
-    broadcaster.py                    #   Sync engine
-    sync_utils.py                     #   Shared utilities (hashing, atomic writes, locking)
-    github_sync.py                    #   GitHub integration
-    config_manager.py                 #   Centralized config loading
-    log_config.py                     #   Centralized logging setup
-    watcher_core.py                   #   Shared filtering logic (transient files, ignored patterns)
-    ui_launcher.py                    #   WPF UI launcher
-    ui_console_fallback.py            #   Console fallback UI
-    requirements.txt                  #   Python dependencies
-    gui/                              #   Desktop GUI modules (PyQt6)
-      app.py                          #     Main GUI application orchestrator
-      main_window.py                  #     Primary dashboard window
-      owl_state_machine.py            #     8-state owl mascot FSM
-      security_engine.py              #     Threat detection and integrity checking
-      watcher_thread.py               #     Background file watcher thread
-      tray_icon.py                    #     System tray icon with badges
-      sound_manager.py                #     Sound effect playback
-      speech_messages.py              #     Randomized owl messages
-      generate_sounds.py              #     Procedural WAV generation
-      constants.py                    #     All magic numbers, colors, thresholds
-      paths.py                        #     Path constants (BASE_DIR, ASSETS_DIR)
-      widgets/                        #     Dashboard widgets
-        owl_widget.py                 #       Animated owl mascot
-        stats_strip.py                #       Composite stats bar
-        sparkline_widget.py           #       Event frequency chart
-        donut_widget.py               #       File type breakdown
-        gauge_widget.py               #       Threat score arc
-        flame_widget.py               #       Uptime intensity
-        ambient_widget.py             #       Night-sky background
-  UI_Templates/                       # WPF XAML templates
-    frontend-ui-template.xaml         #   Main skill manager window
-    progress-bar-template.xaml        #   Sync progress dialog
-  Installation_Workflow_Guide/        # Documentation
-    guide.md                          #   Full installation and usage guide
-  backups/                            # Timestamped file backups
-  logs/                               # Sync log files
-  dist/                               # Distribution packages
+cowork-skills/
+  skills/
+    design-system/                      # Color, typography, layout, accessibility
+    canva-designer/                     # Canva prompt engineering & quality review
+    document-designer/                  # Excel, Word, PPT, PDF best practices
+    universal-coding-standards/         # Access control, init, events, anti-patterns
+    architecture-patterns/              # Observer, composition, data-driven, repo pattern
+    dev-workflow/                       # Brainstorm-first, debugging, version control
+    enterprise-secure-ai-engineering/   # OWASP, NIST, SLSA, SOC2 guardrails
+    desktop-ui-designer/                # PyQt6/PySide6 desktop app patterns
+    pyqt6-ui-debugger/                  # PyQt6 layout & widget debugging
+    python-code-reviewer/               # Python standards compliance review
+  tasks/
+    app-development/      # Feature dev, bug fix, UI upgrade, API, deploy
+    ai-workflows/         # Design gen, doc creation, prompt eng, safety
+    game-development/     # Level design, Unreal, AI, HUD, multiplayer
+  setup.sh                # Linux/macOS/Git Bash installer
+  setup.ps1               # Windows PowerShell installer
 ```
 
-## Key Features
+## Multi-Machine Sync
 
-- **File Watcher**: Monitors skill directories for changes using watchdog
-- **Bidirectional Sync**: Updates cloud registry from disk and vice versa, with hash-based change detection
-- **GitHub Integration**: Commit, push, pull with auto-conflict resolution (skill files prefer local)
-- **Themed UI**: Submarine/Harry Potter themed WPF desktop UI with gold-on-navy color scheme
-- **Console Fallback**: Full-featured console UI with ANSI colors when WPF is not available
-- **Desktop Notifications**: Optional toast notifications via plyer on sync events
-- **Backup & Rollback**: Timestamped backups before overwrites, with CLI restore command
-- **Atomic Writes**: All file operations use temp-then-rename for crash safety
-- **File Locking**: Advisory locks prevent concurrent write corruption
+1. Push changes from any machine: `git add -A && git commit -m "update skills" && git push`
+2. Pull on other machine: `git pull && ./setup.sh`
 
-## Architecture
+That's it. Both machines stay in sync.
 
-### Core Principles (CLAUDE.md Standards)
+## License
 
-All code follows strict architectural standards:
-- **Configuration-Driven**: No hardcoded values. All constants in `scripts/gui/constants.py` and config loaded via `config_manager.py`
-- **Signal-Based Communication**: Qt signals for all inter-component messaging (no polling loops)
-- **Graceful Degradation**: Sound system works without QtMultimedia, security engine is optional
-- **Atomic Operations**: All file writes use temp-then-rename for crash safety
-- **Advisory Locking**: Prevents concurrent write corruption
-
-### Centralized Modules
-
-Refactored from duplicate implementations to single sources of truth:
-
-- **`config_manager.py`**: Loads `watch_config.json` with defaults. Used by observer, watcher_thread, and main.
-- **`log_config.py`**: Configures logging format once. Idempotent (safe to call multiple times).
-- **`watcher_core.py`**: Shared filtering logic (`is_transient()`, `matches_ignored()`, `should_process()`). Eliminates duplication between observer and watcher_thread.
-- **`gui/constants.py`**: All magic numbers, colors, thresholds. Extracted from 20+ files during refactoring.
-- **`gui/paths.py`**: Path constants (BASE_DIR, ASSETS_DIR) for all GUI modules.
-
-### OwlWatcher GUI (PyQt6)
-
-The desktop GUI is a themed file security monitor with an animated owl mascot:
-
-- **8-State FSM**: `SLEEPING → WAKING → SCANNING → CURIOUS/ALERT/ALARM/PROUD` with auto-return transitions
-- **Real-Time Monitoring**: Background QThread runs watchdog observer, emits Qt signals for events
-- **Threat Detection**: SHA-256 integrity baselines, burst detection, suspicious extension checks
-- **Dashboard Widgets**: Sparkline charts, donut breakdowns, arc gauges, flame uptime, ambient night-sky
-- **Sound Effects**: Procedurally generated WAV files (startup_hoot, alert_chirp, alarm_hoot, allclear_settle)
-- **Speech Bubbles**: Randomized owl messages for each state, with 5% humor variants
-
-## Requirements
-
-- Python 3.10+
-- Git 2.x+ (for GitHub sync)
-- PyQt6 6.x+ (for OwlWatcher GUI)
-- .NET Runtime 6.0+ (optional, for legacy WPF UI)
-
-## Documentation
-
-See [Installation_Workflow_Guide/guide.md](Installation_Workflow_Guide/guide.md) for detailed setup, configuration, and troubleshooting instructions.
-
-See [Skill_Creator/README.md](Skill_Creator/README.md) for how to create new skills.
+MIT

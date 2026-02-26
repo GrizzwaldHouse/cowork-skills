@@ -39,7 +39,8 @@ Write-Host "Skills installed to $SkillsTarget`:" -ForegroundColor Green
 Get-ChildItem -Path $SkillsTarget -Directory | ForEach-Object { Write-Host "  $($_.Name)" }
 Write-Host ""
 Write-Host "Done! Skills are now available in all Claude Code sessions." -ForegroundColor Green
-Write-Host "Background skills (design-system, document-designer) auto-load."
-Write-Host "User skills: type /canva-designer to invoke."
+Write-Host "Background skills (design-system, document-designer, universal-coding-standards,"
+Write-Host "  architecture-patterns, dev-workflow, enterprise-secure-ai-engineering) auto-load."
+Write-Host "User skills: /canva-designer, /desktop-ui-designer, /pyqt6-ui-debugger, /python-code-reviewer"
 Write-Host ""
 Write-Host "To update: git pull; .\setup.ps1" -ForegroundColor Cyan
