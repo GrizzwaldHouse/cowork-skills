@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" width="1920" height="1080">
+    <title>OwlWatcher Living Scene - Interactive Guardian Tree</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body, #root {
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            cursor: none;
+        }
+
+        /* LAYER 1: Living Background Image with Mouse Response */
+        .living-background {
+            position: fixed;
+            inset: 0;
+            background-image: url('file:///C:/Users/daley/Downloads/a0ddd4a6-8f74-4e0b-a696-e4209cf44170.png');
+            background-size: cover;
+            background-position: center;
+            transition: filter 1000ms ease, transform 100ms ease;
+            will-change: transform, filter;
+        }
+
+        /* Flashlight overlay that follows cursor */
+        .cursor-light {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.03;
+            transition: opacity 300ms ease;
+        }
+
+        /* LAYER 2: Interactive Hotspots */
+        .hotspot {
+            position: absolute;
+            background: transparent;
+            cursor: none;
+            transition: all 300ms ease;
+        }
+
+        .hotspot-glow {
+            position: absolute;
+            inset: -50%;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 700ms ease;
+            pointer-events: none;
+            mix-blend-mode: screen;
+        }
+
+        .hotspot:hover .hotspot-glow {
+            opacity: 0.6;
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+
+        .hotspot-label {
+            position: absolute;
+            bottom: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: white;
+            text-shadow: 0 0 8px rgba(0,0,0,0.9), 0 0 16px rgba(0,0,0,0.7);
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 500ms ease;
+            pointer-events: none;
+            letter-spacing: 0.05em;
+        }
+
+        .hotspot:hover .hotspot-label {
+            opacity: 1;
+        }
+
+        /* LAYER 3: CSS 3D Fallback Effects */
+        .firefly {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.6;
+            filter: blur(1px);
+            animation: float-firefly 15s ease-in-out infinite;
+        }
+
+        @keyframes float-firefly {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(30px, -40px); }
+            50% { transform: translate(-20px, -80px); }
+            75% { transform: translate(40px, -60px); }
+        }
+
+        .fog-layer {
+            position: absolute;
+            bottom: 0;
+            left: -10%;
+            width: 120%;
+            height: 300px;
+            pointer-events: none;
+            opacity: 0.15;
+            filter: blur(40px);
+            animation: drift-fog 30s linear infinite;
+        }
+
+        @keyframes drift-fog {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(10%); }
+        }
+
+        .light-ray {
+            position: absolute;
+            width: 80px;
+            height: 400px;
+            pointer-events: none;
+            opacity: 0.08;
+            filter: blur(20px);
+            transform-origin: top center;
+            animation: sway-ray 8s ease-in-out infinite;
+        }
+
+        @keyframes sway-ray {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        .dust-mote {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            background: white;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.3;
+            animation: drift-dust 20s linear infinite;
+        }
+
+        @keyframes drift-dust {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(20px, -100px); }
+        }
+
+        /* LAYER 4: Dynamic Scene Effects */
+        .owl-eye {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            pointer-events: none;
+            transition: all 700ms ease;
+            will-change: box-shadow, background;
+        }
+
+        .owl-eye.alert {
+            animation: pulse-alert 300ms ease-in-out infinite;
+        }
+
+        @keyframes pulse-alert {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+
+        .searchlight {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 60px solid transparent;
+            border-right: 60px solid transparent;
+            border-top: 300px solid rgba(255, 215, 0, 0.12);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 700ms ease;
+            filter: blur(15px);
+        }
+
+        .circuit-trace {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0.15;
+            transition: opacity 700ms ease;
+        }
+
+        .circuit-trace.active {
+            opacity: 0.4;
+        }
+
+        .data-sap-dot {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.7;
+            animation: flow-down 3.5s linear infinite;
+        }
+
+        @keyframes flow-down {
+            0% { transform: translateY(0); opacity: 0; }
+            10% { opacity: 0.7; }
+            90% { opacity: 0.7; }
+            100% { transform: translateY(400px); opacity: 0; }
+        }
+
+        /* LAYER 5: Owl Catching Interaction */
+        .target-line {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .strike-flash {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .particle-stream {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .ripple-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        @keyframes target-lock {
+            0% { stroke-dashoffset: 100; }
+            100% { stroke-dashoffset: 0; }
+        }
+
+        @keyframes strike-flash {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+
+        @keyframes particle-flight {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        @keyframes ripple-expand {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+
+        .screen-shake {
+            animation: shake 200ms ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(-3px, 2px); }
+            50% { transform: translate(3px, -2px); }
+            75% { transform: translate(-2px, -3px); }
+        }
+
+        .zoom-hunt {
+            transform: scale(1.02);
+            transition: transform 500ms ease;
+        }
+
+        /* Weather Effects */
+        .falling-leaf {
+            position: absolute;
+            font-size: 20px;
+            pointer-events: none;
+            opacity: 0.7;
+            animation: fall-leaf 8s linear infinite;
+        }
+
+        @keyframes fall-leaf {
+            0% { transform: translateY(-50px) rotate(0deg); }
+            100% { transform: translateY(1080px) rotate(720deg); }
+        }
+
+        .red-vignette {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle, transparent 30%, rgba(239, 68, 68, 0.3) 100%);
+            pointer-events: none;
+            opacity: 0;
+            animation: pulse-vignette 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-vignette {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+        }
+
+        .lightning-flash {
+            position: fixed;
+            inset: 0;
+            background: white;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .cherry-petal {
+            position: absolute;
+            width: 8px;
+            height: 12px;
+            background: linear-gradient(135deg, #FFB3D9 0%, #FF87C3 100%);
+            border-radius: 50% 0 50% 0;
+            pointer-events: none;
+            opacity: 0.6;
+            animation: fall-petal 10s linear infinite;
+        }
+
+        @keyframes fall-petal {
+            0% { transform: translateY(-50px) rotate(0deg); }
+            100% { transform: translateY(1080px) rotate(360deg); }
+        }
+
+        .golden-aura {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255, 184, 0, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            filter: blur(30px);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        .snowflake {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.7;
+            animation: fall-snow 12s linear infinite;
+        }
+
+        @keyframes fall-snow {
+            0% { transform: translateY(-50px); }
+            100% { transform: translateY(1080px); }
+        }
+
+        .sleeping-z {
+            position: absolute;
+            font-size: 24px;
+            color: rgba(147, 180, 220, 0.5);
+            pointer-events: none;
+            animation: float-z 4s ease-in-out infinite;
+        }
+
+        @keyframes float-z {
+            0% { transform: translateY(0) scale(1); opacity: 0.5; }
+            50% { transform: translateY(-60px) scale(1.3); opacity: 0.2; }
+            100% { transform: translateY(-120px) scale(1.5); opacity: 0; }
+        }
+
+        /* HUD Elements */
+        .hud-text {
+            font-size: 10px;
+            opacity: 0.3;
+            text-shadow: 0 0 8px rgba(0,0,0,0.9);
+            letter-spacing: 0.1em;
+            pointer-events: none;
+        }
+
+        .state-badge {
+            font-size: 9px;
+            opacity: 0.4;
+            text-shadow: 0 0 8px rgba(0,0,0,0.9);
+            letter-spacing: 0.15em;
+            pointer-events: none;
+        }
+
+        .hint-text {
+            font-size: 9px;
+            opacity: 0;
+            transition: opacity 500ms ease;
+            letter-spacing: 0.1em;
+            text-shadow: 0 0 8px rgba(0,0,0,0.9);
+        }
+
+        .living-background:hover ~ * .hint-text {
+            opacity: 0.15;
+        }
+
+        .step-label {
+            position: fixed;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            letter-spacing: 0.2em;
+            text-shadow: 0 0 12px rgba(0,0,0,0.9);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 300ms ease;
+        }
+
+        .step-label.visible {
+            opacity: 0.8;
+        }
+
+        /* Custom Cursor */
+        .custom-cursor {
+            position: fixed;
+            width: 16px;
+            height: 16px;
+            pointer-events: none;
+            z-index: 10000;
+            mix-blend-mode: difference;
+        }
+
+        .cursor-crosshair-h {
+            position: absolute;
+            top: 7px;
+            left: 0;
+            width: 16px;
+            height: 2px;
+            background: white;
+        }
+
+        .cursor-crosshair-h::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            width: 2px;
+            height: 2px;
+            background: transparent;
+        }
+
+        .cursor-crosshair-v {
+            position: absolute;
+            top: 0;
+            left: 7px;
+            width: 2px;
+            height: 16px;
+            background: white;
+        }
+
+        .cursor-crosshair-v::before {
+            content: '';
+            position: absolute;
+            top: 7px;
+            width: 2px;
+            height: 2px;
+            background: transparent;
+        }
+
+        .cursor-ring {
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            width: 24px;
+            height: 24px;
+            border: 1px solid;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 300ms ease;
+            animation: pulse-ring 1.5s ease-in-out infinite;
+        }
+
+        .cursor-ring.visible {
+            opacity: 0.6;
+        }
+
+        @keyframes pulse-ring {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* State Transition Strip */
+        .state-strip {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .state-button {
+            width: 120px;
+            height: 36px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            cursor: none;
+            transition: all 300ms ease;
+            position: relative;
+        }
+
+        .state-button:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .state-button::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: currentColor;
+            opacity: 0;
+            transition: opacity 300ms ease;
+        }
+
+        .state-button.active::after {
+            opacity: 1;
+        }
+
+        /* Spline viewer layer */
+        spline-viewer {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const seasons = {
+            IDLE: {
+                name: 'Summer Night',
+                accent: '#4FD1C5',
+                eyeColor: '#4FD1C5',
+                eyeGlow: '#4FD1C5',
+                bgFilter: 'brightness(1) saturate(1)'
+            },
+            SCANNING: {
+                name: 'Autumn Scan',
+                accent: '#FB923C',
+                eyeColor: '#FFD700',
+                eyeGlow: '#FBBF24',
+                bgFilter: 'brightness(0.8) saturate(0.8) sepia(0.4) hue-rotate(-10deg)'
+            },
+            ALERT: {
+                name: 'Winter Storm',
+                accent: '#EF4444',
+                eyeColor: '#FF1A1A',
+                eyeGlow: '#EF4444',
+                bgFilter: 'brightness(0.7) saturate(1.3) hue-rotate(-20deg)'
+            },
+            SUCCESS: {
+                name: 'Spring Bloom',
+                accent: '#F59E0B',
+                eyeColor: '#FFB800',
+                eyeGlow: '#F59E0B',
+                bgFilter: 'brightness(1.1) saturate(1.2) hue-rotate(280deg)'
+            },
+            SLEEPING: {
+                name: 'Deep Winter',
+                accent: '#93B4DC',
+                eyeColor: '#5A7A9E',
+                eyeGlow: '#4A6A8E',
+                bgFilter: 'brightness(0.5) saturate(0.3) hue-rotate(200deg)'
+            }
+        };
+
+        const hotspots = [
+            { id: 'owl', type: 'owl', x: '47%', y: '35%', w: '12%', h: '18%', label: 'Guardian Owl' },
+            { id: 'docs', type: 'bug', x: '20%', y: '25%', w: '5%', h: '5%', label: 'Documents', species: 'Moth', glowColor: '#E8DCC8' },
+            { id: 'py', type: 'bug', x: '15%', y: '40%', w: '5%', h: '5%', label: 'Python', species: 'Beetle', glowColor: '#66BB6A' },
+            { id: 'cfg', type: 'bug', x: '75%', y: '22%', w: '5%', h: '5%', label: 'Config', species: 'Firefly', glowColor: '#FFEB3B' },
+            { id: 'data', type: 'bug', x: '25%', y: '52%', w: '5%', h: '5%', label: 'Data', species: 'Dragonfly', glowColor: '#42A5F5' },
+            { id: 'sec', type: 'bug', x: '35%', y: '58%', w: '5%', h: '6%', label: 'Security', species: 'Spider', glowColor: '#CE93D8' },
+            { id: 'pkg', type: 'bug', x: '28%', y: '68%', w: '5%', h: '5%', label: 'Package', species: 'Caterpillar', glowColor: '#AED581' },
+            { id: 'design', type: 'bug', x: '80%', y: '18%', w: '5%', h: '5%', label: 'Design', species: 'Butterfly', glowColor: '#F48FB1' },
+            { id: 'db', type: 'bug', x: '55%', y: '72%', w: '5%', h: '5%', label: 'Database', species: 'Pill Bug', glowColor: '#90A4AE' },
+            { id: 'test', type: 'bug', x: '68%', y: '42%', w: '5%', h: '5%', label: 'Test', species: 'Lightning Bug', glowColor: '#76FF03' },
+            { id: 'log', type: 'bug', x: '32%', y: '32%', w: '5%', h: '5%', label: 'Log', species: 'Ant', glowColor: '#8D6E63' },
+            { id: 'tools', type: 'bug', x: '62%', y: '30%', w: '5%', h: '5%', label: 'Tools', species: 'Carpenter Bee', glowColor: '#FFD54F' },
+            { id: 'docs2', type: 'bug', x: '58%', y: '20%', w: '5%', h: '5%', label: 'Docs', species: 'Bookworm', glowColor: '#B2EBF2' },
+            { id: 'moon', type: 'environment', x: '78%', y: '5%', w: '10%', h: '12%', label: 'Moon Phase', glowColor: '#FBBF24' },
+            { id: 'mushroom1', type: 'environment', x: '42%', y: '78%', w: '6%', h: '6%', label: 'Bio-Sensor', glowColor: '#4FD1C5' },
+            { id: 'mushroom2', type: 'environment', x: '52%', y: '82%', w: '5%', h: '5%', label: 'Data Node', glowColor: '#CE93D8' },
+            { id: 'roots', type: 'environment', x: '35%', y: '85%', w: '30%', h: '10%', label: 'Root Network', glowColor: '#4FD1C5' },
+            { id: 'trunk', type: 'environment', x: '42%', y: '45%', w: '16%', h: '40%', label: 'Data Stream', glowColor: '#4FD1C5' },
+        ];
+
+        function LivingScene() {
+            const [state, setState] = useState('IDLE');
+            const [mousePos, setMousePos] = useState({ x: 960, y: 540 });
+            const [hoveredHotspot, setHoveredHotspot] = useState(null);
+            const [huntingBug, setHuntingBug] = useState(null);
+            const [huntStep, setHuntStep] = useState(null);
+            const [filesScanned, setFilesScanned] = useState(1287);
+            const [threats, setThreats] = useState(0);
+            const backgroundRef = useRef(null);
+            const lightningInterval = useRef(null);
+
+            const season = seasons[state];
+
+            // Mouse tracking with parallax and flashlight
+            useEffect(() => {
+                const handleMouseMove = (e) => {
+                    setMousePos({ x: e.clientX, y: e.clientY });
+
+                    if (backgroundRef.current) {
+                        const xOffset = ((e.clientX - 960) / 960) * 5;
+                        const yOffset = ((e.clientY - 540) / 540) * 5;
+                        backgroundRef.current.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
+                    }
+                };
+
+                window.addEventListener('mousemove', handleMouseMove);
+                return () => window.removeEventListener('mousemove', handleMouseMove);
+            }, []);
+
+            // Keyboard state switching
+            useEffect(() => {
+                const handleKeyDown = (e) => {
+                    const stateKeys = { '1': 'IDLE', '2': 'SCANNING', '3': 'ALERT', '4': 'SUCCESS', '5': 'SLEEPING' };
+                    if (stateKeys[e.key]) {
+                        setState(stateKeys[e.key]);
+                        if (e.key === '3') setThreats(1);
+                        else setThreats(0);
+                    }
+                };
+
+                window.addEventListener('keydown', handleKeyDown);
+                return () => window.removeEventListener('keydown', handleKeyDown);
+            }, []);
+
+            // Lightning flashes for ALERT state
+            useEffect(() => {
+                if (state === 'ALERT') {
+                    lightningInterval.current = setInterval(() => {
+                        const flash = document.querySelector('.lightning-flash');
+                        if (flash) {
+                            flash.style.opacity = '0.4';
+                            setTimeout(() => flash.style.opacity = '0', 80);
+                        }
+                    }, Math.random() * 3000 + 2000);
+                } else {
+                    if (lightningInterval.current) clearInterval(lightningInterval.current);
+                }
+
+                return () => {
+                    if (lightningInterval.current) clearInterval(lightningInterval.current);
+                };
+            }, [state]);
+
+            // Bug hunting sequence
+            const handleBugClick = (bug) => {
+                if (huntingBug) return;
+
+                setHuntingBug(bug);
+
+                // Step 1: Target Lock (0-500ms)
+                setHuntStep('TARGET LOCK');
+                setTimeout(() => {
+                    // Step 2: Hunt Mode (500-1000ms)
+                    setHuntStep('HUNT MODE');
+                    setTimeout(() => {
+                        // Step 3: Strike (1000-1500ms)
+                        setHuntStep('STRIKE');
+                        if (backgroundRef.current) {
+                            backgroundRef.current.classList.add('screen-shake');
+                            setTimeout(() => backgroundRef.current.classList.remove('screen-shake'), 200);
+                        }
+                        setTimeout(() => {
+                            // Step 4: Capture (1500-2200ms)
+                            setHuntStep('CAPTURE');
+                            setTimeout(() => {
+                                // Step 5: Digest (2200-2800ms)
+                                setHuntStep('DIGEST');
+                                setTimeout(() => {
+                                    // Step 6: Settle (2800-3500ms)
+                                    setHuntStep('SETTLE');
+                                    setTimeout(() => {
+                                        setHuntingBug(null);
+                                        setHuntStep(null);
+                                        setFilesScanned(prev => prev + 1);
+                                    }, 700);
+                                }, 600);
+                            }, 700);
+                        }, 500);
+                    }, 500);
+                }, 500);
+            };
+
+            const handleHotspotClick = (hotspot) => {
+                if (hotspot.type === 'bug') {
+                    handleBugClick(hotspot);
+                }
+            };
+
+            return (
+                <>
+                    {/* LAYER 1: Living Background with Parallax */}
+                    <div
+                        ref={backgroundRef}
+                        className="living-background"
+                        style={{ filter: season.bgFilter }}
+                    />
+
+                    {/* Cursor Flashlight */}
+                    <div
+                        className="cursor-light"
+                        style={{
+                            background: `radial-gradient(circle 200px at ${mousePos.x}px ${mousePos.y}px, white, transparent)`
+                        }}
+                    />
+
+                    {/* LAYER 2: Interactive Hotspots */}
+                    {hotspots.map(hotspot => (
+                        <div
+                            key={hotspot.id}
+                            className="hotspot"
+                            style={{
+                                left: hotspot.x,
+                                top: hotspot.y,
+                                width: hotspot.w,
+                                height: hotspot.h
+                            }}
+                            onMouseEnter={() => setHoveredHotspot(hotspot)}
+                            onMouseLeave={() => setHoveredHotspot(null)}
+                            onClick={() => handleHotspotClick(hotspot)}
+                        >
+                            <div
+                                className="hotspot-glow"
+                                style={{
+                                    background: `radial-gradient(circle, ${hotspot.glowColor || season.accent}, transparent)`
+                                }}
+                            />
+                            <div className="hotspot-label">
+                                {hotspot.label}
+                                {hotspot.species && ` • ${hotspot.species}`}
+                            </div>
+                        </div>
+                    ))}
+
+                    {/* Special Owl Eye Glow on Hover */}
+                    {hoveredHotspot?.type === 'owl' && (
+                        <>
+                            <div style={{
+                                position: 'absolute',
+                                left: '48%',
+                                top: '33%',
+                                width: '20px',
+                                height: '20px',
+                                background: `radial-gradient(circle, ${season.accent}, transparent)`,
+                                borderRadius: '50%',
+                                opacity: 0.6,
+                                pointerEvents: 'none',
+                                animation: 'pulse-glow 2s ease-in-out infinite'
+                            }} />
+                            <div style={{
+                                position: 'absolute',
+                                left: '52%',
+                                top: '33%',
+                                width: '20px',
+                                height: '20px',
+                                background: `radial-gradient(circle, ${season.accent}, transparent)`,
+                                borderRadius: '50%',
+                                opacity: 0.6,
+                                pointerEvents: 'none',
+                                animation: 'pulse-glow 2s ease-in-out infinite'
+                            }} />
+                        </>
+                    )}
+
+                    {/* LAYER 3: CSS 3D Fallback Effects */}
+                    {/* Fireflies */}
+                    {Array.from({ length: 25 }).map((_, i) => (
+                        <div
+                            key={`firefly-${i}`}
+                            className="firefly"
+                            style={{
+                                left: `${Math.random() * 100}%`,
+                                top: `${Math.random() * 100}%`,
+                                background: season.accent,
+                                boxShadow: `0 0 8px ${season.accent}`,
+                                animationDelay: `${Math.random() * 15}s`,
+                                animationDuration: `${15 + Math.random() * 10}s`
+                            }}
+                        />
+                    ))}
+
+                    {/* Fog Layers */}
+                    {[0, 1, 2].map(i => (
+                        <div
+                            key={`fog-${i}`}
+                            className="fog-layer"
+                            style={{
+                                background: `linear-gradient(to top, rgba(79, 209, 197, 0.1), transparent)`,
+                                animationDelay: `${i * 10}s`,
+                                bottom: `${i * 50}px`
+                            }}
+                        />
+                    ))}
+
+                    {/* Light Rays from Moon */}
+                    {[0, 1, 2, 3].map(i => (
+                        <div
+                            key={`ray-${i}`}
+                            className="light-ray"
+                            style={{
+                                left: `${78 + i * 2}%`,
+                                top: '10%',
+                                background: `linear-gradient(to bottom, ${season.accent}22, transparent)`,
+                                animationDelay: `${i * 2}s`,
+                                transform: `rotate(${-5 + i * 3}deg)`
+                            }}
+                        />
+                    ))}
+
+                    {/* Dust Motes */}
+                    {Array.from({ length: 30 }).map((_, i) => (
+                        <div
+                            key={`dust-${i}`}
+                            className="dust-mote"
+                            style={{
+                                left: `${Math.random() * 100}%`,
+                                top: `${Math.random() * 100}%`,
+                                animationDelay: `${Math.random() * 20}s`,
+                                animationDuration: `${15 + Math.random() * 10}s`
+                            }}
+                        />
+                    ))}
+
+                    {/* LAYER 4: Dynamic Scene Effects */}
+                    {/* Owl Eyes - Always Visible */}
+                    <div
+                        className={`owl-eye ${state === 'ALERT' ? 'alert' : ''}`}
+                        style={{
+                            left: '47.5%',
+                            top: '33%',
+                            background: `radial-gradient(circle, ${season.eyeColor}, transparent)`,
+                            boxShadow: `0 0 15px 4px ${season.eyeGlow}`,
+                            opacity: state === 'SLEEPING' ? 0.2 : 1
+                        }}
+                    />
+                    <div
+                        className={`owl-eye ${state === 'ALERT' ? 'alert' : ''}`}
+                        style={{
+                            left: '50.5%',
+                            top: '33%',
+                            background: `radial-gradient(circle, ${season.eyeColor}, transparent)`,
+                            boxShadow: `0 0 15px 4px ${season.eyeGlow}`,
+                            opacity: state === 'SLEEPING' ? 0.2 : 1
+                        }}
+                    />
+
+                    {/* Searchlight Cones (SCANNING state) */}
+                    {state === 'SCANNING' && (
+                        <>
+                            <div className="searchlight" style={{ left: '47.5%', top: '35%', opacity: 1 }} />
+                            <div className="searchlight" style={{ left: '50.5%', top: '35%', opacity: 1 }} />
+                        </>
+                    )}
+
+                    {/* Circuit Traces on Trunk */}
+                    <svg className={`circuit-trace ${hoveredHotspot?.id === 'trunk' || state === 'SCANNING' ? 'active' : ''}`}
+                         style={{ left: '42%', top: '45%', width: '16%', height: '40%' }}>
+                        {[0, 1, 2, 3, 4].map(i => (
+                            <path
+                                key={`trace-${i}`}
+                                d={`M ${20 + i * 30} 0 Q ${25 + i * 30} 100 ${20 + i * 30} 200 Q ${15 + i * 30} 300 ${20 + i * 30} 400`}
+                                stroke={season.accent}
+                                strokeWidth="1"
+                                fill="none"
+                            />
+                        ))}
+                    </svg>
+
+                    {/* Data Sap Streams */}
+                    {Array.from({ length: 8 }).map((_, i) => (
+                        <div
+                            key={`sap-${i}`}
+                            className="data-sap-dot"
+                            style={{
+                                left: `${44 + (i % 4) * 3}%`,
+                                top: '45%',
+                                background: season.accent,
+                                boxShadow: `0 0 6px ${season.accent}`,
+                                animationDelay: `${i * 0.5}s`
+                            }}
+                        />
+                    ))}
+
+                    {/* LAYER 5: Hunting Sequence Elements */}
+                    {huntingBug && huntStep && (
+                        <>
+                            {/* Target Line */}
+                            {huntStep === 'TARGET LOCK' && (
+                                <svg style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+                                    <line
+                                        x1="49%"
+                                        y1="33%"
+                                        x2={huntingBug.x}
+                                        y2={huntingBug.y}
+                                        stroke={season.accent}
+                                        strokeWidth="1"
+                                        strokeDasharray="5,5"
+                                        style={{ animation: 'target-lock 500ms linear' }}
+                                    />
+                                </svg>
+                            )}
+
+                            {/* Strike Flash */}
+                            {huntStep === 'STRIKE' && (
+                                <div
+                                    className="strike-flash"
+                                    style={{
+                                        left: huntingBug.x,
+                                        top: huntingBug.y,
+                                        width: '200px',
+                                        height: '200px',
+                                        background: `radial-gradient(circle, white, ${season.accent}, transparent)`,
+                                        animation: 'strike-flash 500ms ease-out'
+                                    }}
+                                />
+                            )}
+
+                            {/* Particle Streams */}
+                            {huntStep === 'CAPTURE' && Array.from({ length: 12 }).map((_, i) => (
+                                <div
+                                    key={`particle-${i}`}
+                                    className="particle-stream"
+                                    style={{
+                                        left: huntingBug.x,
+                                        top: huntingBug.y,
+                                        background: season.accent,
+                                        boxShadow: `0 0 6px ${season.accent}`,
+                                        animation: `particle-flight 700ms cubic-bezier(${0.2 + i * 0.05}, 0, ${0.8 - i * 0.05}, 1) forwards`,
+                                        transform: `translate(${(49 - parseFloat(huntingBug.x)) * 19.2}px, ${(33 - parseFloat(huntingBug.y)) * 10.8}px)`
+                                    }}
+                                />
+                            ))}
+
+                            {/* Ripple Ring */}
+                            {huntStep === 'DIGEST' && (
+                                <div
+                                    className="ripple-ring"
+                                    style={{
+                                        left: '48%',
+                                        top: '32%',
+                                        width: '60px',
+                                        height: '60px',
+                                        borderColor: season.accent,
+                                        animation: 'ripple-expand 600ms ease-out'
+                                    }}
+                                />
+                            )}
+                        </>
+                    )}
+
+                    {/* Step Label */}
+                    {huntStep && (
+                        <div className={`step-label visible`} style={{ color: season.accent }}>
+                            <span style={{ color: season.accent, fontWeight: 'bold' }}>
+                                [{['TARGET LOCK', 'HUNT MODE', 'STRIKE', 'CAPTURE', 'DIGEST', 'SETTLE'].indexOf(huntStep) + 1}]
+                            </span> {huntStep}
+                        </div>
+                    )}
+
+                    {/* Weather Effects */}
+                    {state === 'SCANNING' && Array.from({ length: 20 }).map((_, i) => (
+                        <div
+                            key={`leaf-${i}`}
+                            className="falling-leaf"
+                            style={{
+                                left: `${Math.random() * 100}%`,
+                                top: `-${Math.random() * 100}px`,
+                                animationDelay: `${Math.random() * 8}s`
+                            }}
+                        >
+                            {['🍂', '🍁', '🍃'][i % 3]}
+                        </div>
+                    ))}
+
+                    {state === 'ALERT' && (
+                        <>
+                            <div className="red-vignette" />
+                            <div className="lightning-flash" />
+                        </>
+                    )}
+
+                    {state === 'SUCCESS' && (
+                        <>
+                            {Array.from({ length: 40 }).map((_, i) => (
+                                <div
+                                    key={`petal-${i}`}
+                                    className="cherry-petal"
+                                    style={{
+                                        left: `${Math.random() * 100}%`,
+                                        top: `-${Math.random() * 100}px`,
+                                        animationDelay: `${Math.random() * 10}s`
+                                    }}
+                                />
+                            ))}
+                            <div className="golden-aura" style={{ left: '43%', top: '26%' }} />
+                        </>
+                    )}
+
+                    {state === 'SLEEPING' && (
+                        <>
+                            {Array.from({ length: 40 }).map((_, i) => (
+                                <div
+                                    key={`snow-${i}`}
+                                    className="snowflake"
+                                    style={{
+                                        left: `${Math.random() * 100}%`,
+                                        top: `-${Math.random() * 100}px`,
+                                        animationDelay: `${Math.random() * 12}s`
+                                    }}
+                                />
+                            ))}
+                            {['Z', 'Z', 'z'].map((z, i) => (
+                                <div
+                                    key={`z-${i}`}
+                                    className="sleeping-z"
+                                    style={{
+                                        left: `${52 + i * 2}%`,
+                                        top: '30%',
+                                        animationDelay: `${i * 1.3}s`,
+                                        fontSize: `${24 - i * 4}px`
+                                    }}
+                                >
+                                    {z}
+                                </div>
+                            ))}
+                        </>
+                    )}
+
+                    {/* LAYER 6: HUD Overlay */}
+                    <div style={{ position: 'fixed', top: '20px', left: '20px' }} className="hud-text text-white">
+                        FILES {filesScanned.toLocaleString()} | SCANNED 100%
+                    </div>
+                    <div style={{ position: 'fixed', top: '20px', right: '20px' }} className="hud-text text-white text-right">
+                        SYNC ACTIVE | UPLINK STABLE
+                    </div>
+                    <div style={{ position: 'fixed', bottom: '80px', left: '20px' }} className="hud-text text-white">
+                        THREATS: <span style={{ color: threats > 0 ? '#EF4444' : 'white' }}>{threats}</span>
+                        {threats > 0 && <span style={{ color: '#EF4444' }}> DETECTED</span>}
+                    </div>
+                    <div style={{ position: 'fixed', bottom: '80px', right: '20px' }} className="hud-text text-white text-right">
+                        MODE: MONITORING
+                    </div>
+
+                    {/* State Badge */}
+                    <div style={{ position: 'fixed', top: '20px', left: '50%', transform: 'translateX(-50%)', textAlign: 'center' }}>
+                        <div style={{
+                            width: '80px',
+                            height: '1px',
+                            background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent)',
+                            margin: '0 auto 8px'
+                        }} />
+                        <div className="state-badge text-white" style={{ color: season.accent }}>
+                            SYS.{state} — {season.name}
+                        </div>
+                        <div style={{
+                            width: '80px',
+                            height: '1px',
+                            background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent)',
+                            margin: '8px auto 0'
+                        }} />
+                    </div>
+
+                    {/* Hints */}
+                    <div style={{ position: 'fixed', bottom: '80px', left: '50%', transform: 'translateX(-50%)', textAlign: 'center' }}
+                         className="hint-text text-white">
+                        [1-5] Seasons | [Click] Catch | [Move] Explore
+                    </div>
+
+                    {/* Spline 3D Layer - Placeholder */}
+                    {/* <spline-viewer url="YOUR_SPLINE_SCENE_URL_HERE"></spline-viewer> */}
+                    {/* Replace with your Spline scene URL. Scene should have transparent background and contain: 3D particles, fog, fireflies, volumetric light rays */}
+
+                    {/* State Transition Strip */}
+                    <div className="state-strip">
+                        {Object.keys(seasons).map((key, i) => (
+                            <button
+                                key={key}
+                                className={`state-button ${state === key ? 'active' : ''}`}
+                                onClick={() => {
+                                    setState(key);
+                                    if (key === 'ALERT') setThreats(1);
+                                    else setThreats(0);
+                                }}
+                                style={{ color: state === key ? seasons[key].accent : undefined }}
+                            >
+                                [{i + 1}] {seasons[key].name.toUpperCase()}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Custom Cursor */}
+                    <div className="custom-cursor" style={{ left: mousePos.x - 8, top: mousePos.y - 8 }}>
+                        <div className="cursor-crosshair-h" />
+                        <div className="cursor-crosshair-v" />
+                        <div
+                            className={`cursor-ring ${hoveredHotspot?.type === 'bug' ? 'visible' : ''}`}
+                            style={{ borderColor: hoveredHotspot?.glowColor || season.accent }}
+                        />
+                    </div>
+                </>
+            );
+        }
+
+        ReactDOM.render(<LivingScene />, document.getElementById('root'));
+    </script>
+</body>
+</html>

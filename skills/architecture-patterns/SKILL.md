@@ -205,6 +205,73 @@ src/project_name/
 | Python | Modules: snake_case, Classes: PascalCase, Functions: snake_case, Constants: SCREAMING_SNAKE_CASE, Private: `_leading_underscore` |
 | C# | Classes: PascalCase, Interfaces: `I` prefix, Methods: PascalCase, Private fields: `_camelCase`, Properties: PascalCase |
 
+### Config-Driven Pipeline Pattern
+
+For multi-stage processing workflows (e.g., asset generation, scene assembly, build pipelines):
+
+**Structure:**
+1. Define pipeline templates in YAML (stage order, handler names, per-stage config, optional gates)
+2. Stage handlers implement a standard contract: `execute(context, config) => { success, result, error }`
+3. A runner engine loads templates, resolves handlers from a registry, executes sequentially
+4. Context is shared across stages — each stage mutates or extends the context for the next
+5. Fire-and-forget start: return an ID immediately, emit SSE events for progress
+
+**Key Design Decisions:**
+- Stage registry maps handler names (from YAML) to modules — adding stages requires no runner changes
+- Context mutation via `Object.assign(context, result.result)` — stages communicate through shared context
+- Optional supervisor gates between stages for quality validation
+- Partial success support (continue on per-item failure, report mixed results)
+
+**When to Use:** Any multi-step transformation pipeline where steps are composable, reorderable, and independently testable.
+
+### LLM Decomposition Pattern
+
+For decomposing natural-language prompts into structured data via LLM:
+
+**Structure:**
+1. System prompt defines exact JSON output schema with examples
+2. LLM call returns free-text — extract JSON via triple fallback:
+   - Strategy 1: ` ```json ... ``` ` code block
+   - Strategy 2: Raw `JSON.parse()` on full response
+   - Strategy 3: First `{` to last `}` substring parse
+3. Validate parsed output against schema (bounds, required fields, duplicate IDs)
+4. On failure, retry once with correction prompt: "Your response was not valid JSON. Output ONLY JSON."
+
+**Key Design Decisions:**
+- Keep validation in a separate method (testable without LLM)
+- Cap output bounds at validation layer (max items, value ranges, string lengths)
+- Use task routing in provider chain for cost optimization (free-tier providers for analysis)
+
+**When to Use:** Prompt-to-structure tasks where keyword detection is insufficient (spatial reasoning, semantic decomposition, creative generation metadata).
+
+### Subprocess Bridge Pattern
+
+For managing long-running child processes (e.g., Python GPU inference servers from Node.js):
+
+**Startup:**
+1. Pre-flight environment check (verify runtime, dependencies)
+2. Port availability scan (check if port already occupied before spawning)
+3. Spawn subprocess with stdio piping (stdout to console, stderr to log file)
+4. Wait for startup health check with process liveness verification
+5. Start periodic health monitoring
+
+**Crash Recovery:**
+1. Detect exit via process `exit` event (capture code + signal)
+2. Exponential backoff restart with max attempts
+3. Log crash context (uptime, restart count, stderr) to error handler
+4. Port conflict detection on restart (zombie processes may hold ports)
+
+**Shutdown:**
+1. SIGTERM first (graceful), wait grace period
+2. SIGKILL if still alive after timeout
+3. Clean up health check intervals and log streams
+
+**Key Lessons:**
+- Always verify the *spawned* process is alive during startup, not just that the port responds (zombie detection)
+- Log subprocess stderr to persistent file for post-mortem debugging
+- On Windows, use `windowsHide: true` and test with `py` launcher for Python discovery
+- Health checks against ports can be fooled by orphaned processes from previous runs
+
 ## Examples
 
 ### Example 1: Event-Driven Health System

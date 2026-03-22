@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mockup 11: Web Dashboard Port - OwlWatcher</title>
+    <style>
+        /* MOCKUP 11: WEB DASHBOARD PORT
+           Theme: Responsive web app (320px-2560px adaptive), embedded Spline React,
+           flexbox/grid hybrid layout, real-time WebSocket simulation,
+           progressive web app aesthetics, mobile-first to desktop scaling */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a1f1f 0%, #051010 60%, #000000 100%);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Top navigation bar */
+        .navbar {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            height: 70px;
+            background: rgba(26, 35, 50, 0.85);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(79, 209, 197, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 clamp(20px, 5vw, 60px);
+            z-index: 1000;
+        }
+        .navbar .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: clamp(18px, 3vw, 24px);
+            font-weight: 700;
+        }
+        .navbar .logo .icon {
+            font-size: clamp(28px, 4vw, 40px);
+            animation: nav-logo-pulse 3s ease-in-out infinite;
+        }
+        @keyframes nav-logo-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .navbar .nav-links {
+            display: flex;
+            gap: clamp(15px, 3vw, 40px);
+            font-size: clamp(12px, 2vw, 16px);
+        }
+        .navbar .nav-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+        .navbar .nav-links a:hover,
+        .navbar .nav-links a.active {
+            color: #4fd1c5;
+            background: rgba(79, 209, 197, 0.1);
+        }
+        .navbar .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(79, 209, 197, 0.3) 0%, rgba(26, 35, 50, 0.8) 70%);
+            border: 2px solid rgba(79, 209, 197, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .navbar .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(79, 209, 197, 0.6);
+        }
+
+        /* Responsive grid container */
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: clamp(15px, 2vw, 30px);
+            padding: clamp(15px, 3vw, 40px);
+            max-width: 2560px;
+            margin: 0 auto;
+        }
+
+        /* Responsive breakpoints via media queries */
+        @media (min-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (min-width: 1440px) {
+            .dashboard-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Hero card with Spline 3D embed */
+        .hero-card {
+            grid-column: 1 / -1;
+            min-height: clamp(300px, 40vh, 500px);
+            background: rgba(26, 35, 50, 0.6);
+            border: 2px solid rgba(79, 209, 197, 0.4);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            padding: clamp(20px, 3vw, 40px);
+            position: relative;
+            overflow: hidden;
+            animation: hero-fade-in 0.8s ease-out forwards;
+        }
+        @keyframes hero-fade-in {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(79, 209, 197, 0.1) 0%, transparent 70%);
+            animation: hero-glow-rotate 20s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes hero-glow-rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .hero-card .spline-embed {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(80px, 15vw, 160px);
+            z-index: 10;
+        }
+        .hero-card .spline-embed::before {
+            content: '🦉';
+            animation: hero-owl-float 6s ease-in-out infinite;
+            filter: drop-shadow(0 0 40px rgba(79, 209, 197, 0.8));
+        }
+        @keyframes hero-owl-float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+        }
+        .hero-card .hero-title {
+            position: absolute;
+            top: 30px;
+            left: 40px;
+            font-size: clamp(24px, 4vw, 36px);
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(79, 209, 197, 0.6);
+            z-index: 20;
+        }
+        .hero-card .hero-subtitle {
+            position: absolute;
+            top: clamp(70px, 10vw, 80px);
+            left: 40px;
+            font-size: clamp(14px, 2vw, 18px);
+            color: rgba(255, 255, 255, 0.7);
+            z-index: 20;
+        }
+
+        /* Stats cards */
+        .stat-card {
+            min-height: 180px;
+            background: rgba(26, 35, 50, 0.6);
+            border: 1px solid rgba(79, 209, 197, 0.3);
+            border-radius: 16px;
+            backdrop-filter: blur(15px);
+            padding: clamp(20px, 3vw, 30px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+            animation: card-fade-in 0.6s ease-out forwards;
+            opacity: 0;
+        }
+        @keyframes card-fade-in {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .stat-card:nth-child(2) { animation-delay: 0.1s; }
+        .stat-card:nth-child(3) { animation-delay: 0.2s; }
+        .stat-card:nth-child(4) { animation-delay: 0.3s; }
+        .stat-card:nth-child(5) { animation-delay: 0.4s; }
+        .stat-card:nth-child(6) { animation-delay: 0.5s; }
+        .stat-card:nth-child(7) { animation-delay: 0.6s; }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(79, 209, 197, 0.8);
+            box-shadow: 0 10px 40px rgba(79, 209, 197, 0.3);
+        }
+        .stat-card .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .stat-card .card-icon {
+            font-size: clamp(32px, 5vw, 48px);
+        }
+        .stat-card .card-menu {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .stat-card .card-menu:hover {
+            color: #4fd1c5;
+        }
+        .stat-card .card-title {
+            font-size: clamp(12px, 2vw, 14px);
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .stat-card .card-value {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 0 15px rgba(79, 209, 197, 0.5);
+            animation: value-count-up 1.5s ease-out forwards;
+        }
+        @keyframes value-count-up {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .stat-card .card-change {
+            font-size: clamp(12px, 2vw, 14px);
+            margin-top: 8px;
+        }
+        .stat-card .card-change.positive {
+            color: #22c55e;
+        }
+        .stat-card .card-change.negative {
+            color: #ef4444;
+        }
+        .stat-card .card-sparkline {
+            margin-top: 15px;
+            height: 50px;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(79, 209, 197, 0.2) 20%,
+                rgba(79, 209, 197, 0.4) 50%,
+                rgba(79, 209, 197, 0.2) 80%,
+                transparent 100%);
+            border-radius: 6px;
+            animation: sparkline-pulse 3s ease-in-out infinite;
+        }
+        @keyframes sparkline-pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+
+        /* Activity feed card (spans 2 columns on desktop) */
+        .activity-card {
+            grid-column: 1 / -1;
+            min-height: 300px;
+            background: rgba(26, 35, 50, 0.6);
+            border: 1px solid rgba(79, 209, 197, 0.3);
+            border-radius: 16px;
+            backdrop-filter: blur(15px);
+            padding: clamp(20px, 3vw, 30px);
+            animation: card-fade-in 0.6s ease-out forwards;
+            opacity: 0;
+            animation-delay: 0.7s;
+        }
+        @media (min-width: 1440px) {
+            .activity-card {
+                grid-column: span 2;
+            }
+        }
+        .activity-card h3 {
+            font-size: clamp(18px, 3vw, 24px);
+            margin-bottom: 20px;
+            color: #4fd1c5;
+        }
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(79, 209, 197, 0.05);
+            border-left: 3px solid rgba(79, 209, 197, 0.6);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .activity-item:hover {
+            background: rgba(79, 209, 197, 0.1);
+            border-left-color: rgba(79, 209, 197, 1);
+            transform: translateX(5px);
+        }
+        .activity-item .activity-icon {
+            font-size: clamp(24px, 4vw, 32px);
+        }
+        .activity-item .activity-content {
+            flex: 1;
+        }
+        .activity-item .activity-title {
+            font-size: clamp(14px, 2vw, 16px);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .activity-item .activity-time {
+            font-size: clamp(11px, 1.5vw, 13px);
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .activity-item .activity-status {
+            padding: 6px 12px;
+            background: rgba(79, 209, 197, 0.2);
+            border-radius: 12px;
+            font-size: clamp(10px, 1.5vw, 12px);
+            color: #4fd1c5;
+            font-weight: 600;
+        }
+
+        /* Real-time indicator */
+        .realtime-badge {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 12px 20px;
+            background: rgba(34, 197, 94, 0.2);
+            border: 2px solid rgba(34, 197, 94, 0.6);
+            border-radius: 25px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #22c55e;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1100;
+            backdrop-filter: blur(10px);
+            animation: badge-pulse 2s ease-in-out infinite;
+        }
+        @keyframes badge-pulse {
+            0%, 100% { box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(34, 197, 94, 0.8); }
+        }
+        .realtime-badge::before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: dot-blink 1.5s ease-in-out infinite;
+        }
+        @keyframes dot-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Mobile menu toggle (hidden on desktop) */
+        .mobile-menu-toggle {
+            display: none;
+            font-size: 28px;
+            cursor: pointer;
+        }
+        @media (max-width: 767px) {
+            .navbar .nav-links {
+                display: none;
+            }
+            .mobile-menu-toggle {
+                display: block;
+            }
+        }
+
+        .annotation {
+            position: fixed;
+            top: 90px;
+            left: 20px;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            background: rgba(251, 146, 60, 0.95);
+            color: white;
+            border: 2px solid rgba(251, 146, 60, 1);
+            z-index: 2000;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation bar -->
+    <nav class="navbar">
+        <div class="logo">
+            <div class="icon">🦉</div>
+            <div>OwlWatcher</div>
+        </div>
+        <div class="nav-links">
+            <a href="#" class="active">Dashboard</a>
+            <a href="#">Files</a>
+            <a href="#">Analytics</a>
+            <a href="#">Settings</a>
+        </div>
+        <div class="mobile-menu-toggle">☰</div>
+        <div class="user-avatar">👤</div>
+    </nav>
+
+    <!-- Dashboard grid -->
+    <div class="dashboard-container">
+        <!-- Hero card with Spline 3D -->
+        <div class="hero-card">
+            <div class="hero-title">File Monitoring Dashboard</div>
+            <div class="hero-subtitle">Real-time sync • 1,247 files tracked • 98% health</div>
+            <div class="spline-embed"></div>
+        </div>
+
+        <!-- Stat cards -->
+        <div class="stat-card">
+            <div class="card-header">
+                <div class="card-icon">📄</div>
+                <div class="card-menu">⋮</div>
+            </div>
+            <div class="card-title">Total Files</div>
+            <div class="card-value">1,247</div>
+            <div class="card-change positive">↑ 23 today</div>
+            <div class="card-sparkline"></div>
+        </div>
+
+        <div class="stat-card">
+            <div class="card-header">
+                <div class="card-icon">✓</div>
+                <div class="card-menu">⋮</div>
+            </div>
+            <div class="card-title">Sync Status</div>
+            <div class="card-value">98%</div>
+            <div class="card-change positive">↑ 2% today</div>
+            <div class="card-sparkline"></div>
+        </div>
+
+        <div class="stat-card">
+            <div class="card-header">
+                <div class="card-icon">⚡</div>
+                <div class="card-menu">⋮</div>
+            </div>
+            <div class="card-title">Active Changes</div>
+            <div class="card-value">23</div>
+            <div class="card-change negative">↓ 5 resolved</div>
+            <div class="card-sparkline"></div>
+        </div>
+
+        <div class="stat-card">
+            <div class="card-header">
+                <div class="card-icon">🔒</div>
+                <div class="card-menu">⋮</div>
+            </div>
+            <div class="card-title">Security Status</div>
+            <div class="card-value">100%</div>
+            <div class="card-change positive">↑ All clear</div>
+            <div class="card-sparkline"></div>
+        </div>
+
+        <div class="stat-card">
+            <div class="card-header">
+                <div class="card-icon">📊</div>
+                <div class="card-menu">⋮</div>
+            </div>
+            <div class="card-title">Storage Used</div>
+            <div class="card-value">47GB</div>
+            <div class="card-change positive">↑ 1.2GB today</div>
+            <div class="card-sparkline"></div>
+        </div>
+
+        <div class="stat-card">
+            <div class="card-header">
+                <div class="card-icon">🌐</div>
+                <div class="card-menu">⋮</div>
+            </div>
+            <div class="card-title">Network Health</div>
+            <div class="card-value">100%</div>
+            <div class="card-change positive">↑ Stable</div>
+            <div class="card-sparkline"></div>
+        </div>
+
+        <!-- Activity feed -->
+        <div class="activity-card">
+            <h3>📋 Recent Activity</h3>
+            <div class="activity-item">
+                <div class="activity-icon">📄</div>
+                <div class="activity-content">
+                    <div class="activity-title">Document synchronized</div>
+                    <div class="activity-time">2 minutes ago</div>
+                </div>
+                <div class="activity-status">SYNCED</div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">🐍</div>
+                <div class="activity-content">
+                    <div class="activity-title">Python script updated</div>
+                    <div class="activity-time">5 minutes ago</div>
+                </div>
+                <div class="activity-status">SYNCED</div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">⚙️</div>
+                <div class="activity-content">
+                    <div class="activity-title">Configuration modified</div>
+                    <div class="activity-time">12 minutes ago</div>
+                </div>
+                <div class="activity-status">PENDING</div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">📊</div>
+                <div class="activity-content">
+                    <div class="activity-title">Analytics data generated</div>
+                    <div class="activity-time">1 hour ago</div>
+                </div>
+                <div class="activity-status">SYNCED</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Real-time connection badge -->
+    <div class="realtime-badge">
+        LIVE • WebSocket Connected
+    </div>
+
+    <div class="annotation">
+        SPLINE 3D<br>Responsive 320px-2560px<br>Flexbox + Grid Layout<br>Embedded Spline React
+    </div>
+
+    <script>
+        // Simulate real-time updates
+        setInterval(() => {
+            const values = document.querySelectorAll('.card-value');
+            values.forEach(value => {
+                if (value.textContent.includes('%')) {
+                    const current = parseInt(value.textContent);
+                    const change = Math.random() > 0.5 ? 1 : -1;
+                    value.textContent = Math.min(100, Math.max(0, current + change)) + '%';
+                } else if (!value.textContent.includes('GB')) {
+                    const current = parseInt(value.textContent.replace(/,/g, ''));
+                    const change = Math.floor(Math.random() * 3) - 1;
+                    value.textContent = (current + change).toLocaleString();
+                }
+            });
+        }, 5000);
+
+        // Mobile menu toggle
+        document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.style.display = navLinks.style.display === 'none' || !navLinks.style.display ? 'flex' : 'none';
+        });
+
+        // Card interactions
+        document.querySelectorAll('.stat-card').forEach(card => {
+            card.addEventListener('click', function() {
+                alert('📊 Card Details\n\nIn production:\n- Drill-down chart view\n- Historical data trends\n- Export options\n- Custom filters');
+            });
+        });
+    </script>
+</body>
+</html>

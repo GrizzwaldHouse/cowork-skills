@@ -101,6 +101,14 @@ Any feature request begins with research, not code.
 6. Run full test suite before committing
 7. Commit with descriptive message explaining what and why
 
+### Analysis Commands (Alexander Vault)
+
+// See vault-analysis skill for full details
+- `npm run analysis:run` — Full static analysis (architecture, security, deps, concurrency)
+- `npm run analysis:security` — Security scan only
+- `npm run docs:generate` — Regenerate architecture/security/event-bus documentation
+- `npm run hooks:install` — Install git pre-commit (security) and post-commit (full) hooks
+
 ### Environment-Specific
 
 **UE5:**

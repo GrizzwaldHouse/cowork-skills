@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0">
+    <title>OwlWatcher - Deep Forest Parallax</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            background: #0A0E2E;
+            font-family: 'Courier New', monospace;
+            cursor: none;
+        }
+
+        .parallax-container {
+            width: 100%;
+            height: 100%;
+            perspective: 1500px;
+            perspective-origin: center center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .parallax-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.15s ease-out;
+        }
+
+        .custom-cursor {
+            position: fixed;
+            width: 32px;
+            height: 32px;
+            border: 2px solid white;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transition: transform 0.1s ease;
+        }
+
+        .custom-cursor::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+
+        .moon {
+            position: absolute;
+            top: 15%;
+            right: 20%;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #FFF8DC, #F0E68C);
+            box-shadow: 0 0 60px rgba(255, 248, 220, 0.5);
+            transition: background 0.7s ease, box-shadow 0.7s ease;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes drift {
+            0% { transform: translateX(0px); }
+            100% { transform: translateX(100px); }
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(1080px) rotate(360deg); opacity: 0.3; }
+        }
+
+        @keyframes petalFall {
+            0% { transform: translateY(-50px) rotateZ(0deg); opacity: 1; }
+            100% { transform: translateY(1080px) rotateZ(720deg); opacity: 0; }
+        }
+
+        @keyframes firefly {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .foreground-leaf {
+            position: absolute;
+            filter: blur(2px);
+            opacity: 0.8;
+        }
+
+        .fog-wisp {
+            position: absolute;
+            bottom: 0;
+            width: 400px;
+            height: 200px;
+            background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.15), transparent);
+            filter: blur(20px);
+            animation: drift 20s linear infinite;
+        }
+
+        .owl-eye {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #7FFFED 20%, #4FD1C5 60%, #2A9D8F);
+            box-shadow: 0 0 20px rgba(79, 209, 197, 0.6);
+            transition: all 0.7s ease;
+        }
+
+        .owl-eye::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            background: #000;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .owl-eye::after {
+            content: '';
+            position: absolute;
+            top: 30%;
+            left: 30%;
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+        }
+
+        .owl-body {
+            position: relative;
+            width: 160px;
+            height: 220px;
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .owl-head {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 100px;
+            background: linear-gradient(135deg, #8B7355 0%, #6B5345 100%);
+            border-radius: 50% 50% 40% 40%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .owl-torso {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px;
+            height: 140px;
+            background: linear-gradient(135deg, #A0826D 0%, #8B7355 100%);
+            border-radius: 50% 50% 50% 50%;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .owl-wing {
+            position: absolute;
+            top: 90px;
+            width: 50px;
+            height: 80px;
+            background: linear-gradient(135deg, #6B5345 0%, #5B4335 100%);
+            border-radius: 50% 20% 40% 50%;
+            opacity: 0.8;
+        }
+
+        .owl-wing.left {
+            left: -20px;
+            transform: rotate(-15deg);
+        }
+
+        .owl-wing.right {
+            right: -20px;
+            transform: rotate(15deg);
+        }
+
+        .bug {
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 0 8px currentColor);
+        }
+
+        .bug:hover {
+            transform: scale(1.15);
+        }
+
+        @keyframes ping {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+
+        .catch-ping {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid currentColor;
+            animation: ping 0.6s ease-out;
+        }
+
+        @keyframes lightning {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.8; }
+        }
+
+        .lightning-flash {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            pointer-events: none;
+            animation: lightning 0.2s ease-out;
+        }
+
+        .hud-text {
+            font-family: 'Courier New', monospace;
+            color: rgba(255, 255, 255, 0.4);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const SEASONS = {
+            IDLE: {
+                name: 'Summer Night',
+                accent: '#4FD1C5',
+                eyeColor: '#4FD1C5',
+                eyeGlow: '#4FD1C5',
+                bgOverlay: 'rgba(0,0,0,0)',
+                bgFilter: 'brightness(1) saturate(1)'
+            },
+            SCANNING: {
+                name: 'Autumn Scan',
+                accent: '#FB923C',
+                eyeColor: '#FFD700',
+                eyeGlow: '#FBBF24',
+                bgOverlay: 'rgba(100,50,0,0.25)',
+                bgFilter: 'brightness(0.8) saturate(0.8) sepia(0.4) hue-rotate(-10deg)'
+            },
+            ALERT: {
+                name: 'Winter Storm',
+                accent: '#EF4444',
+                eyeColor: '#FF1A1A',
+                eyeGlow: '#EF4444',
+                bgOverlay: 'rgba(80,0,0,0.35)',
+                bgFilter: 'brightness(0.7) saturate(1.3) hue-rotate(-20deg)'
+            },
+            SUCCESS: {
+                name: 'Spring Bloom',
+                accent: '#F59E0B',
+                eyeColor: '#FFB800',
+                eyeGlow: '#F59E0B',
+                bgOverlay: 'rgba(80,0,80,0.2)',
+                bgFilter: 'brightness(1.1) saturate(1.2) hue-rotate(280deg)'
+            },
+            SLEEPING: {
+                name: 'Deep Winter',
+                accent: '#93B4DC',
+                eyeColor: '#5A7A9E',
+                eyeGlow: '#4A6A8E',
+                bgOverlay: 'rgba(15,23,42,0.4)',
+                bgFilter: 'brightness(0.5) saturate(0.3) hue-rotate(200deg)'
+            }
+        };
+
+        const BUGS = [
+            { id: 1, name: 'Documents', type: 'Moth', bodyColor: '#8B7355', wingColor: '#D4C5A9', glowColor: '#E8DCC8', x: 25, y: 30 },
+            { id: 2, name: 'Python', type: 'Beetle', bodyColor: '#2E7D32', wingColor: '#4CAF50', glowColor: '#66BB6A', x: 75, y: 25 },
+            { id: 3, name: 'Config', type: 'Firefly', bodyColor: '#1B1B1B', wingColor: '#333', glowColor: '#FFEB3B', x: 15, y: 65 },
+            { id: 4, name: 'Data', type: 'Dragonfly', bodyColor: '#1565C0', wingColor: '#90CAF9', glowColor: '#42A5F5', x: 80, y: 60 },
+            { id: 5, name: 'Security', type: 'Spider', bodyColor: '#1A1A1A', wingColor: '#333', glowColor: '#CE93D8', x: 35, y: 15 },
+            { id: 6, name: 'Package', type: 'Caterpillar', bodyColor: '#558B2F', wingColor: '#8BC34A', glowColor: '#AED581', x: 65, y: 75 },
+            { id: 7, name: 'Design', type: 'Butterfly', bodyColor: '#1A1A1A', wingColor: '#EC407A', glowColor: '#F48FB1', x: 85, y: 40 },
+            { id: 8, name: 'Database', type: 'PillBug', bodyColor: '#455A64', wingColor: '#78909C', glowColor: '#90A4AE', x: 20, y: 80 },
+            { id: 9, name: 'Test', type: 'LightningBug', bodyColor: '#1B1B1B', wingColor: '#333', glowColor: '#76FF03', x: 60, y: 20 },
+            { id: 10, name: 'Log', type: 'Ant', bodyColor: '#3E2723', wingColor: '#5D4037', glowColor: '#8D6E63', x: 40, y: 70 },
+            { id: 11, name: 'Tools', type: 'CarpenterBee', bodyColor: '#1A1A1A', wingColor: '#FFC107', glowColor: '#FFD54F', x: 70, y: 50 },
+            { id: 12, name: 'Docs', type: 'Bookworm', bodyColor: '#4FD1C5', wingColor: '#80DEEA', glowColor: '#B2EBF2', x: 30, y: 45 }
+        ];
+
+        function App() {
+            const [currentSeason, setCurrentSeason] = useState('IDLE');
+            const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
+            const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+            const [catchingBug, setCatchingBug] = useState(null);
+            const [catchStep, setCatchStep] = useState(0);
+            const [bugs, setBugs] = useState(BUGS);
+            const [owlPos, setOwlPos] = useState({ x: 50, y: 45 });
+            const [owlTilt, setOwlTilt] = useState(0);
+            const [particles, setParticles] = useState([]);
+            const [lightningFlash, setLightningFlash] = useState(false);
+
+            const season = SEASONS[currentSeason];
+
+            useEffect(() => {
+                const handleKeyPress = (e) => {
+                    const keys = { '1': 'IDLE', '2': 'SCANNING', '3': 'ALERT', '4': 'SUCCESS', '5': 'SLEEPING' };
+                    if (keys[e.key]) setCurrentSeason(keys[e.key]);
+                };
+                window.addEventListener('keydown', handleKeyPress);
+                return () => window.removeEventListener('keydown', handleKeyPress);
+            }, []);
+
+            useEffect(() => {
+                if (currentSeason === 'ALERT') {
+                    const interval = setInterval(() => {
+                        setLightningFlash(true);
+                        setTimeout(() => setLightningFlash(false), 200);
+                    }, Math.random() * 3000 + 2000);
+                    return () => clearInterval(interval);
+                }
+            }, [currentSeason]);
+
+            const handleMouseMove = (e) => {
+                const x = (e.clientX / 1920 - 0.5) * 2;
+                const y = (e.clientY / 1080 - 0.5) * 2;
+                setMouseOffset({ x, y });
+                setCursorPos({ x: e.clientX, y: e.clientY });
+            };
+
+            const handleBugClick = (bug) => {
+                if (catchingBug) return;
+
+                setCatchingBug(bug.id);
+                setCatchStep(1);
+
+                // Step 1: Target Acquired (0-400ms)
+                setOwlTilt(10);
+
+                setTimeout(() => {
+                    setCatchStep(2);
+                    // Step 2: Swoop (400-800ms)
+                    setOwlPos({ x: bug.x, y: bug.y });
+                }, 400);
+
+                setTimeout(() => {
+                    setCatchStep(3);
+                    // Step 3: Capture (800-1200ms)
+                    setBugs(prev => prev.filter(b => b.id !== bug.id));
+                }, 800);
+
+                setTimeout(() => {
+                    setCatchStep(4);
+                    // Step 4: Energy Burst (1200-1800ms)
+                    createParticles(bug.x, bug.y, season.accent);
+                }, 1200);
+
+                setTimeout(() => {
+                    setCatchStep(5);
+                    // Step 5: Return (1800-2400ms)
+                    setOwlPos({ x: 50, y: 45 });
+                    setOwlTilt(0);
+                }, 1800);
+
+                setTimeout(() => {
+                    setCatchingBug(null);
+                    setCatchStep(0);
+                    // Respawn bug after delay
+                    setTimeout(() => {
+                        setBugs(prev => [...prev, bug]);
+                    }, 3000);
+                }, 2400);
+            };
+
+            const createParticles = (x, y, color) => {
+                const newParticles = Array.from({ length: 20 }, (_, i) => ({
+                    id: Date.now() + i,
+                    x: (x / 100) * 1920,
+                    y: (y / 100) * 1080,
+                    angle: (i / 20) * Math.PI * 2,
+                    color
+                }));
+                setParticles(newParticles);
+                setTimeout(() => setParticles([]), 600);
+            };
+
+            const getLayerTransform = (depth) => {
+                const { x, y } = mouseOffset;
+                const factors = {
+                    0: { x: -30, y: -15, z: -600 },
+                    1: { x: -20, y: -10, z: -400 },
+                    2: { x: -12, y: -6, z: -200 },
+                    3: { x: -5, y: -3, z: 0 },
+                    4: { x: 8, y: 4, z: 100 },
+                    5: { x: 15, y: 8, z: 200 },
+                    6: { x: 25, y: 12, z: 400 }
+                };
+                const factor = factors[depth];
+                return `translateX(${x * factor.x}px) translateY(${y * factor.y}px) translateZ(${factor.z}px)`;
+            };
+
+            const renderStars = () => {
+                return Array.from({ length: 40 }, (_, i) => (
+                    <div
+                        key={i}
+                        className="star"
+                        style={{
+                            left: `${Math.random() * 100}%`,
+                            top: `${Math.random() * 60}%`,
+                            width: `${Math.random() * 2 + 1}px`,
+                            height: `${Math.random() * 2 + 1}px`,
+                            animationDelay: `${Math.random() * 3}s`,
+                            animationDuration: `${Math.random() * 2 + 2}s`
+                        }}
+                    />
+                ));
+            };
+
+            const renderFireflies = () => {
+                return Array.from({ length: 20 }, (_, i) => (
+                    <div
+                        key={i}
+                        style={{
+                            position: 'absolute',
+                            left: `${Math.random() * 100}%`,
+                            top: `${Math.random() * 100}%`,
+                            width: '4px',
+                            height: '4px',
+                            background: '#FFEB3B',
+                            borderRadius: '50%',
+                            boxShadow: '0 0 10px #FFEB3B',
+                            animation: `firefly ${Math.random() * 2 + 2}s ease-in-out infinite`,
+                            animationDelay: `${Math.random() * 2}s`
+                        }}
+                    />
+                ));
+            };
+
+            const renderWeather = () => {
+                if (currentSeason === 'SLEEPING') {
+                    return Array.from({ length: 50 }, (_, i) => (
+                        <div
+                            key={i}
+                            style={{
+                                position: 'absolute',
+                                left: `${Math.random() * 100}%`,
+                                top: '-50px',
+                                width: '6px',
+                                height: '6px',
+                                background: 'white',
+                                borderRadius: '50%',
+                                animation: `fall ${Math.random() * 3 + 5}s linear infinite`,
+                                animationDelay: `${Math.random() * 5}s`,
+                                opacity: 0.8
+                            }}
+                        />
+                    ));
+                } else if (currentSeason === 'SUCCESS') {
+                    return Array.from({ length: 50 }, (_, i) => (
+                        <div
+                            key={i}
+                            style={{
+                                position: 'absolute',
+                                left: `${Math.random() * 100}%`,
+                                top: '-50px',
+                                width: '10px',
+                                height: '10px',
+                                background: 'radial-gradient(circle, #FFB6C1, #FFC0CB)',
+                                borderRadius: '50% 0 50% 0',
+                                animation: `petalFall ${Math.random() * 4 + 6}s linear infinite`,
+                                animationDelay: `${Math.random() * 6}s`
+                            }}
+                        />
+                    ));
+                } else if (currentSeason === 'SCANNING') {
+                    const leaves = ['🍂', '🍁', '🍃'];
+                    return Array.from({ length: 25 }, (_, i) => (
+                        <div
+                            key={i}
+                            style={{
+                                position: 'absolute',
+                                left: `${Math.random() * 100}%`,
+                                top: '-50px',
+                                fontSize: '20px',
+                                animation: `fall ${Math.random() * 4 + 6}s linear infinite`,
+                                animationDelay: `${Math.random() * 6}s`
+                            }}
+                        >
+                            {leaves[Math.floor(Math.random() * leaves.length)]}
+                        </div>
+                    ));
+                }
+                return null;
+            };
+
+            const renderBugSVG = (bug) => {
+                const size = 40;
+                switch (bug.type) {
+                    case 'Moth':
+                        return (
+                            <svg width={size} height={size} viewBox="0 0 40 40">
+                                <ellipse cx="20" cy="25" rx="3" ry="8" fill={bug.bodyColor} />
+                                <ellipse cx="12" cy="20" rx="10" ry="15" fill={bug.wingColor} opacity="0.7" />
+                                <ellipse cx="28" cy="20" rx="10" ry="15" fill={bug.wingColor} opacity="0.7" />
+                                <line x1="20" y1="17" x2="15" y2="10" stroke={bug.bodyColor} strokeWidth="1" />
+                                <line x1="20" y1="17" x2="25" y2="10" stroke={bug.bodyColor} strokeWidth="1" />
+                            </svg>
+                        );
+                    case 'Beetle':
+                        return (
+                            <svg width={size} height={size} viewBox="0 0 40 40">
+                                <ellipse cx="20" cy="20" rx="8" ry="12" fill={bug.bodyColor} />
+                                <ellipse cx="20" cy="15" rx="6" ry="6" fill={bug.wingColor} />
+                                <circle cx="18" cy="13" r="1" fill="white" />
+                                <circle cx="22" cy="13" r="1" fill="white" />
+                            </svg>
+                        );
+                    case 'Dragonfly':
+                        return (
+                            <svg width={size * 1.5} height={size} viewBox="0 0 60 40">
+                                <ellipse cx="30" cy="20" rx="3" ry="10" fill={bug.bodyColor} />
+                                <ellipse cx="20" cy="15" rx="8" ry="12" fill={bug.wingColor} opacity="0.5" />
+                                <ellipse cx="40" cy="15" rx="8" ry="12" fill={bug.wingColor} opacity="0.5" />
+                                <ellipse cx="20" cy="25" rx="8" ry="10" fill={bug.wingColor} opacity="0.5" />
+                                <ellipse cx="40" cy="25" rx="8" ry="10" fill={bug.wingColor} opacity="0.5" />
+                            </svg>
+                        );
+                    case 'Butterfly':
+                        return (
+                            <svg width={size * 1.2} height={size} viewBox="0 0 50 40">
+                                <ellipse cx="25" cy="20" rx="2" ry="10" fill={bug.bodyColor} />
+                                <path d="M 15 20 Q 10 10, 12 5 Q 15 2, 18 5 Q 20 10, 15 20 Z" fill={bug.wingColor} />
+                                <path d="M 35 20 Q 40 10, 38 5 Q 35 2, 32 5 Q 30 10, 35 20 Z" fill={bug.wingColor} />
+                                <path d="M 15 20 Q 10 30, 12 35 Q 15 38, 18 35 Q 20 30, 15 20 Z" fill={bug.wingColor} />
+                                <path d="M 35 20 Q 40 30, 38 35 Q 35 38, 32 35 Q 30 30, 35 20 Z" fill={bug.wingColor} />
+                            </svg>
+                        );
+                    case 'Spider':
+                        return (
+                            <svg width={size} height={size * 1.5} viewBox="0 0 40 60">
+                                <line x1="20" y1="0" x2="20" y2="15" stroke="#888" strokeWidth="1" opacity="0.5" />
+                                <circle cx="20" cy="30" r="8" fill={bug.bodyColor} />
+                                <circle cx="20" cy="22" r="5" fill={bug.bodyColor} />
+                                {[0, 1, 2, 3].map(i => (
+                                    <line key={i} x1="20" y1="30" x2={5 + i * 10} y2="45" stroke={bug.bodyColor} strokeWidth="1.5" />
+                                ))}
+                            </svg>
+                        );
+                    default:
+                        return (
+                            <svg width={size} height={size} viewBox="0 0 40 40">
+                                <circle cx="20" cy="20" r="8" fill={bug.bodyColor} />
+                                <circle cx="18" cy="18" r="2" fill="white" opacity="0.6" />
+                            </svg>
+                        );
+                }
+            };
+
+            const getCatchStepLabel = () => {
+                const labels = ['', 'Target Acquired', 'Swooping', 'Capture', 'Energy Burst', 'Returning'];
+                return labels[catchStep];
+            };
+
+            return (
+                <div className="parallax-container" onMouseMove={handleMouseMove}>
+                    {/* Custom Cursor */}
+                    <div
+                        className="custom-cursor"
+                        style={{
+                            left: cursorPos.x - 16,
+                            top: cursorPos.y - 16,
+                            transform: catchingBug ? 'scale(1.5)' : 'scale(1)'
+                        }}
+                    />
+
+                    {/* Layer 0: Night Sky with Stars */}
+                    <div className="parallax-layer" style={{ transform: getLayerTransform(0) }}>
+                        <div style={{
+                            width: '100%',
+                            height: '100%',
+                            background: 'linear-gradient(to bottom, #0A0E2E, #0F1535)'
+                        }}>
+                            {renderStars()}
+                            <div
+                                className="moon"
+                                style={{
+                                    background: currentSeason === 'ALERT'
+                                        ? 'radial-gradient(circle at 30% 30%, #FF6B6B, #EF4444)'
+                                        : currentSeason === 'SLEEPING'
+                                        ? 'radial-gradient(circle at 30% 30%, #B0C4DE, #93B4DC)'
+                                        : 'radial-gradient(circle at 30% 30%, #FFF8DC, #F0E68C)',
+                                    boxShadow: `0 0 60px ${season.accent}40`
+                                }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Layer 1: Background Image */}
+                    <div className="parallax-layer" style={{ transform: getLayerTransform(1) }}>
+                        <div style={{
+                            width: '100%',
+                            height: '100%',
+                            backgroundImage: 'url(file:///C:/Users/daley/Downloads/a0ddd4a6-8f74-4e0b-a696-e4209cf44170.png)',
+                            backgroundSize: '120% auto',
+                            backgroundPosition: 'center',
+                            filter: season.bgFilter,
+                            transition: 'filter 0.7s ease'
+                        }}>
+                            <div style={{
+                                width: '100%',
+                                height: '100%',
+                                background: season.bgOverlay,
+                                transition: 'background 0.7s ease'
+                            }} />
+                        </div>
+                    </div>
+
+                    {/* Layer 2: Spline 3D Forest (Background) */}
+                    <div className="parallax-layer" style={{ transform: getLayerTransform(2) }}>
+                        {/* <spline-viewer url="YOUR_SPLINE_FOREST_URL_HERE" style={{ width: '100%', height: '60%', position: 'absolute', top: '20%', left: '0' }}></spline-viewer> */}
+                        {/* CSS Fallback: Tree Silhouettes */}
+                        <div style={{
+                            position: 'absolute',
+                            left: 0,
+                            bottom: 0,
+                            width: '300px',
+                            height: '600px',
+                            background: 'linear-gradient(to top, #1A3A2A, transparent)',
+                            clipPath: 'polygon(0% 100%, 10% 50%, 5% 50%, 15% 20%, 10% 20%, 20% 0%, 25% 20%, 30% 20%, 25% 50%, 35% 50%, 0% 100%)',
+                            opacity: 0.6
+                        }} />
+                        <div style={{
+                            position: 'absolute',
+                            right: 0,
+                            bottom: 0,
+                            width: '300px',
+                            height: '600px',
+                            background: 'linear-gradient(to top, #1A3A2A, transparent)',
+                            clipPath: 'polygon(100% 100%, 90% 50%, 95% 50%, 85% 20%, 90% 20%, 80% 0%, 75% 20%, 70% 20%, 75% 50%, 65% 50%, 100% 100%)',
+                            opacity: 0.6
+                        }} />
+                    </div>
+
+                    {/* Layer 3: Interactive Owl (Focal Plane) */}
+                    <div className="parallax-layer" style={{ transform: getLayerTransform(3) }}>
+                        <div
+                            className="owl-body"
+                            style={{
+                                position: 'absolute',
+                                left: `${owlPos.x}%`,
+                                top: `${owlPos.y}%`,
+                                transform: `translate(-50%, -50%) rotate(${owlTilt}deg)`,
+                                transition: 'all 0.7s cubic-bezier(0.4, 0, 0.2, 1)'
+                            }}
+                        >
+                            {/* <spline-viewer url="YOUR_SPLINE_OWL_URL_HERE" style={{ width: '160px', height: '220px' }}></spline-viewer> */}
+
+                            {/* CSS Fallback Owl */}
+                            <div className="owl-wing left" />
+                            <div className="owl-torso" />
+                            <div className="owl-head">
+                                <div
+                                    className="owl-eye"
+                                    style={{
+                                        left: '25%',
+                                        top: '35%',
+                                        background: currentSeason === 'IDLE'
+                                            ? 'radial-gradient(circle, #7FFFED 20%, #4FD1C5 60%, #2A9D8F)'
+                                            : currentSeason === 'SCANNING'
+                                            ? 'radial-gradient(circle, #FFF8DC 20%, #FFD700 60%, #B8860B)'
+                                            : currentSeason === 'ALERT'
+                                            ? 'radial-gradient(circle, #FF4444 30%, #FF1A1A 70%, #8B0000)'
+                                            : currentSeason === 'SUCCESS'
+                                            ? 'radial-gradient(circle, #FFFACD 20%, #FFB800 60%, #CC8800)'
+                                            : 'radial-gradient(circle, #7A9ABE 30%, #5A7A9E 70%, #3A5A7E)',
+                                        boxShadow: `0 0 20px ${season.eyeGlow}`,
+                                        height: currentSeason === 'SLEEPING' ? '3px' : '40px'
+                                    }}
+                                />
+                                <div
+                                    className="owl-eye"
+                                    style={{
+                                        right: '25%',
+                                        top: '35%',
+                                        background: currentSeason === 'IDLE'
+                                            ? 'radial-gradient(circle, #7FFFED 20%, #4FD1C5 60%, #2A9D8F)'
+                                            : currentSeason === 'SCANNING'
+                                            ? 'radial-gradient(circle, #FFF8DC 20%, #FFD700 60%, #B8860B)'
+                                            : currentSeason === 'ALERT'
+                                            ? 'radial-gradient(circle, #FF4444 30%, #FF1A1A 70%, #8B0000)'
+                                            : currentSeason === 'SUCCESS'
+                                            ? 'radial-gradient(circle, #FFFACD 20%, #FFB800 60%, #CC8800)'
+                                            : 'radial-gradient(circle, #7A9ABE 30%, #5A7A9E 70%, #3A5A7E)',
+                                        boxShadow: `0 0 20px ${season.eyeGlow}`,
+                                        height: currentSeason === 'SLEEPING' ? '3px' : '40px'
+                                    }}
+                                />
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '65%',
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    width: '0',
+                                    height: '0',
+                                    borderLeft: '8px solid transparent',
+                                    borderRight: '8px solid transparent',
+                                    borderTop: '12px solid #FFA500'
+                                }} />
+                            </div>
+                            <div className="owl-wing right" />
+
+                            {catchStep > 0 && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '-40px',
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    fontSize: '14px',
+                                    fontWeight: 'bold',
+                                    color: season.accent,
+                                    textShadow: `0 0 10px ${season.accent}`,
+                                    whiteSpace: 'nowrap'
+                                }}>
+                                    {getCatchStepLabel()}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Layer 4: Bugs */}
+                    <div className="parallax-layer" style={{ transform: getLayerTransform(4) }}>
+                        {bugs.map(bug => (
+                            <div
+                                key={bug.id}
+                                className="bug"
+                                style={{
+                                    left: `${bug.x}%`,
+                                    top: `${bug.y}%`,
+                                    color: bug.glowColor,
+                                    animation: `float ${3 + bug.id * 0.3}s ease-in-out infinite`,
+                                    animationDelay: `${bug.id * 0.2}s`
+                                }}
+                                onClick={() => handleBugClick(bug)}
+                            >
+                                {renderBugSVG(bug)}
+                            </div>
+                        ))}
+
+                        {/* Catch Particles */}
+                        {particles.map(p => (
+                            <div
+                                key={p.id}
+                                style={{
+                                    position: 'absolute',
+                                    left: p.x,
+                                    top: p.y,
+                                    width: '8px',
+                                    height: '8px',
+                                    background: p.color,
+                                    borderRadius: '50%',
+                                    boxShadow: `0 0 10px ${p.color}`,
+                                    transform: `translate(${Math.cos(p.angle) * 100}px, ${Math.sin(p.angle) * 100}px)`,
+                                    transition: 'all 0.6s ease-out',
+                                    opacity: 0
+                                }}
+                            />
+                        ))}
+
+                        {catchStep === 4 && catchingBug && (
+                            <div
+                                className="catch-ping"
+                                style={{
+                                    left: `${owlPos.x}%`,
+                                    top: `${owlPos.y}%`,
+                                    transform: 'translate(-50%, -50%)',
+                                    color: season.accent
+                                }}
+                            />
+                        )}
+                    </div>
+
+                    {/* Layer 5: Foreground Foliage */}
+                    <div className="parallax-layer" style={{ transform: getLayerTransform(5) }}>
+                        <div className="foreground-leaf" style={{
+                            left: 0,
+                            bottom: 0,
+                            width: '500px',
+                            height: '400px',
+                            background: 'linear-gradient(to top right, #0A2A1A, transparent)',
+                            clipPath: 'polygon(0 100%, 30% 70%, 20% 60%, 40% 40%, 30% 30%, 50% 10%, 40% 0, 0 0)'
+                        }} />
+                        <div className="foreground-leaf" style={{
+                            right: 0,
+                            bottom: 0,
+                            width: '500px',
+                            height: '400px',
+                            background: 'linear-gradient(to top left, #0A2A1A, transparent)',
+                            clipPath: 'polygon(100% 100%, 70% 70%, 80% 60%, 60% 40%, 70% 30%, 50% 10%, 60% 0, 100% 0)'
+                        }} />
+                    </div>
+
+                    {/* Layer 6: Atmospheric Effects & HUD */}
+                    <div className="parallax-layer" style={{ transform: getLayerTransform(6) }}>
+                        {/* Fog Wisps */}
+                        <div className="fog-wisp" style={{ left: '0%', animationDuration: '20s' }} />
+                        <div className="fog-wisp" style={{ left: '30%', animationDuration: '25s', animationDelay: '5s' }} />
+                        <div className="fog-wisp" style={{ left: '60%', animationDuration: '22s', animationDelay: '10s' }} />
+
+                        {/* Fireflies */}
+                        {renderFireflies()}
+
+                        {/* Weather */}
+                        {renderWeather()}
+
+                        {/* Lightning Flash */}
+                        {lightningFlash && <div className="lightning-flash" />}
+
+                        {/* HUD Overlay */}
+                        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 60 }}>
+                            {/* Top Left */}
+                            <div className="hud-text" style={{ position: 'absolute', top: 30, left: 30, fontSize: '18px' }}>
+                                <div>Files: 1,287</div>
+                                <div>Scanned: 100%</div>
+                            </div>
+
+                            {/* Top Center */}
+                            <div style={{
+                                position: 'absolute',
+                                top: 30,
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                padding: '12px 32px',
+                                background: 'rgba(0, 0, 0, 0.6)',
+                                backdropFilter: 'blur(10px)',
+                                borderRadius: '24px',
+                                border: `2px solid ${season.accent}`,
+                                color: season.accent,
+                                fontSize: '20px',
+                                fontWeight: 'bold',
+                                textShadow: `0 0 10px ${season.accent}`
+                            }}>
+                                {season.name}
+                            </div>
+
+                            {/* Top Right */}
+                            <div className="hud-text" style={{ position: 'absolute', top: 30, right: 30, fontSize: '18px', textAlign: 'right' }}>
+                                <div>Sync: Active</div>
+                                <div>Uplink: Stable</div>
+                            </div>
+
+                            {/* Bottom Left */}
+                            <div className="hud-text" style={{ position: 'absolute', bottom: 120, left: 30, fontSize: '18px' }}>
+                                <div style={{ color: currentSeason === 'ALERT' ? '#EF4444' : 'rgba(255, 255, 255, 0.4)' }}>
+                                    Threats: {currentSeason === 'ALERT' ? '1 DETECTED' : '0'}
+                                </div>
+                            </div>
+
+                            {/* Bottom Right */}
+                            <div className="hud-text" style={{ position: 'absolute', bottom: 120, right: 30, fontSize: '18px', textAlign: 'right' }}>
+                                <div>Mode: Monitoring</div>
+                            </div>
+
+                            {/* Bottom Center Hints */}
+                            <div className="hud-text" style={{
+                                position: 'absolute',
+                                bottom: 120,
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                fontSize: '14px',
+                                textAlign: 'center'
+                            }}>
+                                Press 1-5 to change seasons | Click bugs to catch | Move mouse for parallax
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* State Transition Strip */}
+                    <div style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '80px',
+                        background: 'rgba(0, 0, 0, 0.8)',
+                        backdropFilter: 'blur(20px)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: '20px',
+                        zIndex: 70,
+                        pointerEvents: 'auto'
+                    }}>
+                        {Object.entries(SEASONS).map(([key, s], index) => (
+                            <button
+                                key={key}
+                                onClick={() => setCurrentSeason(key)}
+                                style={{
+                                    padding: '12px 24px',
+                                    background: currentSeason === key ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+                                    border: 'none',
+                                    borderBottom: currentSeason === key ? `3px solid ${s.accent}` : '3px solid transparent',
+                                    color: currentSeason === key ? s.accent : 'rgba(255, 255, 255, 0.5)',
+                                    fontSize: '16px',
+                                    fontFamily: 'Courier New, monospace',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease',
+                                    transform: currentSeason === key ? 'scale(1.05)' : 'scale(1)',
+                                    textShadow: currentSeason === key ? `0 0 10px ${s.accent}` : 'none'
+                                }}
+                            >
+                                {index + 1}. {s.name}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

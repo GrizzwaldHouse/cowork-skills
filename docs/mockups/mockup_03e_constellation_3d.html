@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OwlWatcher: Stellar Constellation</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body, html {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            cursor: none;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+        .bg-layer {
+            position: fixed;
+            inset: 0;
+            background-image: url('file:///C:/Users/daley/Downloads/a0ddd4a6-8f74-4e0b-a696-e4209cf44170.png');
+            background-size: cover;
+            background-position: center;
+            transition: filter 1s ease;
+            z-index: 0;
+        }
+        .bg-gradient {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0) 60%);
+            z-index: 1;
+        }
+        .bg-overlay {
+            position: fixed;
+            inset: 0;
+            transition: background-color 1s ease;
+            z-index: 2;
+        }
+        .custom-cursor {
+            position: fixed;
+            width: 24px;
+            height: 24px;
+            border: 2px solid white;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s ease;
+        }
+        .custom-cursor::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+        }
+        .constellation-container {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90vw;
+            height: 50vh;
+            perspective: 1200px;
+            perspective-origin: 50% 50%;
+            z-index: 10;
+        }
+        .constellation-3d {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            animation: rotate3d 60s linear infinite;
+            transition: transform 0.3s ease;
+        }
+        @keyframes rotate3d {
+            from { transform: rotateY(0deg); }
+            to { transform: rotateY(360deg); }
+        }
+        .star-node {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            transform-style: preserve-3d;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .star-node:hover {
+            transform: scale(1.3) !important;
+        }
+        .node-glow {
+            position: absolute;
+            inset: -10px;
+            border-radius: 50%;
+            filter: blur(15px);
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+        .star-node:hover .node-glow {
+            opacity: 1;
+        }
+        .node-label {
+            position: absolute;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.9);
+            padding: 6px 12px;
+            border-radius: 6px;
+            white-space: nowrap;
+            font-size: 12px;
+            color: white;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .star-node:hover .node-label {
+            opacity: 1;
+        }
+        .constellation-line {
+            position: absolute;
+            height: 2px;
+            transform-origin: left center;
+            background: linear-gradient(90deg, currentColor 0%, transparent 100%);
+            opacity: 0.3;
+            transition: opacity 0.3s ease;
+        }
+        .constellation-line.active {
+            opacity: 0.8;
+            box-shadow: 0 0 10px currentColor;
+        }
+        @keyframes pulseLine {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+        .star-node:hover ~ .constellation-line {
+            animation: pulseLine 1s ease infinite;
+        }
+        .star-particle {
+            position: fixed;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        .firefly {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            opacity: 0.8;
+            filter: blur(2px);
+            animation: float 8s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(100px, -50px); }
+            50% { transform: translate(200px, 20px); }
+            75% { transform: translate(100px, 60px); }
+        }
+        .weather-particle {
+            position: fixed;
+            font-size: 20px;
+            opacity: 0.7;
+            pointer-events: none;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            to { transform: translateY(110vh); }
+        }
+        .owl-container {
+            position: absolute;
+            left: 50%;
+            top: 55%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 250px;
+            z-index: 20;
+        }
+        .css-owl {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        .owl-body {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 140px;
+            background: linear-gradient(135deg, #4A3F35 0%, #2A2520 100%);
+            border-radius: 40% 40% 50% 50%;
+        }
+        .owl-head {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, 0);
+            width: 100px;
+            height: 80px;
+            background: linear-gradient(135deg, #5A4F45 0%, #3A3530 100%);
+            border-radius: 50% 50% 40% 40%;
+        }
+        .owl-eye {
+            position: absolute;
+            top: 35%;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: black;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.8);
+        }
+        .owl-eye.left { left: 22%; }
+        .owl-eye.right { right: 22%; }
+        .owl-iris {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            transition: background 1s ease, box-shadow 1s ease;
+        }
+        .owl-pupil {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: black;
+            border-radius: 50%;
+            transition: height 1s ease;
+        }
+        .owl-beak {
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, 0);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 16px solid #8B7355;
+        }
+        .owl-ear {
+            position: absolute;
+            top: 5%;
+            width: 20px;
+            height: 30px;
+            background: linear-gradient(135deg, #5A4F45 0%, #3A3530 100%);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        }
+        .owl-ear.left { left: 10%; transform: rotate(-15deg); }
+        .owl-ear.right { right: 10%; transform: rotate(15deg); }
+        .energy-burst {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            opacity: 0;
+            pointer-events: none;
+        }
+        @keyframes burst {
+            0% { opacity: 1; transform: translate(0, 0) scale(1); }
+            100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
+        }
+        .hud-text {
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: rgba(255,255,255,0.4);
+            text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+            letter-spacing: 1px;
+        }
+        .state-badge {
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 2px solid;
+            transition: all 1s ease;
+        }
+        .lightning-flash {
+            position: fixed;
+            inset: 0;
+            background: white;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 30;
+        }
+        @keyframes lightning {
+            0%, 100% { opacity: 0; }
+            10%, 30% { opacity: 0.3; }
+            20% { opacity: 0; }
+        }
+        .red-vignette {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle, transparent 30%, rgba(139,0,0,0.5) 100%);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 25;
+            animation: vignettePulse 2s ease-in-out infinite;
+        }
+        @keyframes vignettePulse {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Seasonal state definitions
+        const seasons = {
+            IDLE: {
+                name: 'Summer Night',
+                accent: '#4FD1C5',
+                eyeColor: '#4FD1C5',
+                eyeGlow: '#4FD1C5',
+                bgOverlay: 'rgba(0,0,0,0)',
+                bgFilter: 'brightness(1) saturate(1)',
+                irisGradient: 'radial-gradient(circle, #7FFFED 20%, #4FD1C5 60%, #2A9D8F)',
+                pupilHeight: '8px'
+            },
+            SCANNING: {
+                name: 'Autumn Scan',
+                accent: '#FB923C',
+                eyeColor: '#FFD700',
+                eyeGlow: '#FBBF24',
+                bgOverlay: 'rgba(100,50,0,0.25)',
+                bgFilter: 'brightness(0.8) saturate(0.8) sepia(0.4) hue-rotate(-10deg)',
+                irisGradient: 'radial-gradient(circle, #FFF8DC 20%, #FFD700 60%, #B8860B)',
+                pupilHeight: '8px'
+            },
+            ALERT: {
+                name: 'Winter Storm',
+                accent: '#EF4444',
+                eyeColor: '#FF1A1A',
+                eyeGlow: '#EF4444',
+                bgOverlay: 'rgba(80,0,0,0.35)',
+                bgFilter: 'brightness(0.7) saturate(1.3) hue-rotate(-20deg)',
+                irisGradient: 'radial-gradient(circle, #FF4444 30%, #FF1A1A 70%, #8B0000)',
+                pupilHeight: '16px'
+            },
+            SUCCESS: {
+                name: 'Spring Bloom',
+                accent: '#F59E0B',
+                eyeColor: '#FFB800',
+                eyeGlow: '#F59E0B',
+                bgOverlay: 'rgba(80,0,80,0.2)',
+                bgFilter: 'brightness(1.1) saturate(1.2) hue-rotate(280deg)',
+                irisGradient: 'radial-gradient(circle, #FFFACD 20%, #FFB800 60%, #CC8800)',
+                pupilHeight: '8px'
+            },
+            SLEEPING: {
+                name: 'Deep Winter',
+                accent: '#93B4DC',
+                eyeColor: '#5A7A9E',
+                eyeGlow: '#4A6A8E',
+                bgOverlay: 'rgba(15,23,42,0.4)',
+                bgFilter: 'brightness(0.5) saturate(0.3) hue-rotate(200deg)',
+                irisGradient: 'radial-gradient(circle, #7A9ABE 30%, #5A7A9E 70%, #3A5A7E)',
+                pupilHeight: '4px'
+            }
+        };
+
+        // 12 Bug type definitions with 3D positions
+        const bugTypes = [
+            { id: 1, name: 'Documents', insect: 'Moth', bodyColor: '#8B7355', wingColor: '#D4C5A9', glowColor: '#E8DCC8',
+              x: -40, y: -20, z: 100 },
+            { id: 2, name: 'Python', insect: 'Beetle', bodyColor: '#2E7D32', wingColor: '#4CAF50', glowColor: '#66BB6A',
+              x: -30, y: 10, z: -50 },
+            { id: 3, name: 'Config', insect: 'Firefly', bodyColor: '#1B1B1B', wingColor: '#333', glowColor: '#FFEB3B',
+              x: -15, y: -30, z: 0 },
+            { id: 4, name: 'Data', insect: 'Dragonfly', bodyColor: '#1565C0', wingColor: '#90CAF9', glowColor: '#42A5F5',
+              x: 0, y: 5, z: 80 },
+            { id: 5, name: 'Security', insect: 'Spider', bodyColor: '#1A1A1A', wingColor: '#333', glowColor: '#CE93D8',
+              x: 15, y: -15, z: -30 },
+            { id: 6, name: 'Package', insect: 'Caterpillar', bodyColor: '#558B2F', wingColor: '#8BC34A', glowColor: '#AED581',
+              x: 30, y: 15, z: 50 },
+            { id: 7, name: 'Design', insect: 'Butterfly', bodyColor: '#1A1A1A', wingColor: '#EC407A', glowColor: '#F48FB1',
+              x: 40, y: -25, z: -70 },
+            { id: 8, name: 'Database', insect: 'Pill Bug', bodyColor: '#455A64', wingColor: '#78909C', glowColor: '#90A4AE',
+              x: -35, y: 20, z: 30 },
+            { id: 9, name: 'Test', insect: 'Lightning Bug', bodyColor: '#1B1B1B', wingColor: '#333', glowColor: '#76FF03',
+              x: 25, y: -5, z: -100 },
+            { id: 10, name: 'Log', insect: 'Ant', bodyColor: '#3E2723', wingColor: '#5D4037', glowColor: '#8D6E63',
+              x: -20, y: 25, z: -20 },
+            { id: 11, name: 'Tools', insect: 'Carpenter Bee', bodyColor: '#1A1A1A', wingColor: '#FFC107', glowColor: '#FFD54F',
+              x: 35, y: 8, z: 20 },
+            { id: 12, name: 'Docs', insect: 'Bookworm', bodyColor: '#4FD1C5', wingColor: '#80DEEA', glowColor: '#B2EBF2',
+              x: -25, y: -8, z: 60 }
+        ];
+
+        // Constellation connections
+        const connections = [
+            [1, 12], [12, 10], // Document cluster
+            [2, 9], [9, 11], // Dev cluster
+            [3, 4], [4, 8], // Data cluster
+            [5, 6], [6, 7] // Misc cluster
+        ];
+
+        function BugSVG({ bug, size = 40 }) {
+            return (
+                <svg width={size} height={size} viewBox="0 0 40 40" style={{ filter: 'drop-shadow(0 0 4px ' + bug.glowColor + ')' }}>
+                    {/* Body */}
+                    <ellipse cx="20" cy="22" rx="8" ry="12" fill={bug.bodyColor} stroke={bug.wingColor} strokeWidth="1"/>
+
+                    {/* Wings */}
+                    <ellipse cx="12" cy="18" rx="10" ry="14" fill={bug.wingColor} opacity="0.7"
+                             transform="rotate(-30 12 18)"/>
+                    <ellipse cx="28" cy="18" rx="10" ry="14" fill={bug.wingColor} opacity="0.7"
+                             transform="rotate(30 28 18)"/>
+
+                    {/* Head */}
+                    <circle cx="20" cy="12" r="5" fill={bug.bodyColor}/>
+
+                    {/* Antennae */}
+                    <line x1="18" y1="10" x2="15" y2="5" stroke={bug.wingColor} strokeWidth="1.5" strokeLinecap="round"/>
+                    <line x1="22" y1="10" x2="25" y2="5" stroke={bug.wingColor} strokeWidth="1.5" strokeLinecap="round"/>
+                    <circle cx="15" cy="5" r="1.5" fill={bug.glowColor}/>
+                    <circle cx="25" cy="5" r="1.5" fill={bug.glowColor}/>
+
+                    {/* Glow center */}
+                    <circle cx="20" cy="20" r="3" fill={bug.glowColor} opacity="0.6"/>
+                </svg>
+            );
+        }
+
+        function StarNode({ bug, onClick, onHover, onLeave, style }) {
+            return (
+                <div
+                    className="star-node"
+                    style={style}
+                    onClick={() => onClick(bug)}
+                    onMouseEnter={() => onHover(bug)}
+                    onMouseLeave={onLeave}
+                >
+                    <div className="node-glow" style={{ background: bug.glowColor }}></div>
+                    <div style={{ position: 'relative', zIndex: 10 }}>
+                        <BugSVG bug={bug} />
+                    </div>
+                    <div className="node-label">
+                        {bug.name} • {bug.insect}
+                    </div>
+                </div>
+            );
+        }
+
+        function ConstellationLine({ from, to, active, color }) {
+            const length = Math.sqrt(Math.pow(to.x - from.x, 2) + Math.pow(to.y - from.y, 2));
+            const angle = Math.atan2(to.y - from.y, to.x - from.x) * 180 / Math.PI;
+
+            return (
+                <div
+                    className={`constellation-line ${active ? 'active' : ''}`}
+                    style={{
+                        left: `${from.x}%`,
+                        top: `${from.y}%`,
+                        width: `${length}%`,
+                        transform: `rotate(${angle}deg)`,
+                        color: color
+                    }}
+                />
+            );
+        }
+
+        function CSSOwl({ state }) {
+            const stateConfig = seasons[state];
+
+            return (
+                <div className="css-owl">
+                    <div className="owl-ear left"></div>
+                    <div className="owl-ear right"></div>
+                    <div className="owl-head">
+                        <div className="owl-eye left">
+                            <div
+                                className="owl-iris"
+                                style={{
+                                    background: stateConfig.irisGradient,
+                                    boxShadow: `0 0 15px ${stateConfig.eyeGlow}`
+                                }}
+                            >
+                                <div
+                                    className="owl-pupil"
+                                    style={{ height: stateConfig.pupilHeight }}
+                                />
+                            </div>
+                        </div>
+                        <div className="owl-eye right">
+                            <div
+                                className="owl-iris"
+                                style={{
+                                    background: stateConfig.irisGradient,
+                                    boxShadow: `0 0 15px ${stateConfig.eyeGlow}`
+                                }}
+                            >
+                                <div
+                                    className="owl-pupil"
+                                    style={{ height: stateConfig.pupilHeight }}
+                                />
+                            </div>
+                        </div>
+                        <div className="owl-beak"></div>
+                    </div>
+                    <div className="owl-body"></div>
+                </div>
+            );
+        }
+
+        function OwlWatcherConstellation() {
+            const [state, setState] = useState('IDLE');
+            const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+            const [parallax, setParallax] = useState({ rotateX: 0, rotateY: 0 });
+            const [activeNode, setActiveNode] = useState(null);
+            const [hoveredNode, setHoveredNode] = useState(null);
+            const [stats, setStats] = useState({ files: 1287, scanned: 100, sync: 'Active', uplink: 'Stable' });
+            const [weatherParticles, setWeatherParticles] = useState([]);
+            const [showLightning, setShowLightning] = useState(false);
+
+            const constellationRef = useRef(null);
+
+            useEffect(() => {
+                const handleKeyPress = (e) => {
+                    const keyMap = { '1': 'IDLE', '2': 'SCANNING', '3': 'ALERT', '4': 'SUCCESS', '5': 'SLEEPING' };
+                    if (keyMap[e.key]) setState(keyMap[e.key]);
+                };
+                window.addEventListener('keydown', handleKeyPress);
+                return () => window.removeEventListener('keydown', handleKeyPress);
+            }, []);
+
+            useEffect(() => {
+                const handleMouseMove = (e) => {
+                    setMousePos({ x: e.clientX, y: e.clientY });
+
+                    // Parallax calculation
+                    const centerX = window.innerWidth / 2;
+                    const centerY = window.innerHeight / 2;
+                    const rotateY = ((e.clientX - centerX) / centerX) * 10;
+                    const rotateX = ((centerY - e.clientY) / centerY) * 10;
+                    setParallax({ rotateX, rotateY });
+                };
+                window.addEventListener('mousemove', handleMouseMove);
+                return () => window.removeEventListener('mousemove', handleMouseMove);
+            }, []);
+
+            useEffect(() => {
+                // Generate weather particles based on state
+                const particleConfig = {
+                    SLEEPING: { emoji: '❄️', count: 20 },
+                    SUCCESS: { emoji: '🌸', count: 15 },
+                    SCANNING: { emoji: '🍂', count: 12 }
+                };
+
+                const config = particleConfig[state];
+                if (config) {
+                    const particles = Array(config.count).fill(0).map((_, i) => ({
+                        id: i,
+                        emoji: config.emoji,
+                        left: Math.random() * 100,
+                        delay: Math.random() * 5,
+                        duration: 8 + Math.random() * 4
+                    }));
+                    setWeatherParticles(particles);
+                } else {
+                    setWeatherParticles([]);
+                }
+
+                // Lightning effect for ALERT
+                if (state === 'ALERT') {
+                    const interval = setInterval(() => {
+                        setShowLightning(true);
+                        setTimeout(() => setShowLightning(false), 200);
+                    }, 3000);
+                    return () => clearInterval(interval);
+                }
+            }, [state]);
+
+            const handleNodeClick = (bug) => {
+                setActiveNode(bug.id);
+
+                // Create energy burst particles
+                const burstCount = 12;
+                const burstContainer = document.createElement('div');
+                burstContainer.style.position = 'fixed';
+                burstContainer.style.left = '50%';
+                burstContainer.style.top = '55%';
+                burstContainer.style.zIndex = '100';
+                document.body.appendChild(burstContainer);
+
+                for (let i = 0; i < burstCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'energy-burst';
+                    particle.style.background = bug.glowColor;
+                    const angle = (i / burstCount) * Math.PI * 2;
+                    const distance = 100;
+                    particle.style.setProperty('--tx', `${Math.cos(angle) * distance}px`);
+                    particle.style.setProperty('--ty', `${Math.sin(angle) * distance}px`);
+                    particle.style.animation = 'burst 1s ease-out';
+                    burstContainer.appendChild(particle);
+                }
+
+                setTimeout(() => {
+                    document.body.removeChild(burstContainer);
+                    setActiveNode(null);
+                }, 3000);
+            };
+
+            const stateConfig = seasons[state];
+            const stateKeys = Object.keys(seasons);
+
+            return (
+                <>
+                    {/* Background layers */}
+                    <div className="bg-layer" style={{ filter: stateConfig.bgFilter }}></div>
+                    <div className="bg-gradient"></div>
+                    <div className="bg-overlay" style={{ backgroundColor: stateConfig.bgOverlay }}></div>
+
+                    {/* Star particles */}
+                    {Array(30).fill(0).map((_, i) => (
+                        <div
+                            key={`star-${i}`}
+                            className="star-particle"
+                            style={{
+                                left: `${Math.random() * 100}%`,
+                                top: `${Math.random() * 40}%`,
+                                animationDelay: `${Math.random() * 3}s`
+                            }}
+                        />
+                    ))}
+
+                    {/* Firefly particles */}
+                    {Array(15).fill(0).map((_, i) => (
+                        <div
+                            key={`firefly-${i}`}
+                            className="firefly"
+                            style={{
+                                left: `${Math.random() * 100}%`,
+                                top: `${30 + Math.random() * 40}%`,
+                                background: stateConfig.accent,
+                                animationDelay: `${Math.random() * 8}s`,
+                                animationDuration: `${8 + Math.random() * 4}s`
+                            }}
+                        />
+                    ))}
+
+                    {/* Weather particles */}
+                    {weatherParticles.map(p => (
+                        <div
+                            key={`weather-${p.id}`}
+                            className="weather-particle"
+                            style={{
+                                left: `${p.left}%`,
+                                top: '-5%',
+                                animationDelay: `${p.delay}s`,
+                                animationDuration: `${p.duration}s`
+                            }}
+                        >
+                            {p.emoji}
+                        </div>
+                    ))}
+
+                    {/* Lightning and vignette for ALERT */}
+                    {state === 'ALERT' && (
+                        <>
+                            <div className="red-vignette"></div>
+                            {showLightning && (
+                                <div className="lightning-flash" style={{ animation: 'lightning 0.2s ease' }}></div>
+                            )}
+                        </>
+                    )}
+
+                    {/* 3D Constellation */}
+                    <div className="constellation-container">
+                        <div
+                            ref={constellationRef}
+                            className="constellation-3d"
+                            style={{
+                                transform: `rotateX(${parallax.rotateX}deg) rotateY(${parallax.rotateY}deg)`
+                            }}
+                        >
+                            {/* Constellation lines */}
+                            {connections.map(([fromId, toId], idx) => {
+                                const fromBug = bugTypes.find(b => b.id === fromId);
+                                const toBug = bugTypes.find(b => b.id === toId);
+                                return (
+                                    <ConstellationLine
+                                        key={`line-${idx}`}
+                                        from={{ x: 50 + fromBug.x, y: 50 + fromBug.y }}
+                                        to={{ x: 50 + toBug.x, y: 50 + toBug.y }}
+                                        active={activeNode === fromId || activeNode === toId ||
+                                                hoveredNode === fromId || hoveredNode === toId}
+                                        color={stateConfig.accent}
+                                    />
+                                );
+                            })}
+
+                            {/* Star nodes */}
+                            {bugTypes.map(bug => (
+                                <StarNode
+                                    key={bug.id}
+                                    bug={bug}
+                                    onClick={handleNodeClick}
+                                    onHover={setHoveredNode}
+                                    onLeave={() => setHoveredNode(null)}
+                                    style={{
+                                        left: `${50 + bug.x}%`,
+                                        top: `${50 + bug.y}%`,
+                                        transform: `translate(-50%, -50%) translateZ(${bug.z}px)`
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Owl (Spline or CSS fallback) */}
+                    <div className="owl-container">
+                        {/* Replace URL with your Spline owl scene */}
+                        {/* <spline-viewer
+                            url=""
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                mixBlendMode: 'screen',
+                                pointerEvents: 'auto'
+                            }}
+                        ></spline-viewer> */}
+
+                        {/* CSS Fallback Owl */}
+                        <CSSOwl state={state} />
+                    </div>
+
+                    {/* HUD Overlay */}
+                    <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 50 }}>
+                        {/* Top-left stats */}
+                        <div style={{ position: 'absolute', top: 20, left: 30 }}>
+                            <div className="hud-text" style={{ fontSize: 14 }}>Files: {stats.files}</div>
+                            <div className="hud-text" style={{ fontSize: 14 }}>Scanned: {stats.scanned}%</div>
+                        </div>
+
+                        {/* Top-center state badge */}
+                        <div style={{ position: 'absolute', top: 20, left: '50%', transform: 'translateX(-50%)' }}>
+                            <div
+                                className="state-badge"
+                                style={{
+                                    borderColor: stateConfig.accent,
+                                    color: stateConfig.accent
+                                }}
+                            >
+                                {stateConfig.name}
+                            </div>
+                        </div>
+
+                        {/* Top-right status */}
+                        <div style={{ position: 'absolute', top: 20, right: 30, textAlign: 'right' }}>
+                            <div className="hud-text" style={{ fontSize: 14 }}>Sync: {stats.sync}</div>
+                            <div className="hud-text" style={{ fontSize: 14 }}>Uplink: {stats.uplink}</div>
+                        </div>
+
+                        {/* Bottom-center instructions */}
+                        <div style={{
+                            position: 'absolute',
+                            bottom: 100,
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            textAlign: 'center'
+                        }}>
+                            <div className="hud-text" style={{ fontSize: 13 }}>
+                                Press [1-5] States | Click to Catch | Move to Explore
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* State transition strip */}
+                    <div style={{
+                        position: 'fixed',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: 80,
+                        background: 'rgba(0,0,0,0.8)',
+                        backdropFilter: 'blur(10px)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 40,
+                        zIndex: 60,
+                        pointerEvents: 'auto'
+                    }}>
+                        {stateKeys.map((key, idx) => {
+                            const isActive = state === key;
+                            const config = seasons[key];
+                            return (
+                                <button
+                                    key={key}
+                                    onClick={() => setState(key)}
+                                    style={{
+                                        background: 'transparent',
+                                        border: 'none',
+                                        color: isActive ? config.accent : 'rgba(255,255,255,0.5)',
+                                        fontSize: 14,
+                                        fontFamily: 'Consolas, Monaco, monospace',
+                                        cursor: 'pointer',
+                                        padding: '10px 20px',
+                                        borderBottom: isActive ? `3px solid ${config.accent}` : '3px solid transparent',
+                                        transform: isActive ? 'scale(1.1)' : 'scale(1)',
+                                        transition: 'all 0.3s ease',
+                                        letterSpacing: 1
+                                    }}
+                                >
+                                    [{idx + 1}] {config.name}
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {/* Custom cursor */}
+                    <div
+                        className="custom-cursor"
+                        style={{
+                            left: mousePos.x - 12,
+                            top: mousePos.y - 12,
+                            borderColor: stateConfig.accent
+                        }}
+                    />
+                </>
+            );
+        }
+
+        ReactDOM.render(<OwlWatcherConstellation />, document.getElementById('root'));
+    </script>
+</body>
+</html>

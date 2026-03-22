@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=375, initial-scale=1.0">
+    <title>Mockup 10: Mobile Companion - OwlWatcher</title>
+    <style>
+        /* MOCKUP 10: MOBILE COMPANION CONCEPT
+           Theme: Touch-optimized portrait mobile interface (375x812),
+           swipeable 3D file cards with stack perspective, floating owl FAB,
+           gesture-driven navigation, mobile-first cybersecurity aesthetics */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            width: 375px; height: 812px;
+            overflow: hidden;
+            background: linear-gradient(180deg, #0a1f1f 0%, #051010 60%, #000000 100%);
+            position: relative;
+            touch-action: none;
+        }
+
+        /* Mobile status bar -->
+        .status-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 44px;
+            background: rgba(26, 35, 50, 0.6);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(79, 209, 197, 0.3);
+        }
+        .status-bar .time {
+            font-size: 14px;
+            color: white;
+            font-weight: 600;
+        }
+        .status-bar .indicators {
+            display: flex;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        /* Header with owl icon */
+        .header {
+            position: absolute;
+            top: 44px;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            z-index: 900;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header .logo .icon {
+            width: 48px;
+            height: 48px;
+            font-size: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: logo-pulse 3s ease-in-out infinite;
+        }
+        @keyframes logo-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .header .logo .icon::before { content: '🦉'; }
+        .header .logo .title {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 0 10px rgba(79, 209, 197, 0.6);
+        }
+        .header .menu-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(26, 35, 50, 0.6);
+            border: 1px solid rgba(79, 209, 197, 0.4);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        .header .menu-btn:active {
+            transform: scale(0.95);
+            border-color: rgba(79, 209, 197, 1);
+            box-shadow: 0 0 20px rgba(79, 209, 197, 0.6);
+        }
+
+        /* Stats banner */
+        .stats-banner {
+            position: absolute;
+            top: 134px;
+            left: 20px;
+            right: 20px;
+            padding: 20px;
+            background: rgba(26, 35, 50, 0.7);
+            border: 1px solid rgba(79, 209, 197, 0.4);
+            border-radius: 16px;
+            backdrop-filter: blur(15px);
+            z-index: 850;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            animation: banner-slide-down 0.6s ease-out forwards;
+        }
+        @keyframes banner-slide-down {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-item .value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #4fd1c5;
+            text-shadow: 0 0 10px rgba(79, 209, 197, 0.6);
+        }
+        .stat-item .label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        /* Swipeable card stack */
+        .card-stack {
+            position: absolute;
+            top: 250px;
+            left: 20px;
+            right: 20px;
+            height: 420px;
+            z-index: 800;
+            perspective: 1000px;
+        }
+        .file-card {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 380px;
+            background: rgba(26, 35, 50, 0.8);
+            border: 2px solid rgba(79, 209, 197, 0.4);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            padding: 30px;
+            cursor: grab;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: center bottom;
+        }
+        .file-card:active {
+            cursor: grabbing;
+        }
+        /* Stack perspective effect */
+        .file-card:nth-child(1) {
+            z-index: 5;
+            transform: translateY(0) scale(1) rotateX(0deg);
+            opacity: 1;
+        }
+        .file-card:nth-child(2) {
+            z-index: 4;
+            transform: translateY(20px) scale(0.95) rotateX(5deg);
+            opacity: 0.8;
+        }
+        .file-card:nth-child(3) {
+            z-index: 3;
+            transform: translateY(40px) scale(0.90) rotateX(10deg);
+            opacity: 0.6;
+        }
+        .file-card:nth-child(4) {
+            z-index: 2;
+            transform: translateY(60px) scale(0.85) rotateX(15deg);
+            opacity: 0.4;
+        }
+        .file-card .card-icon {
+            width: 100%;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: card-icon-float 3s ease-in-out infinite;
+        }
+        @keyframes card-icon-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .file-card .card-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .file-card .card-subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .file-card .card-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .card-stat {
+            padding: 12px;
+            background: rgba(79, 209, 197, 0.1);
+            border: 1px solid rgba(79, 209, 197, 0.3);
+            border-radius: 10px;
+            text-align: center;
+        }
+        .card-stat .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #4fd1c5;
+        }
+        .card-stat .stat-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 4px;
+        }
+        .file-card .swipe-hint {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            animation: swipe-hint-blink 2s ease-in-out infinite;
+        }
+        @keyframes swipe-hint-blink {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+
+        /* Floating action button (owl) */
+        .fab {
+            position: absolute;
+            bottom: 90px;
+            right: 20px;
+            width: 64px;
+            height: 64px;
+            background: radial-gradient(circle, rgba(79, 209, 197, 0.3) 0%, rgba(26, 35, 50, 0.9) 70%);
+            border: 2px solid rgba(79, 209, 197, 0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            cursor: pointer;
+            z-index: 950;
+            box-shadow: 0 0 30px rgba(79, 209, 197, 0.6);
+            animation: fab-bounce 2s ease-in-out infinite;
+            transition: all 0.3s ease;
+        }
+        @keyframes fab-bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-8px) scale(1.05); }
+        }
+        .fab:active {
+            transform: scale(0.9);
+        }
+        .fab::before { content: '🦉'; }
+
+        /* Bottom navigation */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background: rgba(26, 35, 50, 0.8);
+            backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(79, 209, 197, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 20px;
+            z-index: 900;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .nav-item .nav-icon {
+            font-size: 24px;
+            transition: all 0.3s ease;
+        }
+        .nav-item .nav-label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+        .nav-item.active .nav-icon {
+            transform: scale(1.2);
+            filter: drop-shadow(0 0 10px rgba(79, 209, 197, 0.8));
+        }
+        .nav-item.active .nav-label {
+            color: #4fd1c5;
+        }
+        .nav-item:active {
+            transform: scale(0.95);
+        }
+
+        /* Swipe indicator overlay */
+        .swipe-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: 700;
+            pointer-events: none;
+            z-index: 1100;
+        }
+        .swipe-overlay.swipe-left {
+            background: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            text-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
+        }
+        .swipe-overlay.swipe-right {
+            background: rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+            text-shadow: 0 0 20px rgba(34, 197, 94, 0.8);
+        }
+
+        .annotation {
+            position: absolute;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            background: rgba(251, 146, 60, 0.95);
+            color: white;
+            border: 2px solid rgba(251, 146, 60, 1);
+            z-index: 2000;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <!-- Status bar -->
+    <div class="status-bar">
+        <div class="time">9:41</div>
+        <div class="indicators">
+            <span>📶</span>
+            <span>📡</span>
+            <span>🔋</span>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            <div class="icon"></div>
+            <div class="title">OwlWatcher</div>
+        </div>
+        <div class="menu-btn">⚙️</div>
+    </div>
+
+    <!-- Stats banner -->
+    <div class="stats-banner">
+        <div class="stat-item">
+            <div class="value">1,247</div>
+            <div class="label">Files</div>
+        </div>
+        <div class="stat-item">
+            <div class="value">98%</div>
+            <div class="label">Synced</div>
+        </div>
+        <div class="stat-item">
+            <div class="value">23</div>
+            <div class="label">Changes</div>
+        </div>
+    </div>
+
+    <!-- Swipeable card stack -->
+    <div class="card-stack">
+        <div class="file-card" data-card="1">
+            <div class="card-icon">📄</div>
+            <div class="card-title">Documents</div>
+            <div class="card-subtitle">342 files • Last updated 5 min ago</div>
+            <div class="card-stats">
+                <div class="card-stat">
+                    <div class="stat-value">98%</div>
+                    <div class="stat-label">Synced</div>
+                </div>
+                <div class="card-stat">
+                    <div class="stat-value">5</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+            </div>
+            <div class="swipe-hint">← Swipe to explore →</div>
+        </div>
+
+        <div class="file-card" data-card="2">
+            <div class="card-icon">🐍</div>
+            <div class="card-title">Python Scripts</div>
+            <div class="card-subtitle">127 files • Last updated 12 min ago</div>
+            <div class="card-stats">
+                <div class="card-stat">
+                    <div class="stat-value">100%</div>
+                    <div class="stat-label">Synced</div>
+                </div>
+                <div class="card-stat">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+            </div>
+            <div class="swipe-hint">← Swipe to explore →</div>
+        </div>
+
+        <div class="file-card" data-card="3">
+            <div class="card-icon">⚙️</div>
+            <div class="card-title">Configuration</div>
+            <div class="card-subtitle">89 files • Last updated 3 hours ago</div>
+            <div class="card-stats">
+                <div class="card-stat">
+                    <div class="stat-value">95%</div>
+                    <div class="stat-label">Synced</div>
+                </div>
+                <div class="card-stat">
+                    <div class="stat-value">4</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+            </div>
+            <div class="swipe-hint">← Swipe to explore →</div>
+        </div>
+
+        <div class="file-card" data-card="4">
+            <div class="card-icon">📊</div>
+            <div class="card-title">Data Analytics</div>
+            <div class="card-subtitle">214 files • Last updated 1 day ago</div>
+            <div class="card-stats">
+                <div class="card-stat">
+                    <div class="stat-value">92%</div>
+                    <div class="stat-label">Synced</div>
+                </div>
+                <div class="card-stat">
+                    <div class="stat-value">14</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+            </div>
+            <div class="swipe-hint">← Swipe to explore →</div>
+        </div>
+    </div>
+
+    <!-- Floating action button -->
+    <div class="fab"></div>
+
+    <!-- Bottom navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item active">
+            <div class="nav-icon">🏠</div>
+            <div class="nav-label">Home</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">📊</div>
+            <div class="nav-label">Stats</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">🔍</div>
+            <div class="nav-label">Search</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">⚙️</div>
+            <div class="nav-label">Settings</div>
+        </div>
+    </div>
+
+    <!-- Swipe overlay (hidden by default) -->
+    <div class="swipe-overlay swipe-left">DISMISS ❌</div>
+    <div class="swipe-overlay swipe-right">OPEN ✓</div>
+
+    <div class="annotation" style="top: 60px; right: 20px;">
+        SPLINE 3D<br>Mobile Portrait 375x812<br>Swipeable 3D Cards<br>Touch-Optimized
+    </div>
+
+    <script>
+        // Card swiping functionality
+        let currentCard = 0;
+        const cards = document.querySelectorAll('.file-card');
+        const overlayLeft = document.querySelector('.swipe-overlay.swipe-left');
+        const overlayRight = document.querySelector('.swipe-overlay.swipe-right');
+        let startX = 0;
+        let currentX = 0;
+        let isDragging = false;
+
+        cards.forEach((card, index) => {
+            card.addEventListener('mousedown', startDrag);
+            card.addEventListener('touchstart', startDrag);
+        });
+
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('touchmove', drag);
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchend', endDrag);
+
+        function startDrag(e) {
+            if (e.target.closest('.file-card') !== cards[0]) return;
+            isDragging = true;
+            startX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
+            cards[0].style.transition = 'none';
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+            currentX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+            const deltaX = currentX - startX;
+            const rotation = deltaX * 0.1;
+
+            cards[0].style.transform = `translateX(${deltaX}px) rotate(${rotation}deg)`;
+
+            // Show swipe overlay
+            if (deltaX < -50) {
+                overlayLeft.style.display = 'flex';
+                overlayRight.style.display = 'none';
+            } else if (deltaX > 50) {
+                overlayRight.style.display = 'flex';
+                overlayLeft.style.display = 'none';
+            } else {
+                overlayLeft.style.display = 'none';
+                overlayRight.style.display = 'none';
+            }
+        }
+
+        function endDrag(e) {
+            if (!isDragging) return;
+            isDragging = false;
+            const deltaX = currentX - startX;
+
+            overlayLeft.style.display = 'none';
+            overlayRight.style.display = 'none';
+
+            if (Math.abs(deltaX) > 100) {
+                // Swipe completed
+                const direction = deltaX > 0 ? 1 : -1;
+                cards[0].style.transition = 'all 0.4s ease-out';
+                cards[0].style.transform = `translateX(${direction * 500}px) rotate(${direction * 30}deg)`;
+                cards[0].style.opacity = '0';
+
+                setTimeout(() => {
+                    cards[0].remove();
+                    if (document.querySelectorAll('.file-card').length === 0) {
+                        alert('🎉 All cards swiped!\n\nIn production:\n- Load more file categories\n- Show completion summary\n- Navigate to detailed view');
+                    }
+                }, 400);
+            } else {
+                // Return to original position
+                cards[0].style.transition = 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                cards[0].style.transform = 'translateX(0) rotate(0deg)';
+            }
+        }
+
+        // FAB interaction
+        document.querySelector('.fab').addEventListener('click', function() {
+            alert('🦉 Owl Assistant\n\nIn production:\n- Voice command interface\n- Quick file search\n- Sync controls\n- Settings shortcuts');
+        });
+
+        // Bottom nav interaction
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

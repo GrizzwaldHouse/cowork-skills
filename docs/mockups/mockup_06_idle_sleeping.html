@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, initial-scale=1.0">
+    <title>Mockup 06: Idle Sleeping State - OwlWatcher</title>
+    <style>
+        /* MOCKUP 06: IDLE SLEEPING STATE
+           Theme: Peaceful low-power mode with soft gradients, sleeping owl,
+           floating Z's, dim ambient stars, minimal UI chrome */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            width: 1920px; height: 1080px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1a1f2e 0%, #0f1419 50%, #050a0f 100%);
+        }
+
+        /* Soft ambient glow */
+        .ambient-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(147, 197, 253, 0.15) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            animation: glow-breathe 8s ease-in-out infinite;
+            z-index: 1;
+        }
+        @keyframes glow-breathe {
+            0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        /* Dim stars */
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.3), transparent),
+                radial-gradient(1px 1px at 60% 70%, rgba(255, 255, 255, 0.2), transparent),
+                radial-gradient(1px 1px at 80% 20%, rgba(255, 255, 255, 0.3), transparent);
+            background-size: 200% 200%;
+            animation: stars-twinkle 10s ease-in-out infinite;
+            z-index: 2;
+        }
+        @keyframes stars-twinkle {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Sleeping owl */
+        .owl-sleeping {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 256px;
+            height: 256px;
+            font-size: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: owl-sleep-breathe 6s ease-in-out infinite;
+            z-index: 100;
+            filter: drop-shadow(0 0 30px rgba(147, 197, 253, 0.4));
+        }
+        @keyframes owl-sleep-breathe {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.03); }
+        }
+        .owl-sleeping::before {
+            content: '😴';
+        }
+
+        /* Floating Z's */
+        .z-particle {
+            position: absolute;
+            font-size: 32px;
+            color: rgba(147, 197, 253, 0.6);
+            animation: z-float 4s ease-out infinite;
+            pointer-events: none;
+        }
+        @keyframes z-float {
+            0% {
+                transform: translateY(0) scale(0.5);
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-150px) scale(1.2);
+                opacity: 0;
+            }
+        }
+        .z-particle:nth-child(1) { top: 40%; left: 48%; animation-delay: 0s; }
+        .z-particle:nth-child(2) { top: 42%; left: 52%; animation-delay: 1s; }
+        .z-particle:nth-child(3) { top: 44%; left: 50%; animation-delay: 2s; }
+        .z-particle:nth-child(4) { top: 40%; left: 54%; animation-delay: 3s; }
+
+        /* Status indicator */
+        .sleep-status {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 150;
+        }
+        .sleep-status h2 {
+            font-size: 20px;
+            color: rgba(147, 197, 253, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 400;
+        }
+        .sleep-status p {
+            margin-top: 10px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Minimal moon */
+        .moon-dim {
+            position: absolute;
+            top: 15%;
+            right: 15%;
+            width: 80px;
+            height: 80px;
+            font-size: 64px;
+            opacity: 0.5;
+            z-index: 50;
+        }
+
+        .annotation {
+            position: absolute;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            background: rgba(251, 146, 60, 0.95);
+            color: white;
+            border: 2px solid rgba(251, 146, 60, 1);
+            z-index: 200;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-glow"></div>
+    <div class="stars"></div>
+    <div class="owl-sleeping"></div>
+
+    <div class="z-particle">Z</div>
+    <div class="z-particle">z</div>
+    <div class="z-particle">Z</div>
+    <div class="z-particle">z</div>
+
+    <div class="moon-dim">🌙</div>
+
+    <div class="sleep-status">
+        <h2>💤 Low Power Mode</h2>
+        <p>All files synced • System idle • Click to wake</p>
+    </div>
+
+    <div class="annotation" style="top: 20px; left: 20px;">
+        SPLINE 3D<br>Sleeping Owl + Floating Z's<br>Peaceful Animation
+    </div>
+
+    <script>
+        document.body.addEventListener('click', () => {
+            alert('💤 Waking Up!\n\nIn production:\n- Owl opens eyes\n- Transitions to idle state\n- Restores full monitoring\n- Re-enables all features');
+        });
+    </script>
+</body>
+</html>

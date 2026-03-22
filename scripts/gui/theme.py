@@ -22,7 +22,12 @@ from __future__ import annotations
 
 from enum import Enum
 
+from PyQt6.QtCore import QSettings
 from PyQt6.QtWidgets import QApplication
+
+# QSettings constants (must match main_window.py)
+QSETTINGS_ORG = "ClaudeSkills"
+QSETTINGS_APP = "OwlWatcher"
 
 
 class Theme(str, Enum):
@@ -55,10 +60,13 @@ LIGHT_COLORS = {
 
 
 class ThemeManager:
-    """Manages application-wide theme switching."""
+    """Manages application-wide theme switching with persistent preference storage."""
 
     def __init__(self) -> None:
-        self._current_theme = Theme.DARK
+        # Load saved theme preference from QSettings
+        settings = QSettings(QSETTINGS_ORG, QSETTINGS_APP)
+        saved_theme = settings.value("theme", "dark", type=str)
+        self._current_theme = Theme.DARK if saved_theme == "dark" else Theme.LIGHT
 
     @property
     def current_theme(self) -> Theme:
@@ -79,10 +87,16 @@ class ThemeManager:
 
     def apply_theme(self, theme: Theme) -> None:
         """Apply the specified theme to the application.
-        
-        Updates the global QApplication stylesheet with theme colors.
+
+        Updates the global QApplication stylesheet with theme colors
+        and saves the preference to QSettings for persistence.
         """
         self._current_theme = theme
+
+        # Save theme preference
+        settings = QSettings(QSETTINGS_ORG, QSETTINGS_APP)
+        settings.setValue("theme", theme.value)
+
         colors = DARK_COLORS if theme == Theme.DARK else LIGHT_COLORS
 
         # Generate global stylesheet

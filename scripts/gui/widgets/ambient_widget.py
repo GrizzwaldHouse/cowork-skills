@@ -24,7 +24,7 @@ import math
 import random
 from datetime import date
 
-from PyQt6.QtCore import QPointF, QRectF, QTimer, Qt, pyqtSignal
+from PyQt6.QtCore import QPointF, QRectF, QTimer, Qt, pyqtSignal, QPropertyAnimation, pyqtProperty
 from PyQt6.QtGui import (
     QBrush,
     QColor,
@@ -132,6 +132,10 @@ class AmbientBackgroundWidget(QWidget):
         self._moon_font = QFont("Segoe UI Emoji", _MOON_SIZE)
         self._moon_rect = QRectF()  # Stores moon clickable area
 
+        # Moon hover animation properties
+        self._moon_opacity: float = 0.7  # Default opacity (180/255 = ~0.7)
+        self._moon_scale: float = 1.0     # Scale factor for hover effect
+
         # Animation timer for star drift
         self._dt = AMBIENT_FRAME_MS / 1000.0
         self._timer = QTimer(self)
@@ -141,6 +145,35 @@ class AmbientBackgroundWidget(QWidget):
 
         # Enable mouse tracking for hover cursor
         self.setMouseTracking(True)
+
+        # Moon hover animations
+        self._moon_opacity_anim = QPropertyAnimation(self, b"moon_opacity")
+        self._moon_opacity_anim.setDuration(200)  # 200ms smooth transition
+
+        self._moon_scale_anim = QPropertyAnimation(self, b"moon_scale")
+        self._moon_scale_anim.setDuration(200)  # 200ms smooth transition
+
+    # -- Qt properties for moon animations ----------------------------------
+
+    def _get_moon_opacity(self) -> float:
+        return self._moon_opacity
+
+    def _set_moon_opacity(self, value: float) -> None:
+        self._moon_opacity = value
+        self.update()
+
+    moon_opacity = pyqtProperty(float, _get_moon_opacity, _set_moon_opacity)
+
+    def _get_moon_scale(self) -> float:
+        return self._moon_scale
+
+    def _set_moon_scale(self, value: float) -> None:
+        self._moon_scale = value
+        self.update()
+
+    moon_scale = pyqtProperty(float, _get_moon_scale, _set_moon_scale)
+
+    # -- Widget methods ------------------------------------------------------
 
     def _ensure_stars(self) -> None:
         """Create stars if not yet initialized or if widget was resized."""
@@ -188,21 +221,64 @@ class AmbientBackgroundWidget(QWidget):
             painter.setBrush(QBrush(color))
             painter.drawEllipse(QPointF(star.x, star.y), star.size, star.size)
 
-        # --- Moon phase glyph (top-right) ---
+        # --- Moon phase glyph (top-right) with hover animation ---
         painter.setFont(self._moon_font)
-        painter.setPen(QPen(QColor(255, 255, 255, 180)))
-        self._moon_rect = QRectF(w - _MOON_SIZE - 12, 4, _MOON_SIZE + 8, _MOON_SIZE + 8)
+
+        # Apply opacity from animation
+        opacity_value = int(255 * self._moon_opacity)
+        painter.setPen(QPen(QColor(255, 255, 255, opacity_value)))
+
+        # Calculate moon position and size (with scale animation)
+        base_size = _MOON_SIZE + 8
+        scaled_size = base_size * self._moon_scale
+        size_diff = scaled_size - base_size
+        moon_x = w - _MOON_SIZE - 12 - (size_diff / 2)
+        moon_y = 4 - (size_diff / 2)
+
+        self._moon_rect = QRectF(moon_x, moon_y, scaled_size, scaled_size)
+
+        # Save painter state for transform
+        painter.save()
+
+        # Apply scale transform if needed (for smooth scaling)
+        if self._moon_scale != 1.0:
+            center_x = moon_x + scaled_size / 2
+            center_y = moon_y + scaled_size / 2
+            painter.translate(center_x, center_y)
+            painter.scale(self._moon_scale, self._moon_scale)
+            painter.translate(-center_x, -center_y)
+
         painter.drawText(
             self._moon_rect, int(Qt.AlignmentFlag.AlignCenter), self._moon_char,
         )
 
+        painter.restore()
         painter.end()
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         """Detect clicks on the moon to toggle theme."""
         if self._moon_rect.contains(event.pos()):
+            # Slight scale-down on click for feedback
+            self._moon_scale_anim.stop()
+            self._moon_scale_anim.setStartValue(self._moon_scale)
+            self._moon_scale_anim.setEndValue(0.9)
+            self._moon_scale_anim.setDuration(100)
+            self._moon_scale_anim.start()
+
+            # Emit toggle signal
             self.theme_toggle_requested.emit()
+
+            # Scale back up after click
+            QTimer.singleShot(100, self._restore_hover_scale)
         super().mousePressEvent(event)
+
+    def _restore_hover_scale(self) -> None:
+        """Restore moon to hover scale after click."""
+        self._moon_scale_anim.stop()
+        self._moon_scale_anim.setStartValue(self._moon_scale)
+        self._moon_scale_anim.setEndValue(1.15)
+        self._moon_scale_anim.setDuration(100)
+        self._moon_scale_anim.start()
 
     def enterEvent(self, event: object) -> None:
         """Show pointer cursor when hovering over moon."""
@@ -211,9 +287,34 @@ class AmbientBackgroundWidget(QWidget):
         super().enterEvent(event)
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:
-        """Update cursor when moving over moon."""
-        if self._moon_rect.contains(event.pos()):
+        """Update cursor and animations when moving over moon."""
+        is_over_moon = self._moon_rect.contains(event.pos())
+
+        if is_over_moon:
             self.setCursor(Qt.CursorShape.PointingHandCursor)
+
+            # Animate to hover state (brighter, slightly larger)
+            self._moon_opacity_anim.stop()
+            self._moon_opacity_anim.setStartValue(self._moon_opacity)
+            self._moon_opacity_anim.setEndValue(1.0)  # Full opacity
+            self._moon_opacity_anim.start()
+
+            self._moon_scale_anim.stop()
+            self._moon_scale_anim.setStartValue(self._moon_scale)
+            self._moon_scale_anim.setEndValue(1.15)  # 15% larger
+            self._moon_scale_anim.start()
         else:
             self.setCursor(Qt.CursorShape.ArrowCursor)
+
+            # Animate back to normal state
+            self._moon_opacity_anim.stop()
+            self._moon_opacity_anim.setStartValue(self._moon_opacity)
+            self._moon_opacity_anim.setEndValue(0.7)  # Back to default
+            self._moon_opacity_anim.start()
+
+            self._moon_scale_anim.stop()
+            self._moon_scale_anim.setStartValue(self._moon_scale)
+            self._moon_scale_anim.setEndValue(1.0)  # Back to normal size
+            self._moon_scale_anim.start()
+
         super().mouseMoveEvent(event)

@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, initial-scale=1.0">
+    <title>Mockup 03: Fullscreen Immersive Experience - OwlWatcher</title>
+    <style>
+        /* ===================================================================
+           MOCKUP 03: FULLSCREEN IMMERSIVE EXPERIENCE
+           Theme: Deep space nebula with no UI chrome, massive 3D owl centerpiece,
+           holographic file ring with orbital mechanics, gesture-driven controls
+           Developer: Marcus Daley
+           Date: 2026-02-24
+           =================================================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            position: relative;
+            cursor: crosshair;
+        }
+
+        /* ===================================================================
+           NANO BANANA ASSET #1: Deep Space Nebula Background
+           Prompt: "Deep space nebula with volumetric teal and purple auroras,
+           distant stars twinkling, cinematic sci-fi aesthetic, 4K resolution,
+           volumetric fog layers with depth, gravitational lens distortion,
+           cosmic dust clouds, no text or UI elements"
+           =================================================================== */
+        .deep-space-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at 30% 40%,
+                rgba(147, 51, 234, 0.3) 0%,
+                rgba(79, 209, 197, 0.2) 30%,
+                rgba(10, 14, 39, 1) 70%,
+                #000000 100%);
+            z-index: 0;
+        }
+
+        /* Volumetric nebula layers (parallax) */
+        .nebula-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.6;
+            mix-blend-mode: screen;
+            animation: nebula-drift 60s ease-in-out infinite;
+        }
+
+        .nebula-layer-1 {
+            background: radial-gradient(ellipse at 20% 30%,
+                rgba(147, 51, 234, 0.4) 0%,
+                transparent 40%);
+            animation-duration: 60s;
+            animation-delay: 0s;
+        }
+
+        .nebula-layer-2 {
+            background: radial-gradient(ellipse at 70% 60%,
+                rgba(79, 209, 197, 0.3) 0%,
+                transparent 50%);
+            animation-duration: 80s;
+            animation-delay: -20s;
+        }
+
+        .nebula-layer-3 {
+            background: radial-gradient(ellipse at 50% 80%,
+                rgba(251, 146, 60, 0.2) 0%,
+                transparent 35%);
+            animation-duration: 100s;
+            animation-delay: -40s;
+        }
+
+        @keyframes nebula-drift {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.6;
+            }
+            25% {
+                transform: translate(30px, -20px) scale(1.05);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translate(-20px, 30px) scale(1);
+                opacity: 0.5;
+            }
+            75% {
+                transform: translate(20px, 20px) scale(1.03);
+                opacity: 0.8;
+            }
+        }
+
+        /* Starfield with twinkling */
+        .starfield {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(1px 1px at 10% 20%, white, transparent),
+                radial-gradient(1px 1px at 30% 40%, rgba(79, 209, 197, 0.8), transparent),
+                radial-gradient(1px 1px at 50% 10%, white, transparent),
+                radial-gradient(1px 1px at 70% 60%, rgba(147, 51, 234, 0.8), transparent),
+                radial-gradient(1px 1px at 20% 80%, white, transparent),
+                radial-gradient(1px 1px at 80% 30%, white, transparent),
+                radial-gradient(1px 1px at 60% 90%, rgba(251, 146, 60, 0.8), transparent),
+                radial-gradient(1px 1px at 90% 70%, white, transparent),
+                radial-gradient(1px 1px at 40% 50%, white, transparent),
+                radial-gradient(1px 1px at 85% 15%, rgba(79, 209, 197, 0.8), transparent);
+            background-size: 200% 200%;
+            background-position: 0% 0%;
+            animation: starfield-twinkle 5s ease-in-out infinite, starfield-drift 120s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes starfield-twinkle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes starfield-drift {
+            from { background-position: 0% 0%; }
+            to { background-position: 100% 100%; }
+        }
+
+        /* Aurora effects (teal and purple) */
+        .aurora {
+            position: absolute;
+            width: 100%;
+            height: 300px;
+            opacity: 0.4;
+            filter: blur(60px);
+            mix-blend-mode: screen;
+        }
+
+        .aurora-1 {
+            top: 10%;
+            left: -10%;
+            background: linear-gradient(120deg,
+                transparent 0%,
+                rgba(79, 209, 197, 0.6) 30%,
+                rgba(147, 51, 234, 0.4) 60%,
+                transparent 100%);
+            animation: aurora-flow-1 15s ease-in-out infinite;
+        }
+
+        .aurora-2 {
+            bottom: 20%;
+            right: -10%;
+            background: linear-gradient(240deg,
+                transparent 0%,
+                rgba(147, 51, 234, 0.5) 30%,
+                rgba(251, 146, 60, 0.3) 60%,
+                transparent 100%);
+            animation: aurora-flow-2 20s ease-in-out infinite;
+        }
+
+        @keyframes aurora-flow-1 {
+            0%, 100% {
+                transform: translateX(0) translateY(0) scaleX(1);
+                opacity: 0.4;
+            }
+            50% {
+                transform: translateX(100px) translateY(-50px) scaleX(1.2);
+                opacity: 0.6;
+            }
+        }
+
+        @keyframes aurora-flow-2 {
+            0%, 100% {
+                transform: translateX(0) translateY(0) scaleX(1);
+                opacity: 0.3;
+            }
+            50% {
+                transform: translateX(-80px) translateY(40px) scaleX(1.15);
+                opacity: 0.5;
+            }
+        }
+
+        /* ===================================================================
+           SPLINE 3D ELEMENT #1: Massive Owl (512px) - Centerpiece
+           Scene: owl_massive_immersive.splinecode with advanced shaders
+           =================================================================== */
+        .owl-massive-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 512px;
+            height: 512px;
+            z-index: 100;
+            perspective: 1500px;
+            transform-style: preserve-3d;
+        }
+
+        .owl-massive {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            animation: owl-massive-breathe 5s ease-in-out infinite;
+            transform-style: preserve-3d;
+        }
+
+        @keyframes owl-massive-breathe {
+            0%, 100% {
+                transform: translateZ(0) scale(1) rotateY(0deg);
+            }
+            25% {
+                transform: translateZ(30px) scale(1.03) rotateY(5deg);
+            }
+            50% {
+                transform: translateZ(0) scale(1) rotateY(0deg);
+            }
+            75% {
+                transform: translateZ(30px) scale(1.03) rotateY(-5deg);
+            }
+        }
+
+        .owl-massive::before {
+            content: '🦉';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 400px;
+            filter: drop-shadow(0 0 80px rgba(79, 209, 197, 0.8))
+                    drop-shadow(0 0 40px rgba(147, 51, 234, 0.6));
+            animation: owl-glow-pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes owl-glow-pulse {
+            0%, 100% {
+                filter: drop-shadow(0 0 80px rgba(79, 209, 197, 0.8))
+                        drop-shadow(0 0 40px rgba(147, 51, 234, 0.6));
+            }
+            50% {
+                filter: drop-shadow(0 0 120px rgba(79, 209, 197, 1))
+                        drop-shadow(0 0 60px rgba(147, 51, 234, 0.9));
+            }
+        }
+
+        /* Energy aura around owl */
+        .owl-aura {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 600px;
+            height: 600px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: radial-gradient(circle,
+                rgba(79, 209, 197, 0.3) 0%,
+                rgba(147, 51, 234, 0.2) 40%,
+                transparent 70%);
+            animation: aura-pulse 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes aura-pulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.6;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.9;
+            }
+        }
+
+        /* Holographic projection beams */
+        .projection-beam {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 300px;
+            background: linear-gradient(to bottom,
+                rgba(79, 209, 197, 0.8) 0%,
+                transparent 100%);
+            transform-origin: top center;
+            filter: blur(2px);
+            animation: beam-rotate 10s linear infinite;
+            pointer-events: none;
+        }
+
+        .projection-beam:nth-child(1) { animation-delay: 0s; }
+        .projection-beam:nth-child(2) { animation-delay: -2.5s; }
+        .projection-beam:nth-child(3) { animation-delay: -5s; }
+        .projection-beam:nth-child(4) { animation-delay: -7.5s; }
+
+        @keyframes beam-rotate {
+            from {
+                transform: translate(-50%, -50%) rotate(0deg);
+                opacity: 0.6;
+            }
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+                opacity: 0.6;
+            }
+        }
+
+        /* ===================================================================
+           SPLINE 3D ELEMENT #2: Floating Moon Orb (128px)
+           Scene: moon_orb_levitate.splinecode with anti-gravity particles
+           =================================================================== */
+        .moon-orb-container {
+            position: absolute;
+            top: 15%;
+            right: 10%;
+            width: 128px;
+            height: 128px;
+            z-index: 90;
+            perspective: 1000px;
+        }
+
+        .moon-orb {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            animation: moon-levitate 6s ease-in-out infinite;
+            transform-style: preserve-3d;
+        }
+
+        @keyframes moon-levitate {
+            0%, 100% {
+                transform: translateY(0) translateZ(0) rotateY(0deg);
+            }
+            25% {
+                transform: translateY(-20px) translateZ(15px) rotateY(90deg);
+            }
+            50% {
+                transform: translateY(0) translateZ(0) rotateY(180deg);
+            }
+            75% {
+                transform: translateY(-20px) translateZ(15px) rotateY(270deg);
+            }
+        }
+
+        .moon-orb::before {
+            content: '🌙';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 96px;
+            filter: drop-shadow(0 0 40px rgba(251, 146, 60, 0.9));
+        }
+
+        /* Anti-gravity particles rising from moon */
+        .moon-particles {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            width: 2px;
+            height: 2px;
+            background: radial-gradient(circle, rgba(251, 146, 60, 1) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: particle-rise 3s ease-out infinite;
+            pointer-events: none;
+        }
+
+        .moon-particles:nth-child(1) { left: 40%; animation-delay: 0s; }
+        .moon-particles:nth-child(2) { left: 50%; animation-delay: 0.5s; }
+        .moon-particles:nth-child(3) { left: 60%; animation-delay: 1s; }
+        .moon-particles:nth-child(4) { left: 45%; animation-delay: 1.5s; }
+        .moon-particles:nth-child(5) { left: 55%; animation-delay: 2s; }
+
+        @keyframes particle-rise {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-200px) scale(0.2);
+                opacity: 0;
+            }
+        }
+
+        /* Orbital debris ring */
+        .debris-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 180px;
+            height: 180px;
+            transform: translate(-50%, -50%) rotateX(70deg);
+            border: 1px dashed rgba(251, 146, 60, 0.4);
+            border-radius: 50%;
+            animation: debris-orbit 15s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes debris-orbit {
+            from { transform: translate(-50%, -50%) rotateX(70deg) rotateZ(0deg); }
+            to { transform: translate(-50%, -50%) rotateX(70deg) rotateZ(360deg); }
+        }
+
+        /* ===================================================================
+           SPLINE 3D ELEMENT #3: Holographic File Ring (12 orbiting cubes)
+           Scene: file_ring_orbit.splinecode with orbital mechanics
+           =================================================================== */
+        .file-ring-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 900px;
+            height: 900px;
+            transform: translate(-50%, -50%);
+            z-index: 50;
+            perspective: 1500px;
+            transform-style: preserve-3d;
+            pointer-events: none;
+        }
+
+        .file-ring {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+        }
+
+        /* Orbital path visualization */
+        .orbit-path {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            border: 1px dashed rgba(79, 209, 197, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) rotateX(75deg);
+            pointer-events: none;
+        }
+
+        /* Individual file cubes in orbit */
+        .file-cube-orbit {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 80px;
+            height: 80px;
+            transform-origin: center;
+            animation: cube-orbit linear infinite;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        .file-cube {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg,
+                rgba(26, 35, 50, 0.9) 0%,
+                rgba(10, 14, 39, 0.9) 100%);
+            border: 2px solid rgba(79, 209, 197, 0.5);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 30px rgba(79, 209, 197, 0.4);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-style: preserve-3d;
+        }
+
+        .file-cube:hover {
+            transform: scale(1.3) translateZ(50px);
+            border-color: rgba(79, 209, 197, 1);
+            box-shadow: 0 0 60px rgba(79, 209, 197, 0.9);
+        }
+
+        .file-icon {
+            font-size: 36px;
+            margin-bottom: 5px;
+            filter: drop-shadow(0 2px 8px rgba(79, 209, 197, 0.5));
+        }
+
+        .file-label {
+            font-size: 8px;
+            color: rgba(255, 255, 255, 0.8);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* Particle trails behind cubes */
+        .cube-trail {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 3px;
+            height: 3px;
+            background: radial-gradient(circle, rgba(79, 209, 197, 0.8) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: trail-fade 1s ease-out infinite;
+        }
+
+        @keyframes trail-fade {
+            from {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+            to {
+                transform: translate(-50%, -50%) scale(0.3);
+                opacity: 0;
+            }
+        }
+
+        /* Orbital mechanics (Kepler's laws - different speeds/radii) */
+        @keyframes cube-orbit {
+            from {
+                transform: translate(-50%, -50%) rotate(0deg) translateX(var(--orbit-radius)) rotate(0deg);
+            }
+            to {
+                transform: translate(-50%, -50%) rotate(360deg) translateX(var(--orbit-radius)) rotate(-360deg);
+            }
+        }
+
+        /* 12 cubes with unique orbital parameters */
+        .file-cube-orbit:nth-child(1) { --orbit-radius: 380px; animation-duration: 20s; animation-delay: 0s; }
+        .file-cube-orbit:nth-child(2) { --orbit-radius: 400px; animation-duration: 22s; animation-delay: -2s; }
+        .file-cube-orbit:nth-child(3) { --orbit-radius: 360px; animation-duration: 18s; animation-delay: -4s; }
+        .file-cube-orbit:nth-child(4) { --orbit-radius: 420px; animation-duration: 24s; animation-delay: -6s; }
+        .file-cube-orbit:nth-child(5) { --orbit-radius: 370px; animation-duration: 19s; animation-delay: -8s; }
+        .file-cube-orbit:nth-child(6) { --orbit-radius: 410px; animation-duration: 23s; animation-delay: -10s; }
+        .file-cube-orbit:nth-child(7) { --orbit-radius: 390px; animation-duration: 21s; animation-delay: -12s; }
+        .file-cube-orbit:nth-child(8) { --orbit-radius: 430px; animation-duration: 25s; animation-delay: -14s; }
+        .file-cube-orbit:nth-child(9) { --orbit-radius: 365px; animation-duration: 18.5s; animation-delay: -16s; }
+        .file-cube-orbit:nth-child(10) { --orbit-radius: 405px; animation-duration: 22.5s; animation-delay: -18s; }
+        .file-cube-orbit:nth-child(11) { --orbit-radius: 385px; animation-duration: 20.5s; animation-delay: -20s; }
+        .file-cube-orbit:nth-child(12) { --orbit-radius: 415px; animation-duration: 23.5s; animation-delay: -22s; }
+
+        /* ===================================================================
+           NANO BANANA ASSET #2: HUD Overlay with Scan Grid
+           Prompt: "Transparent futuristic HUD overlay with glowing teal
+           scan grid, data streams, targeting reticles, tactical information
+           display, holographic interface elements, no background"
+           =================================================================== */
+        .hud-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 200;
+            pointer-events: none;
+        }
+
+        /* Scan grid */
+        .scan-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                repeating-linear-gradient(90deg,
+                    rgba(79, 209, 197, 0.05) 0px,
+                    transparent 1px,
+                    transparent 100px),
+                repeating-linear-gradient(0deg,
+                    rgba(79, 209, 197, 0.05) 0px,
+                    transparent 1px,
+                    transparent 100px);
+            animation: scan-grid-pulse 5s ease-in-out infinite;
+        }
+
+        @keyframes scan-grid-pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Targeting reticle */
+        .targeting-reticle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120px;
+            height: 120px;
+            transform: translate(-50%, -50%);
+            border: 2px solid rgba(79, 209, 197, 0.6);
+            border-radius: 50%;
+            animation: reticle-pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes reticle-pulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.6;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+                opacity: 1;
+            }
+        }
+
+        .targeting-reticle::before,
+        .targeting-reticle::after {
+            content: '';
+            position: absolute;
+            background: rgba(79, 209, 197, 0.8);
+        }
+
+        .targeting-reticle::before {
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            transform: translateY(-50%);
+        }
+
+        .targeting-reticle::after {
+            top: 0;
+            left: 50%;
+            width: 1px;
+            height: 100%;
+            transform: translateX(-50%);
+        }
+
+        /* Corner brackets */
+        .corner-bracket {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(79, 209, 197, 0.5);
+        }
+
+        .corner-bracket.top-left {
+            top: 30px;
+            left: 30px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .corner-bracket.top-right {
+            top: 30px;
+            right: 30px;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .corner-bracket.bottom-left {
+            bottom: 30px;
+            left: 30px;
+            border-right: none;
+            border-top: none;
+        }
+
+        .corner-bracket.bottom-right {
+            bottom: 30px;
+            right: 30px;
+            border-left: none;
+            border-top: none;
+        }
+
+        /* Data streams */
+        .data-stream {
+            position: absolute;
+            width: 2px;
+            height: 80px;
+            background: linear-gradient(to bottom,
+                rgba(79, 209, 197, 0.8) 0%,
+                transparent 100%);
+            animation: stream-flow 2s ease-out infinite;
+        }
+
+        .data-stream:nth-child(1) { top: 100px; left: 100px; animation-delay: 0s; }
+        .data-stream:nth-child(2) { top: 200px; right: 150px; animation-delay: 0.3s; }
+        .data-stream:nth-child(3) { bottom: 150px; left: 200px; animation-delay: 0.6s; }
+        .data-stream:nth-child(4) { bottom: 100px; right: 100px; animation-delay: 0.9s; }
+
+        @keyframes stream-flow {
+            0% {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+        }
+
+        /* Status text overlays */
+        .status-text {
+            position: absolute;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(79, 209, 197, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 10px rgba(79, 209, 197, 0.6);
+        }
+
+        .status-text.top-left {
+            top: 80px;
+            left: 40px;
+        }
+
+        .status-text.top-right {
+            top: 80px;
+            right: 40px;
+            text-align: right;
+        }
+
+        .status-text.bottom-left {
+            bottom: 80px;
+            left: 40px;
+        }
+
+        .status-text.bottom-right {
+            bottom: 80px;
+            right: 40px;
+            text-align: right;
+        }
+
+        /* Gesture control indicators */
+        .gesture-hint {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: hint-fade 3s ease-in-out infinite;
+        }
+
+        @keyframes hint-fade {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* ===================================================================
+           ANNOTATIONS
+           =================================================================== */
+        .annotation {
+            position: absolute;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            pointer-events: none;
+            z-index: 300;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .annotation.nano-banana {
+            background: rgba(147, 51, 234, 0.95);
+            color: white;
+            border: 2px solid rgba(147, 51, 234, 1);
+        }
+
+        .annotation.spline-3d {
+            background: rgba(251, 146, 60, 0.95);
+            color: white;
+            border: 2px solid rgba(251, 146, 60, 1);
+        }
+
+        /* ===================================================================
+           LEGEND
+           =================================================================== */
+        .legend {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(10, 14, 39, 0.95);
+            border: 1px solid rgba(79, 209, 197, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            z-index: 350;
+            backdrop-filter: blur(10px);
+        }
+
+        .legend-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #4fd1c5;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            margin-right: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .legend-color.nano {
+            background: rgba(147, 51, 234, 0.8);
+        }
+
+        .legend-color.spline {
+            background: rgba(251, 146, 60, 0.8);
+        }
+
+        /* ===================================================================
+           INTERACTIVE GRAVITY FIELD EFFECT
+           =================================================================== */
+        .gravity-field {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle,
+                rgba(79, 209, 197, 0.3) 0%,
+                transparent 70%);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+        }
+
+        /* ===================================================================
+           OWL CATCHING ANIMATION (WORM BEHAVIOR)
+           =================================================================== */
+        .owl-massive-container.catching {
+            animation: none !important;
+            z-index: 150;
+        }
+
+        @keyframes owl-swoop {
+            0% {
+                transform: translate(-50%, -50%) scale(1) rotate(0deg);
+            }
+            30% {
+                transform: translate(var(--target-x), var(--target-y)) scale(1.2) rotate(var(--target-rotation));
+            }
+            40% {
+                transform: translate(var(--target-x), calc(var(--target-y) + 30px)) scale(1.25) rotate(var(--target-rotation));
+            }
+            45% {
+                transform: translate(var(--target-x), var(--target-y)) scale(1.2) rotate(var(--target-rotation));
+            }
+            50% {
+                transform: translate(var(--target-x), calc(var(--target-y) + 30px)) scale(1.25) rotate(var(--target-rotation));
+            }
+            55% {
+                transform: translate(var(--target-x), var(--target-y)) scale(1.2) rotate(var(--target-rotation));
+            }
+            70% {
+                transform: translate(var(--target-x), var(--target-y)) scale(1.15) rotate(var(--target-rotation));
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1) rotate(0deg);
+            }
+        }
+
+        .owl-massive.pecking::before {
+            animation: owl-peck 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+        }
+
+        @keyframes owl-peck {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+            40%, 50% {
+                transform: translate(-50%, -45%) scale(1.1);
+            }
+            45%, 55% {
+                transform: translate(-50%, -50%) scale(1.05);
+            }
+        }
+
+        /* Cube being caught animation */
+        .file-cube.being-caught {
+            animation: cube-caught 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards !important;
+            z-index: 200;
+        }
+
+        @keyframes cube-caught {
+            0% {
+                transform: scale(1) translateZ(50px);
+                opacity: 1;
+            }
+            30% {
+                transform: scale(0.8) translateZ(100px);
+                opacity: 0.9;
+            }
+            60% {
+                transform: scale(0.4) translate(var(--catch-x), var(--catch-y)) translateZ(150px);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(0) translate(var(--catch-x), var(--catch-y)) translateZ(200px);
+                opacity: 0;
+            }
+        }
+
+        /* Energy burst when owl catches cube */
+        .catch-burst {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(79, 209, 197, 0.8) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            pointer-events: none;
+            z-index: 180;
+            animation: burst-expand 0.6s ease-out forwards;
+        }
+
+        @keyframes burst-expand {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(3);
+                opacity: 0;
+            }
+        }
+
+        /* ===================================================================
+           OWL STATE MACHINE ANIMATIONS
+           States: idle, scanning, alert, success, sleeping
+           Cycle with number keys 1-5 or click owl
+           =================================================================== */
+
+        /* STATE: SCANNING - head sweep, teal scan beam from eyes */
+        .owl-massive-container.state-scanning .owl-massive {
+            animation: owl-scanning-sweep 3s ease-in-out infinite !important;
+        }
+        @keyframes owl-scanning-sweep {
+            0%, 100% { transform: translateZ(0) scale(1) rotateY(-25deg); }
+            50% { transform: translateZ(20px) scale(1.02) rotateY(25deg); }
+        }
+        .owl-massive-container.state-scanning .owl-massive::before {
+            animation: owl-glow-pulse 3s ease-in-out infinite,
+                       owl-scan-eyes 3s linear infinite !important;
+        }
+        @keyframes owl-scan-eyes {
+            0%, 100% { filter: drop-shadow(0 0 80px rgba(79, 209, 197, 1)) drop-shadow(0 0 40px rgba(79, 209, 197, 0.8)); }
+            50% { filter: drop-shadow(0 0 120px rgba(79, 209, 197, 1)) drop-shadow(0 0 80px rgba(34, 211, 238, 1)); }
+        }
+        .owl-massive-container.state-scanning .owl-aura {
+            background: radial-gradient(circle,
+                rgba(79, 209, 197, 0.5) 0%,
+                rgba(34, 211, 238, 0.3) 40%,
+                transparent 70%) !important;
+            animation: aura-pulse 2s ease-in-out infinite !important;
+        }
+        /* Scan beam effect */
+        .scan-beam {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 1200px;
+            height: 4px;
+            background: linear-gradient(90deg, rgba(79, 209, 197, 0.9) 0%, transparent 100%);
+            transform-origin: left center;
+            animation: scan-beam-sweep 3s linear infinite;
+            pointer-events: none;
+            z-index: 110;
+            display: none;
+            filter: blur(2px);
+            box-shadow: 0 0 20px rgba(79, 209, 197, 0.8);
+        }
+        @keyframes scan-beam-sweep {
+            from { transform: translate(0, -50%) rotate(0deg); }
+            to { transform: translate(0, -50%) rotate(360deg); }
+        }
+        .state-scanning ~ .scan-beam { display: block; }
+
+        /* STATE: ALERT - red glow, rapid shake, danger aura */
+        .owl-massive-container.state-alert .owl-massive {
+            animation: owl-alert-shake 0.3s ease-in-out infinite !important;
+        }
+        @keyframes owl-alert-shake {
+            0%, 100% { transform: translateX(0) translateY(0) scale(1.05); }
+            25% { transform: translateX(-8px) translateY(4px) scale(1.05); }
+            50% { transform: translateX(8px) translateY(-4px) scale(1.08); }
+            75% { transform: translateX(-4px) translateY(8px) scale(1.05); }
+        }
+        .owl-massive-container.state-alert .owl-massive::before {
+            filter: drop-shadow(0 0 100px rgba(239, 68, 68, 1))
+                    drop-shadow(0 0 60px rgba(251, 146, 60, 0.9)) !important;
+            animation: owl-alert-flash 0.5s ease-in-out infinite !important;
+        }
+        @keyframes owl-alert-flash {
+            0%, 100% { filter: drop-shadow(0 0 100px rgba(239, 68, 68, 1)) drop-shadow(0 0 60px rgba(251, 146, 60, 0.9)); }
+            50% { filter: drop-shadow(0 0 150px rgba(239, 68, 68, 1)) drop-shadow(0 0 100px rgba(220, 38, 38, 1)); }
+        }
+        .owl-massive-container.state-alert .owl-aura {
+            background: radial-gradient(circle,
+                rgba(239, 68, 68, 0.5) 0%,
+                rgba(251, 146, 60, 0.3) 40%,
+                transparent 70%) !important;
+            animation: aura-alert-throb 0.5s ease-in-out infinite !important;
+        }
+        @keyframes aura-alert-throb {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+            50% { transform: translate(-50%, -50%) scale(1.4); opacity: 1; }
+        }
+        /* Alert vignette */
+        .alert-vignette {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(ellipse at center, transparent 40%, rgba(239, 68, 68, 0.3) 100%);
+            pointer-events: none;
+            z-index: 190;
+            display: none;
+            animation: vignette-pulse 1s ease-in-out infinite;
+        }
+        @keyframes vignette-pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* STATE: SUCCESS - gold glow, celebration particles */
+        .owl-massive-container.state-success .owl-massive {
+            animation: owl-success-bounce 1s cubic-bezier(0.34, 1.56, 0.64, 1) infinite !important;
+        }
+        @keyframes owl-success-bounce {
+            0%, 100% { transform: translateY(0) scale(1) rotateY(0deg); }
+            25% { transform: translateY(-30px) scale(1.08) rotateY(10deg); }
+            75% { transform: translateY(-30px) scale(1.08) rotateY(-10deg); }
+        }
+        .owl-massive-container.state-success .owl-massive::before {
+            filter: drop-shadow(0 0 100px rgba(251, 191, 36, 1))
+                    drop-shadow(0 0 60px rgba(234, 179, 8, 0.9)) !important;
+            animation: owl-success-glow 1.5s ease-in-out infinite !important;
+        }
+        @keyframes owl-success-glow {
+            0%, 100% { filter: drop-shadow(0 0 100px rgba(251, 191, 36, 1)) drop-shadow(0 0 60px rgba(234, 179, 8, 0.9)); }
+            50% { filter: drop-shadow(0 0 150px rgba(251, 191, 36, 1)) drop-shadow(0 0 100px rgba(245, 158, 11, 1)); }
+        }
+        .owl-massive-container.state-success .owl-aura {
+            background: radial-gradient(circle,
+                rgba(251, 191, 36, 0.4) 0%,
+                rgba(234, 179, 8, 0.2) 40%,
+                transparent 70%) !important;
+        }
+        /* Confetti particle */
+        .confetti-particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            pointer-events: none;
+            z-index: 180;
+            animation: confetti-fall linear forwards;
+        }
+        @keyframes confetti-fall {
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(1200px) rotate(720deg); opacity: 0; }
+        }
+
+        /* STATE: SLEEPING - dim glow, closed eyes, slow drift, floating Z's */
+        .owl-massive-container.state-sleeping .owl-massive {
+            animation: owl-sleeping-drift 8s ease-in-out infinite !important;
+        }
+        @keyframes owl-sleeping-drift {
+            0%, 100% { transform: translateY(0) scale(0.95) rotateZ(0deg); }
+            50% { transform: translateY(15px) scale(0.93) rotateZ(3deg); }
+        }
+        .owl-massive-container.state-sleeping .owl-massive::before {
+            filter: drop-shadow(0 0 40px rgba(79, 209, 197, 0.3))
+                    drop-shadow(0 0 20px rgba(147, 51, 234, 0.2)) !important;
+            opacity: 0.6;
+            animation: owl-sleep-breathe 4s ease-in-out infinite !important;
+        }
+        @keyframes owl-sleep-breathe {
+            0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.98); }
+            50% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
+        }
+        .owl-massive-container.state-sleeping .owl-aura {
+            background: radial-gradient(circle,
+                rgba(79, 209, 197, 0.1) 0%,
+                rgba(147, 51, 234, 0.05) 40%,
+                transparent 70%) !important;
+            opacity: 0.4 !important;
+        }
+        /* Floating Z particles */
+        .sleep-z {
+            position: absolute;
+            font-size: 36px;
+            color: rgba(79, 209, 197, 0.6);
+            pointer-events: none;
+            z-index: 120;
+            animation: z-float 3s ease-out forwards;
+            text-shadow: 0 0 10px rgba(79, 209, 197, 0.6);
+        }
+        @keyframes z-float {
+            0% { transform: translateY(0) scale(0.5) rotate(0deg); opacity: 0; }
+            20% { opacity: 0.8; }
+            100% { transform: translateY(-180px) translateX(40px) scale(1.2) rotate(15deg); opacity: 0; }
+        }
+
+        /* State indicator badge */
+        .state-badge {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 30px;
+            background: rgba(10, 14, 39, 0.85);
+            border: 2px solid rgba(79, 209, 197, 0.6);
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #4fd1c5;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-family: 'Courier New', monospace;
+            z-index: 400;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+            text-shadow: 0 0 10px rgba(79, 209, 197, 0.6);
+        }
+        .state-badge.alert { border-color: rgba(239, 68, 68, 0.8); color: #ef4444; text-shadow: 0 0 10px rgba(239, 68, 68, 0.6); }
+        .state-badge.success { border-color: rgba(251, 191, 36, 0.8); color: #fbbf24; text-shadow: 0 0 10px rgba(251, 191, 36, 0.6); }
+        .state-badge.sleeping { border-color: rgba(147, 51, 234, 0.5); color: #9333ea; text-shadow: 0 0 10px rgba(147, 51, 234, 0.4); opacity: 0.7; }
+
+        /* Right-click context menu */
+        .context-menu {
+            position: absolute;
+            width: 220px;
+            background: rgba(10, 14, 39, 0.95);
+            border: 1px solid rgba(79, 209, 197, 0.5);
+            border-radius: 10px;
+            backdrop-filter: blur(15px);
+            z-index: 500;
+            overflow: hidden;
+            display: none;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+        }
+        .context-menu-item {
+            padding: 12px 18px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+        .context-menu-item:hover {
+            background: rgba(79, 209, 197, 0.2);
+            color: #4fd1c5;
+        }
+        .context-menu-divider {
+            height: 1px;
+            background: rgba(79, 209, 197, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- NANO BANANA: Deep space nebula background -->
+    <div class="deep-space-background">
+        <div class="nebula-layer nebula-layer-1"></div>
+        <div class="nebula-layer nebula-layer-2"></div>
+        <div class="nebula-layer nebula-layer-3"></div>
+        <div class="starfield"></div>
+        <div class="aurora aurora-1"></div>
+        <div class="aurora aurora-2"></div>
+    </div>
+
+    <!-- SPLINE 3D: Massive Owl (512px centerpiece) -->
+    <div class="owl-massive-container">
+        <div class="owl-aura"></div>
+        <div class="owl-massive">
+            <div class="projection-beam"></div>
+            <div class="projection-beam"></div>
+            <div class="projection-beam"></div>
+            <div class="projection-beam"></div>
+        </div>
+    </div>
+
+    <!-- SPLINE 3D: Floating Moon Orb (128px) -->
+    <div class="moon-orb-container">
+        <div class="debris-ring"></div>
+        <div class="moon-orb"></div>
+        <div class="moon-particles"></div>
+        <div class="moon-particles"></div>
+        <div class="moon-particles"></div>
+        <div class="moon-particles"></div>
+        <div class="moon-particles"></div>
+    </div>
+
+    <!-- SPLINE 3D: Holographic File Ring (12 orbiting cubes) -->
+    <div class="file-ring-container">
+        <div class="orbit-path"></div>
+        <div class="file-ring">
+            <div class="file-cube-orbit">
+                <div class="file-cube">
+                    <div class="file-icon">📄</div>
+                    <div class="file-label">Doc</div>
+                </div>
+                <div class="cube-trail"></div>
+            </div>
+            <div class="file-cube-orbit">
+                <div class="file-cube">
+                    <div class="file-icon">🐍</div>
+                    <div class="file-label">Python</div>
+                </div>
+                <div class="cube-trail"></div>
+            </div>
+            <div class="file-cube-orbit">
+                <div class="file-cube">
+                    <div class="file-icon">⚙️</div>
+                    <div class="file-label">Config</div>
+                </div>
+                <div class="cube-trail"></div>
+            </div>
+            <div class="file-cube-orbit">
+                <div class="file-cube">
+                    <div class="file-icon">📊</div>
+                    <div class="file-label">Data</div>
+                </div>
+                <div class="cube-trail"></div>
+            </div>
+            <div class="file-cube-orbit">
+                <div class="file-cube">
+                    <div class="file-icon">🔒</div>
+                    <div class="file-label">Security</div>
+                </div>
+                <div class="cube-trail"></div>
+            </div>
+            <div class="file-cube-orbit">
+                <div class="file-cube">
+                    <div class="file-icon">📦</div>
+                    <div class="file-label">Package</div>
+                </div>
+                <div class="cube-trail"></div>
+            </div>
+            <div class="file-cube-orbit">
+                <div class="file-cube">
+                    <div class="file-icon">🎨</div>
+                    <div class="file-label">Design</div>
+                </div>
+                <div class="cube-trail"></div>
+            </div>
+            <div class="file-cube-orbit">
+                <div class="file-cube">
+                    <div class="file-icon">🗄️</div>
+                    <div class="file-label">Database</div>
+                </div>
+                <div class="cube-trail"></div>
+            </div>
+            <div class="file-cube-orbit">
+                <div class="file-cube">
+                    <div class="file-icon">🧪</div>
+                    <div class="file-label">Test</div>
+                </div>
+                <div class="cube-trail"></div>
+            </div>
+            <div class="file-cube-orbit">
+                <div class="file-cube">
+                    <div class="file-icon">📝</div>
+                    <div class="file-label">Log</div>
+                </div>
+                <div class="cube-trail"></div>
+            </div>
+            <div class="file-cube-orbit">
+                <div class="file-cube">
+                    <div class="file-icon">🔧</div>
+                    <div class="file-label">Tools</div>
+                </div>
+                <div class="cube-trail"></div>
+            </div>
+            <div class="file-cube-orbit">
+                <div class="file-cube">
+                    <div class="file-icon">📚</div>
+                    <div class="file-label">Docs</div>
+                </div>
+                <div class="cube-trail"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NANO BANANA: HUD Overlay with scan grid -->
+    <div class="hud-overlay">
+        <div class="scan-grid"></div>
+        <div class="targeting-reticle"></div>
+
+        <!-- Corner brackets -->
+        <div class="corner-bracket top-left"></div>
+        <div class="corner-bracket top-right"></div>
+        <div class="corner-bracket bottom-left"></div>
+        <div class="corner-bracket bottom-right"></div>
+
+        <!-- Data streams -->
+        <div class="data-stream"></div>
+        <div class="data-stream"></div>
+        <div class="data-stream"></div>
+        <div class="data-stream"></div>
+
+        <!-- Status text -->
+        <div class="status-text top-left">
+            SYSTEM: ACTIVE<br>
+            FILES: 1,247<br>
+            STATUS: NOMINAL
+        </div>
+        <div class="status-text top-right">
+            SYNC: 98%<br>
+            LATENCY: 12ms<br>
+            UPTIME: 23h 14m
+        </div>
+        <div class="status-text bottom-left">
+            THREATS: 0<br>
+            ALERTS: 0<br>
+            MODE: IMMERSIVE
+        </div>
+        <div class="status-text bottom-right">
+            FPS: 60<br>
+            GPU: 45%<br>
+            MEM: 247 MB
+        </div>
+
+        <!-- Gesture hint -->
+        <div class="gesture-hint">
+            1-5: STATE CYCLE • CLICK CUBE: OWL CATCHES • RIGHT-CLICK: CONTEXT MENU • SCROLL: ZOOM • SPACE: RESET
+        </div>
+    </div>
+
+    <!-- State indicator badge -->
+    <div class="state-badge" id="stateBadge">STATE: IDLE</div>
+
+    <!-- Scan beam (visible in scanning state) -->
+    <div class="scan-beam" id="scanBeam"></div>
+
+    <!-- Alert vignette (visible in alert state) -->
+    <div class="alert-vignette" id="alertVignette"></div>
+
+    <!-- Right-click context menu -->
+    <div class="context-menu" id="contextMenu">
+        <div class="context-menu-item" data-action="open">📂 Open</div>
+        <div class="context-menu-item" data-action="sync">🔄 Sync Now</div>
+        <div class="context-menu-item" data-action="details">📋 Details</div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item" data-action="history">📜 History</div>
+        <div class="context-menu-item" data-action="pin">📌 Pin to Orbit</div>
+    </div>
+
+    <!-- ANNOTATIONS -->
+    <div class="annotation nano-banana" style="top: 20px; left: 20px;">
+        NANO BANANA PRO<br>Deep Space Nebula<br>+ Volumetric Auroras
+    </div>
+    <div class="annotation spline-3d" style="top: 50%; left: 20px; transform: translateY(-50%);">
+        SPLINE 3D<br>512px Massive Owl<br>Energy Aura + Beams
+    </div>
+    <div class="annotation spline-3d" style="top: 15%; right: 20px;">
+        SPLINE 3D<br>128px Moon Orb<br>Anti-Gravity Particles
+    </div>
+    <div class="annotation spline-3d" style="bottom: 100px; left: 50%; transform: translateX(-50%);">
+        SPLINE 3D<br>12 Orbiting File Cubes<br>(Kepler Orbital Mechanics)
+    </div>
+    <div class="annotation nano-banana" style="top: 50%; right: 20px; transform: translateY(-50%);">
+        NANO BANANA PRO<br>HUD Overlay<br>Scan Grid + Reticles
+    </div>
+
+    <!-- LEGEND -->
+    <div class="legend">
+        <div class="legend-title">Immersive Mode</div>
+        <div class="legend-item">
+            <div class="legend-color nano"></div>
+            <span>Nano Banana Pro</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color spline"></div>
+            <span>Spline 3D</span>
+        </div>
+    </div>
+
+    <!-- Interactive gravity field (follows mouse) -->
+    <div class="gravity-field" id="gravityField"></div>
+
+    <script>
+        /* ===================================================================
+           OWL STATE MACHINE + ENHANCED INTERACTIONS
+           Developer: Marcus Daley
+           Date: 2026-02-25
+           =================================================================== */
+
+        // DOM references
+        const gravityField = document.getElementById('gravityField');
+        const owlMassive = document.querySelector('.owl-massive-container');
+        const owlInner = document.querySelector('.owl-massive');
+        const fileRing = document.querySelector('.file-ring-container');
+        const stateBadge = document.getElementById('stateBadge');
+        const scanBeam = document.getElementById('scanBeam');
+        const alertVignette = document.getElementById('alertVignette');
+        const contextMenu = document.getElementById('contextMenu');
+
+        // ===== OWL STATE MACHINE =====
+        const STATES = ['idle', 'scanning', 'alert', 'success', 'sleeping'];
+        let currentState = 'idle';
+        let sleepZInterval = null;
+        let confettiInterval = null;
+
+        function setOwlState(newState) {
+            if (!STATES.includes(newState)) return;
+            if (owlMassive.classList.contains('catching')) return;
+
+            // SOUND: state_${newState}
+            const previousState = currentState;
+            currentState = newState;
+
+            // Clear all state classes
+            STATES.forEach(s => owlMassive.classList.remove(`state-${s}`));
+            scanBeam.style.display = 'none';
+            alertVignette.style.display = 'none';
+
+            // Clear state-specific intervals
+            if (sleepZInterval) { clearInterval(sleepZInterval); sleepZInterval = null; }
+            if (confettiInterval) { clearInterval(confettiInterval); confettiInterval = null; }
+
+            // Apply new state
+            owlMassive.classList.add(`state-${newState}`);
+
+            // Update badge
+            stateBadge.textContent = `STATE: ${newState.toUpperCase()}`;
+            stateBadge.className = 'state-badge';
+            if (newState === 'alert') stateBadge.classList.add('alert');
+            if (newState === 'success') stateBadge.classList.add('success');
+            if (newState === 'sleeping') stateBadge.classList.add('sleeping');
+
+            // Update HUD mode text
+            const modeText = document.querySelector('.status-text.bottom-left');
+            if (modeText) {
+                modeText.innerHTML = `THREATS: ${newState === 'alert' ? '3' : '0'}<br>ALERTS: ${newState === 'alert' ? '1' : '0'}<br>MODE: ${newState.toUpperCase()}`;
+            }
+
+            // State-specific effects
+            if (newState === 'scanning') {
+                scanBeam.style.display = 'block';
+            }
+            if (newState === 'alert') {
+                alertVignette.style.display = 'block';
+            }
+            if (newState === 'sleeping') {
+                sleepZInterval = setInterval(spawnSleepZ, 2000);
+                spawnSleepZ();
+            }
+            if (newState === 'success') {
+                confettiInterval = setInterval(spawnConfettiBurst, 800);
+                spawnConfettiBurst();
+            }
+        }
+
+        function cycleState() {
+            const idx = STATES.indexOf(currentState);
+            const next = STATES[(idx + 1) % STATES.length];
+            setOwlState(next);
+        }
+
+        // Spawn floating Z's for sleeping state
+        function spawnSleepZ() {
+            const owlRect = owlMassive.getBoundingClientRect();
+            const z = document.createElement('div');
+            z.className = 'sleep-z';
+            z.textContent = 'Z';
+            z.style.left = `${owlRect.left + owlRect.width / 2 + 80 + Math.random() * 60}px`;
+            z.style.top = `${owlRect.top + owlRect.height / 2 - 100}px`;
+            z.style.fontSize = `${24 + Math.random() * 24}px`;
+            z.style.animationDuration = `${2.5 + Math.random() * 1.5}s`;
+            document.body.appendChild(z);
+            setTimeout(() => z.remove(), 4000);
+        }
+
+        // Spawn confetti burst for success state
+        function spawnConfettiBurst() {
+            const colors = ['#fbbf24', '#f59e0b', '#4fd1c5', '#9333ea', '#ec4899', '#22c55e', '#ef4444', '#3b82f6', '#fb923c'];
+            for (let i = 0; i < 15; i++) {
+                const p = document.createElement('div');
+                p.className = 'confetti-particle';
+                p.style.left = `${300 + Math.random() * 1320}px`;
+                p.style.top = '-20px';
+                p.style.width = `${6 + Math.random() * 10}px`;
+                p.style.height = `${6 + Math.random() * 10}px`;
+                p.style.background = colors[Math.floor(Math.random() * colors.length)];
+                p.style.animationDuration = `${2 + Math.random() * 3}s`;
+                p.style.animationDelay = `${Math.random() * 0.5}s`;
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 5500);
+            }
+        }
+
+        // ===== MOUSE TRACKING + GRAVITY FIELD =====
+        document.addEventListener('mousemove', (e) => {
+            gravityField.style.left = e.clientX - 100 + 'px';
+            gravityField.style.top = e.clientY - 100 + 'px';
+            gravityField.style.opacity = '0.6';
+
+            const owlRect = owlMassive.getBoundingClientRect();
+            const owlCenterX = owlRect.left + owlRect.width / 2;
+            const owlCenterY = owlRect.top + owlRect.height / 2;
+            const distanceX = e.clientX - owlCenterX;
+            const distanceY = e.clientY - owlCenterY;
+            const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+            if (distance < 400 && !owlMassive.classList.contains('catching')) {
+                const attraction = 1 - (distance / 400);
+                const offsetX = -distanceX * attraction * 0.02;
+                const offsetY = -distanceY * attraction * 0.02;
+                owlMassive.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px))`;
+            } else if (!owlMassive.classList.contains('catching')) {
+                owlMassive.style.transform = 'translate(-50%, -50%)';
+            }
+
+            const parallaxX = (e.clientX - window.innerWidth / 2) * 0.03;
+            const parallaxY = (e.clientY - window.innerHeight / 2) * 0.03;
+            fileRing.style.transform = `translate(calc(-50% + ${parallaxX}px), calc(-50% + ${parallaxY}px))`;
+        });
+
+        document.addEventListener('mouseleave', () => {
+            gravityField.style.opacity = '0';
+            if (!owlMassive.classList.contains('catching')) {
+                owlMassive.style.transform = 'translate(-50%, -50%)';
+            }
+            fileRing.style.transform = 'translate(-50%, -50%)';
+        });
+
+        // ===== SCROLL TO ZOOM =====
+        let zoomLevel = 1;
+        document.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY * -0.001;
+            zoomLevel = Math.min(Math.max(0.7, zoomLevel + delta), 1.5);
+            document.body.style.transform = `scale(${zoomLevel})`;
+            document.body.style.transformOrigin = 'center center';
+        }, { passive: false });
+
+        // ===== CLICK OWL TO CYCLE STATE =====
+        owlMassive.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // SOUND: owl_state_cycle
+            cycleState();
+        });
+
+        // ===== CLICK FILE CUBES - OWL CATCHES WORM =====
+        document.querySelectorAll('.file-cube').forEach(cube => {
+            cube.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const fileName = cube.querySelector('.file-label').textContent;
+
+                if (owlMassive.classList.contains('catching')) return;
+
+                // SOUND: cube_click
+                const cubeRect = cube.getBoundingClientRect();
+                const cubeCenterX = cubeRect.left + cubeRect.width / 2;
+                const cubeCenterY = cubeRect.top + cubeRect.height / 2;
+
+                const owlRect = owlMassive.getBoundingClientRect();
+                const owlCenterX = owlRect.left + owlRect.width / 2;
+                const owlCenterY = owlRect.top + owlRect.height / 2;
+
+                const deltaX = cubeCenterX - owlCenterX;
+                const deltaY = cubeCenterY - owlCenterY;
+                const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+
+                owlMassive.style.setProperty('--target-x', `calc(-50% + ${deltaX * 0.7}px)`);
+                owlMassive.style.setProperty('--target-y', `calc(-50% + ${deltaY * 0.7}px)`);
+                owlMassive.style.setProperty('--target-rotation', `${angle * 0.3}deg`);
+                cube.style.setProperty('--catch-x', `${-deltaX * 0.5}px`);
+                cube.style.setProperty('--catch-y', `${-deltaY * 0.5}px`);
+
+                // Temporarily override state for catching
+                const prevState = currentState;
+                STATES.forEach(s => owlMassive.classList.remove(`state-${s}`));
+                owlMassive.classList.add('catching');
+                owlMassive.style.animation = 'owl-swoop 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+
+                // SOUND: owl_swoop
+                setTimeout(() => {
+                    owlInner.classList.add('pecking');
+                    // SOUND: owl_peck_1
+                }, 450);
+
+                setTimeout(() => {
+                    // SOUND: owl_peck_3 (catch)
+                    cube.classList.add('being-caught');
+
+                    // SOUND: energy_burst
+                    const burst = document.createElement('div');
+                    burst.className = 'catch-burst';
+                    burst.style.left = `${cubeCenterX}px`;
+                    burst.style.top = `${cubeCenterY}px`;
+                    document.body.appendChild(burst);
+                    setTimeout(() => burst.remove(), 600);
+                }, 600);
+
+                // SOUND: owl_return
+                setTimeout(() => {
+                    owlMassive.classList.remove('catching');
+                    owlMassive.style.animation = '';
+                    owlInner.classList.remove('pecking');
+
+                    // SOUND: window_open
+                    alert(`🦉 Owl caught ${fileName}!\n\nOpening ${fileName} window...`);
+
+                    // Restore previous state + respawn cube
+                    setTimeout(() => {
+                        cube.classList.remove('being-caught');
+                        cube.style.opacity = '1';
+                        cube.style.transform = '';
+                        // SOUND: cube_respawn
+                        setOwlState(prevState);
+                    }, 500);
+                }, 1500);
+            });
+
+            // DOUBLE-CLICK: Quick open (skip animation)
+            cube.addEventListener('dblclick', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                const fileName = cube.querySelector('.file-label').textContent;
+                // SOUND: window_open
+                alert(`⚡ Quick Open: ${fileName}\n\nOpening immediately (skipped catching animation)`);
+            });
+
+            // HOVER: Sound trigger
+            cube.addEventListener('mouseenter', () => {
+                // SOUND: cube_hover
+            });
+        });
+
+        // ===== RIGHT-CLICK CONTEXT MENU =====
+        let contextTarget = null;
+
+        document.querySelectorAll('.file-cube').forEach(cube => {
+            cube.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                contextTarget = cube;
+                contextMenu.style.display = 'block';
+                contextMenu.style.left = `${e.clientX}px`;
+                contextMenu.style.top = `${e.clientY}px`;
+            });
+        });
+
+        document.addEventListener('click', () => {
+            contextMenu.style.display = 'none';
+        });
+
+        document.querySelectorAll('.context-menu-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const action = item.dataset.action;
+                const fileName = contextTarget?.querySelector('.file-label')?.textContent || 'Unknown';
+                contextMenu.style.display = 'none';
+
+                switch(action) {
+                    case 'open':
+                        alert(`📂 Opening ${fileName}...`);
+                        break;
+                    case 'sync':
+                        alert(`🔄 Syncing ${fileName}...`);
+                        break;
+                    case 'details':
+                        alert(`📋 ${fileName} Details\n\nType: ${fileName}\nFiles: ${Math.floor(Math.random() * 500)}\nLast sync: ${Math.floor(Math.random() * 60)} min ago\nStatus: Healthy`);
+                        break;
+                    case 'history':
+                        alert(`📜 ${fileName} History\n\n• 2 min ago: File modified\n• 15 min ago: Synced\n• 1 hour ago: Created backup\n• 3 hours ago: Initial scan`);
+                        break;
+                    case 'pin':
+                        alert(`📌 ${fileName} pinned to inner orbit ring`);
+                        break;
+                }
+            });
+        });
+
+        // ===== CLICK MOON ORB =====
+        document.querySelector('.moon-orb').addEventListener('click', () => {
+            // SOUND: theme_toggle
+            alert('🌙 Moon Orb: Theme Toggle\n\nIn production: Cycles through dark/light/aurora themes');
+        });
+
+        // ===== KEYBOARD CONTROLS =====
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case ' ':
+                    e.preventDefault();
+                    zoomLevel = 1;
+                    document.body.style.transform = 'scale(1)';
+                    owlMassive.style.transform = 'translate(-50%, -50%)';
+                    fileRing.style.transform = 'translate(-50%, -50%)';
+                    break;
+                case '1': setOwlState('idle'); break;
+                case '2': setOwlState('scanning'); break;
+                case '3': setOwlState('alert'); break;
+                case '4': setOwlState('success'); break;
+                case '5': setOwlState('sleeping'); break;
+            }
+        });
+
+        // ===== PARTICLE TRAIL GENERATION =====
+        document.querySelectorAll('.file-cube-orbit').forEach((orbit, index) => {
+            setInterval(() => {
+                const trail = document.createElement('div');
+                trail.className = 'cube-trail';
+                orbit.appendChild(trail);
+                setTimeout(() => trail.remove(), 1000);
+            }, 500 + index * 100);
+        });
+    </script>
+</body>
+</html>

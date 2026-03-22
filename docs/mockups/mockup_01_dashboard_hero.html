@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, initial-scale=1.0">
+    <title>Mockup 01: Dashboard Hero - OwlWatcher</title>
+    <style>
+        /* ===================================================================
+           MOCKUP 01: DASHBOARD HERO
+           Theme: Dark mode cybersecurity command center
+           Developer: Marcus Daley
+           Date: 2026-02-24
+           =================================================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ===================================================================
+           NANO BANANA ASSET #1: Background
+           Prompt: "Dark navy gradient cybersecurity dashboard background
+           with subtle circuit board patterns and glowing teal accents,
+           4K resolution, professional monitoring software aesthetic"
+           =================================================================== */
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a1128 0%, #1a2332 50%, #0d1b2a 100%);
+            z-index: 0;
+        }
+
+        .background::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                repeating-linear-gradient(90deg, rgba(79, 209, 197, 0.03) 0px, transparent 1px, transparent 40px),
+                repeating-linear-gradient(0deg, rgba(79, 209, 197, 0.03) 0px, transparent 1px, transparent 40px);
+            opacity: 0.4;
+        }
+
+        .background::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, rgba(79, 209, 197, 0.1) 0%, transparent 70%);
+        }
+
+        /* ===================================================================
+           HEADER BAR
+           =================================================================== */
+        .header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 140px;
+            background: rgba(10, 17, 40, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid rgba(79, 209, 197, 0.3);
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* ===================================================================
+           SPLINE 3D ELEMENT #1: Owl Mascot (Header Size)
+           Scene: owl_idle.splinecode (56x56px)
+           =================================================================== */
+        .owl-header {
+            width: 56px;
+            height: 56px;
+            margin-right: 20px;
+            background: linear-gradient(135deg, #f5deb3 0%, #d4a574 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(245, 222, 179, 0.4);
+            position: relative;
+            animation: owl-breathe 3s ease-in-out infinite;
+        }
+
+        @keyframes owl-breathe {
+            0%, 100% { transform: scale(1) translateY(0); }
+            50% { transform: scale(1.05) translateY(-3px); }
+        }
+
+        .owl-header::before {
+            content: '🦉';
+            font-size: 36px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        .owl-header-label {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(79, 209, 197, 0.9);
+            color: #0a1128;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(79, 209, 197, 0.4);
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #ffffff;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 10px rgba(79, 209, 197, 0.5);
+        }
+
+        .header-spacer {
+            flex: 1;
+        }
+
+        /* ===================================================================
+           SPLINE 3D ELEMENT #2: Moon Toggle
+           Scene: moon_toggle.splinecode (64x64px with orbital particles)
+           =================================================================== */
+        .moon-toggle {
+            width: 64px;
+            height: 64px;
+            background: rgba(79, 209, 197, 0.2);
+            border: 2px solid rgba(79, 209, 197, 0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            animation: moon-rotate 20s linear infinite;
+        }
+
+        @keyframes moon-rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .moon-toggle:hover {
+            background: rgba(79, 209, 197, 0.3);
+            border-color: rgba(79, 209, 197, 0.8);
+            box-shadow: 0 0 20px rgba(79, 209, 197, 0.6);
+        }
+
+        .moon-toggle::before {
+            content: '🌙';
+            font-size: 32px;
+            animation: moon-counter-rotate 20s linear infinite;
+        }
+
+        @keyframes moon-counter-rotate {
+            from { transform: rotate(360deg); }
+            to { transform: rotate(0deg); }
+        }
+
+        /* Orbital particles */
+        .moon-toggle::after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border: 1px dashed rgba(79, 209, 197, 0.3);
+            border-radius: 50%;
+            animation: particle-orbit 5s linear infinite;
+        }
+
+        @keyframes particle-orbit {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===================================================================
+           SIDEBAR STATS PANEL
+           =================================================================== */
+        .sidebar {
+            position: absolute;
+            top: 140px;
+            left: 0;
+            width: 280px;
+            height: calc(100% - 140px);
+            background: rgba(10, 17, 40, 0.7);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(79, 209, 197, 0.2);
+            padding: 30px 20px;
+            overflow-y: auto;
+            z-index: 50;
+        }
+
+        /* ===================================================================
+           NANO BANANA ASSET #2: Glass Morphism Panel Texture
+           Prompt: "Translucent glass morphism panel with frosted blur effect,
+           subtle neon teal border glow, 2048x2048 PNG with alpha"
+           =================================================================== */
+        .stat-card {
+            background: rgba(26, 35, 50, 0.6);
+            border: 1px solid rgba(79, 209, 197, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            background: rgba(26, 35, 50, 0.8);
+            border-color: rgba(79, 209, 197, 0.6);
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(79, 209, 197, 0.2);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #4fd1c5;
+            text-shadow: 0 2px 8px rgba(79, 209, 197, 0.5);
+        }
+
+        .stat-unit {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-left: 5px;
+        }
+
+        .stat-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4fd1c5 0%, #38b2ac 100%);
+            border-radius: 3px;
+            box-shadow: 0 0 10px rgba(79, 209, 197, 0.5);
+            transition: width 0.5s ease;
+        }
+
+        /* ===================================================================
+           CENTRAL OWL ZONE
+           =================================================================== */
+        .owl-zone {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 75;
+        }
+
+        /* ===================================================================
+           SPLINE 3D ELEMENT #3: Large Owl Mascot
+           Scene: owl_idle_large.splinecode (256x256px with breathing animation)
+           =================================================================== */
+        .owl-large {
+            width: 256px;
+            height: 256px;
+            background: radial-gradient(ellipse at center, rgba(245, 222, 179, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: owl-large-float 4s ease-in-out infinite;
+        }
+
+        @keyframes owl-large-float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.03); }
+        }
+
+        .owl-large::before {
+            content: '🦉';
+            font-size: 180px;
+            filter: drop-shadow(0 10px 30px rgba(245, 222, 179, 0.5));
+            animation: owl-large-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes owl-large-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+
+        /* Glow ring around owl */
+        .owl-large::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border: 2px solid rgba(79, 209, 197, 0.2);
+            border-radius: 50%;
+            animation: glow-ring-pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes glow-ring-pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        .owl-state-label {
+            margin-top: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #4fd1c5;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: rgba(10, 17, 40, 0.8);
+            padding: 8px 24px;
+            border-radius: 20px;
+            border: 1px solid rgba(79, 209, 197, 0.4);
+            box-shadow: 0 4px 15px rgba(79, 209, 197, 0.3);
+        }
+
+        /* ===================================================================
+           BOTTOM FILE GRID PANEL
+           =================================================================== */
+        .file-panel {
+            position: absolute;
+            bottom: 0;
+            left: 280px;
+            right: 0;
+            height: 250px;
+            background: rgba(10, 17, 40, 0.85);
+            backdrop-filter: blur(10px);
+            border-top: 2px solid rgba(79, 209, 197, 0.3);
+            padding: 30px;
+            z-index: 50;
+        }
+
+        .file-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .file-panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+            letter-spacing: 1px;
+        }
+
+        .file-count {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            background: rgba(79, 209, 197, 0.2);
+            padding: 4px 12px;
+            border-radius: 12px;
+        }
+
+        /* ===================================================================
+           SPLINE 3D ELEMENT #4: File Cube Grid
+           Scene: file_grid.splinecode (6 floating cubes with glow)
+           =================================================================== */
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 20px;
+            padding: 0 20px;
+        }
+
+        .file-cube {
+            width: 100%;
+            aspect-ratio: 1;
+            background: rgba(26, 35, 50, 0.6);
+            border: 1px solid rgba(79, 209, 197, 0.3);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            backdrop-filter: blur(5px);
+        }
+
+        .file-cube::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, rgba(79, 209, 197, 0.5) 0%, transparent 100%);
+            border-radius: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .file-cube:hover {
+            transform: translateY(-10px) scale(1.05);
+            border-color: rgba(79, 209, 197, 0.8);
+            box-shadow: 0 10px 30px rgba(79, 209, 197, 0.4);
+        }
+
+        .file-cube:hover::before {
+            opacity: 1;
+        }
+
+        .file-cube:nth-child(1) { animation: cube-float 3s ease-in-out infinite 0s; }
+        .file-cube:nth-child(2) { animation: cube-float 3s ease-in-out infinite 0.2s; }
+        .file-cube:nth-child(3) { animation: cube-float 3s ease-in-out infinite 0.4s; }
+        .file-cube:nth-child(4) { animation: cube-float 3s ease-in-out infinite 0.6s; }
+        .file-cube:nth-child(5) { animation: cube-float 3s ease-in-out infinite 0.8s; }
+        .file-cube:nth-child(6) { animation: cube-float 3s ease-in-out infinite 1s; }
+
+        @keyframes cube-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .file-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 2px 8px rgba(79, 209, 197, 0.3));
+        }
+
+        .file-name {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .file-status {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid rgba(10, 17, 40, 0.8);
+        }
+
+        .file-status.synced {
+            background: #48bb78;
+            box-shadow: 0 0 10px rgba(72, 187, 120, 0.6);
+        }
+
+        .file-status.modified {
+            background: #ecc94b;
+            box-shadow: 0 0 10px rgba(236, 201, 75, 0.6);
+            animation: status-pulse 2s ease-in-out infinite;
+        }
+
+        .file-status.error {
+            background: #f56565;
+            box-shadow: 0 0 10px rgba(245, 101, 101, 0.6);
+            animation: status-pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes status-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* ===================================================================
+           ANNOTATION OVERLAYS (for development reference)
+           =================================================================== */
+        .annotation {
+            position: absolute;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            pointer-events: none;
+            z-index: 200;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .annotation.nano-banana {
+            background: rgba(147, 51, 234, 0.9);
+            color: white;
+            border: 2px solid rgba(147, 51, 234, 1);
+        }
+
+        .annotation.spline-3d {
+            background: rgba(251, 146, 60, 0.9);
+            color: white;
+            border: 2px solid rgba(251, 146, 60, 1);
+        }
+
+        /* ===================================================================
+           LEGEND (bottom-right corner)
+           =================================================================== */
+        .legend {
+            position: absolute;
+            bottom: 270px;
+            right: 20px;
+            background: rgba(10, 17, 40, 0.95);
+            border: 1px solid rgba(79, 209, 197, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            z-index: 150;
+            backdrop-filter: blur(10px);
+        }
+
+        .legend-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #4fd1c5;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            margin-right: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .legend-color.nano {
+            background: rgba(147, 51, 234, 0.8);
+        }
+
+        .legend-color.spline {
+            background: rgba(251, 146, 60, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <!-- NANO BANANA: Background texture -->
+    <div class="background"></div>
+
+    <!-- HEADER BAR -->
+    <div class="header">
+        <!-- SPLINE 3D: Owl mascot (header size) -->
+        <div class="owl-header">
+            <div class="owl-header-label">SPLINE 3D</div>
+        </div>
+        <div class="title">OwlWatcher</div>
+        <div class="header-spacer"></div>
+        <!-- SPLINE 3D: Moon toggle -->
+        <div class="moon-toggle">
+            <div class="owl-header-label" style="top: -30px;">SPLINE 3D</div>
+        </div>
+    </div>
+
+    <!-- SIDEBAR STATS -->
+    <div class="sidebar">
+        <!-- NANO BANANA: Glass morphism panels -->
+        <div class="stat-card">
+            <div class="stat-label">Files Watched</div>
+            <div class="stat-value">1,247<span class="stat-unit">total</span></div>
+            <div class="stat-bar">
+                <div class="stat-bar-fill" style="width: 78%;"></div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Sync Status</div>
+            <div class="stat-value">98<span class="stat-unit">%</span></div>
+            <div class="stat-bar">
+                <div class="stat-bar-fill" style="width: 98%;"></div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Active Threads</div>
+            <div class="stat-value">4<span class="stat-unit">threads</span></div>
+            <div class="stat-bar">
+                <div class="stat-bar-fill" style="width: 40%;"></div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Memory Usage</div>
+            <div class="stat-value">247<span class="stat-unit">MB</span></div>
+            <div class="stat-bar">
+                <div class="stat-bar-fill" style="width: 62%;"></div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Uptime</div>
+            <div class="stat-value">23h<span class="stat-unit">14m</span></div>
+        </div>
+    </div>
+
+    <!-- CENTRAL OWL ZONE -->
+    <div class="owl-zone">
+        <!-- SPLINE 3D: Large owl mascot (256x256) -->
+        <div class="owl-large"></div>
+        <div class="owl-state-label">IDLE</div>
+    </div>
+
+    <!-- BOTTOM FILE GRID -->
+    <div class="file-panel">
+        <div class="file-panel-header">
+            <div class="file-panel-title">Recent Changes</div>
+            <div class="file-count">6 files</div>
+        </div>
+
+        <!-- SPLINE 3D: File cubes (6 floating with glow) -->
+        <div class="file-grid">
+            <div class="file-cube">
+                <div class="file-status synced"></div>
+                <div class="file-icon">📄</div>
+                <div class="file-name">SKILL.md</div>
+            </div>
+            <div class="file-cube">
+                <div class="file-status synced"></div>
+                <div class="file-icon">🐍</div>
+                <div class="file-name">main.py</div>
+            </div>
+            <div class="file-cube">
+                <div class="file-status modified"></div>
+                <div class="file-icon">⚙️</div>
+                <div class="file-name">config.json</div>
+            </div>
+            <div class="file-cube">
+                <div class="file-status synced"></div>
+                <div class="file-icon">📊</div>
+                <div class="file-name">stats.db</div>
+            </div>
+            <div class="file-cube">
+                <div class="file-status error"></div>
+                <div class="file-icon">🔒</div>
+                <div class="file-name">audit.log</div>
+            </div>
+            <div class="file-cube">
+                <div class="file-status synced"></div>
+                <div class="file-icon">📦</div>
+                <div class="file-name">package.json</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ANNOTATIONS -->
+    <div class="annotation nano-banana" style="top: 20px; left: 300px;">
+        NANO BANANA PRO<br>Background Asset
+    </div>
+    <div class="annotation spline-3d" style="top: 420px; left: 850px;">
+        SPLINE 3D<br>Large Owl (256px)
+    </div>
+    <div class="annotation nano-banana" style="top: 160px; left: 20px;">
+        NANO BANANA PRO<br>Glass Panels
+    </div>
+    <div class="annotation spline-3d" style="bottom: 280px; left: 50%; transform: translateX(-50%);">
+        SPLINE 3D<br>File Cube Grid (6 cubes)
+    </div>
+
+    <!-- LEGEND -->
+    <div class="legend">
+        <div class="legend-title">Asset Sources</div>
+        <div class="legend-item">
+            <div class="legend-color nano"></div>
+            <span>Nano Banana Pro (AI-generated)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color spline"></div>
+            <span>Spline 3D (Interactive scenes)</span>
+        </div>
+    </div>
+
+    <script>
+        // Interactive demo behaviors
+        document.querySelector('.moon-toggle').addEventListener('click', function() {
+            alert('🌙 Theme toggle clicked!\n\nIn production:\n- Triggers ThemeManager.toggle_theme()\n- Spline moon flips 180° (sun/moon)\n- Background switches to light variant');
+        });
+
+        document.querySelectorAll('.file-cube').forEach(cube => {
+            cube.addEventListener('click', function() {
+                const fileName = this.querySelector('.file-name').textContent;
+                alert(`📂 File clicked: ${fileName}\n\nIn production:\n- Opens file details panel\n- Shows sync history\n- Displays file metadata`);
+            });
+        });
+
+        document.querySelector('.owl-large').addEventListener('click', function() {
+            alert('🦉 Owl clicked!\n\nIn production:\n- Cycles through owl states (idle → scanning → alert)\n- Triggers Spline animation state machine\n- Shows speech bubble with status message');
+        });
+    </script>
+</body>
+</html>

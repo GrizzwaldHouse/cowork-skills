@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, initial-scale=1.0">
+    <title>Mockup 05: Scanning Active State - OwlWatcher</title>
+    <style>
+        /* MOCKUP 05: SCANNING ACTIVE STATE
+           Theme: Teal radar sweep with animated scan overlay, owl rotating 360°,
+           files with scan beam highlight, real-time data flow visualization */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            width: 1920px; height: 1080px;
+            overflow: hidden;
+            background: radial-gradient(ellipse at center, #0a1f1f 0%, #051010 60%, #000000 100%);
+        }
+
+        /* Animated scan grid */
+        .scan-grid {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image:
+                repeating-linear-gradient(0deg, transparent 0px, rgba(79, 209, 197, 0.1) 1px, transparent 2px, transparent 60px),
+                repeating-linear-gradient(90deg, transparent 0px, rgba(79, 209, 197, 0.1) 1px, transparent 2px, transparent 60px);
+            animation: grid-scan 3s linear infinite;
+            z-index: 1;
+        }
+        @keyframes grid-scan {
+            from { transform: translateY(0); }
+            to { transform: translateY(60px); }
+        }
+
+        /* Radar sweep */
+        .radar-sweep {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 800px;
+            height: 800px;
+            border-radius: 50%;
+            background: conic-gradient(
+                transparent 0deg,
+                transparent 270deg,
+                rgba(79, 209, 197, 0.3) 300deg,
+                rgba(79, 209, 197, 0.6) 330deg,
+                rgba(79, 209, 197, 0.8) 345deg,
+                rgba(79, 209, 197, 1) 360deg
+            );
+            transform: translate(-50%, -50%);
+            animation: radar-rotate 4s linear infinite;
+            z-index: 50;
+            mix-blend-mode: screen;
+        }
+        @keyframes radar-rotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Owl scanning (rotating head 360°) */
+        .owl-scanning {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 256px;
+            height: 256px;
+            font-size: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: owl-scan-rotate 6s linear infinite;
+            z-index: 100;
+            filter: drop-shadow(0 0 40px rgba(79, 209, 197, 0.8));
+        }
+        @keyframes owl-scan-rotate {
+            from { transform: translate(-50%, -50%) rotateY(0deg); }
+            to { transform: translate(-50%, -50%) rotateY(360deg); }
+        }
+        .owl-scanning::before {
+            content: '🦉';
+        }
+
+        /* Scan beam emanating from owl */
+        .scan-beam {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 400px;
+            background: linear-gradient(to bottom, rgba(79, 209, 197, 1) 0%, transparent 100%);
+            transform-origin: top center;
+            animation: beam-scan 4s linear infinite;
+            filter: blur(2px);
+            z-index: 60;
+        }
+        @keyframes beam-scan {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Files being scanned (highlight when beam passes) */
+        .file-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 700px;
+            height: 700px;
+            transform: translate(-50%, -50%);
+            z-index: 70;
+        }
+        .file-scan-cube {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: rgba(26, 35, 50, 0.8);
+            border: 2px solid rgba(79, 209, 197, 0.4);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            transition: all 0.3s ease;
+            animation: file-pulse 2s ease-in-out infinite;
+        }
+        @keyframes file-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .file-scan-cube.scanning {
+            border-color: rgba(79, 209, 197, 1);
+            box-shadow: 0 0 30px rgba(79, 209, 197, 0.8);
+            background: rgba(79, 209, 197, 0.2);
+        }
+
+        /* Position files in circle */
+        .file-scan-cube:nth-child(1) { top: 0%; left: 50%; transform: translate(-50%, -50%); }
+        .file-scan-cube:nth-child(2) { top: 15%; left: 85%; transform: translate(-50%, -50%); }
+        .file-scan-cube:nth-child(3) { top: 50%; left: 100%; transform: translate(-50%, -50%); }
+        .file-scan-cube:nth-child(4) { top: 85%; left: 85%; transform: translate(-50%, -50%); }
+        .file-scan-cube:nth-child(5) { top: 100%; left: 50%; transform: translate(-50%, -50%); }
+        .file-scan-cube:nth-child(6) { top: 85%; left: 15%; transform: translate(-50%, -50%); }
+        .file-scan-cube:nth-child(7) { top: 50%; left: 0%; transform: translate(-50%, -50%); }
+        .file-scan-cube:nth-child(8) { top: 15%; left: 15%; transform: translate(-50%, -50%); }
+
+        /* Status HUD */
+        .scan-status {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 150;
+        }
+        .scan-status h1 {
+            font-size: 32px;
+            color: #4fd1c5;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 20px rgba(79, 209, 197, 0.8);
+            animation: status-blink 1s ease-in-out infinite;
+        }
+        @keyframes status-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .scan-progress {
+            margin-top: 20px;
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.8);
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Data flow visualization */
+        .data-stream {
+            position: absolute;
+            width: 2px;
+            height: 60px;
+            background: linear-gradient(to bottom, rgba(79, 209, 197, 0.8) 0%, transparent 100%);
+            animation: stream-flow 2s ease-out infinite;
+        }
+        @keyframes stream-flow {
+            0% { transform: translateY(-60px); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translateY(400px); opacity: 0; }
+        }
+        .data-stream:nth-child(1) { top: 200px; left: 300px; animation-delay: 0s; }
+        .data-stream:nth-child(2) { top: 150px; left: 500px; animation-delay: 0.3s; }
+        .data-stream:nth-child(3) { top: 250px; right: 400px; animation-delay: 0.6s; }
+        .data-stream:nth-child(4) { top: 180px; right: 200px; animation-delay: 0.9s; }
+
+        .annotation {
+            position: absolute;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            background: rgba(251, 146, 60, 0.95);
+            color: white;
+            border: 2px solid rgba(251, 146, 60, 1);
+            z-index: 200;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="scan-grid"></div>
+    <div class="radar-sweep"></div>
+    <div class="scan-beam"></div>
+    <div class="owl-scanning"></div>
+
+    <div class="file-ring">
+        <div class="file-scan-cube">📄</div>
+        <div class="file-scan-cube">🐍</div>
+        <div class="file-scan-cube">⚙️</div>
+        <div class="file-scan-cube">📊</div>
+        <div class="file-scan-cube">🔒</div>
+        <div class="file-scan-cube">📦</div>
+        <div class="file-scan-cube">🎨</div>
+        <div class="file-scan-cube">📚</div>
+    </div>
+
+    <div class="scan-status">
+        <h1>🔍 SCANNING IN PROGRESS</h1>
+        <div class="scan-progress">FILES SCANNED: <span id="count">247</span> / 1,247</div>
+    </div>
+
+    <div class="data-stream"></div>
+    <div class="data-stream"></div>
+    <div class="data-stream"></div>
+    <div class="data-stream"></div>
+
+    <div class="annotation" style="top: 20px; left: 20px;">
+        SPLINE 3D<br>Radar Sweep + Rotating Owl<br>360° Head Scan
+    </div>
+
+    <script>
+        // Simulate file scanning
+        let count = 247;
+        setInterval(() => {
+            count += Math.floor(Math.random() * 10);
+            if (count > 1247) count = 247;
+            document.getElementById('count').textContent = count;
+        }, 500);
+
+        // Highlight files as scan beam passes
+        let angle = 0;
+        setInterval(() => {
+            angle = (angle + 2) % 360;
+            document.querySelectorAll('.file-scan-cube').forEach((cube, index) => {
+                const fileAngle = (index * 45) % 360;
+                const diff = Math.abs(angle - fileAngle);
+                if (diff < 15 || diff > 345) {
+                    cube.classList.add('scanning');
+                } else {
+                    cube.classList.remove('scanning');
+                }
+            });
+        }, 50);
+    </script>
+</body>
+</html>

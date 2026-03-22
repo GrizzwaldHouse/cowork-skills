@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OwlWatcher with Spline 3D Integration - Mockup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(180deg, #060D15 0%, #0D1B2A 100%);
+            color: #E0E1DD;
+            padding: 20px;
+        }
+
+        .mockup-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #0D1B2A;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        /* Header with 3D Owl */
+        .header {
+            background: linear-gradient(90deg, #1B263B 0%, #415A77 100%);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+            height: 140px;
+        }
+
+        .owl-3d-container {
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(212,175,55,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .owl-3d-placeholder {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #D4AF37 0%, #8B7320 100%);
+            border-radius: 50%;
+            position: relative;
+            animation: breathe 4s ease-in-out infinite;
+        }
+
+        .owl-eye {
+            width: 20px;
+            height: 20px;
+            background: #0D1B2A;
+            border-radius: 50%;
+            position: absolute;
+            top: 30px;
+        }
+
+        .owl-eye.left { left: 25px; }
+        .owl-eye.right { right: 25px; }
+
+        .owl-beak {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 15px solid #C87533;
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .title-section {
+            flex: 1;
+        }
+
+        .title-section h1 {
+            font-size: 28px;
+            color: #D4AF37;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .title-section p {
+            font-size: 14px;
+            color: #E0E1DD;
+            opacity: 0.8;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn-3d {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #4A7C9D 0%, #2C5F7F 100%);
+            border: none;
+            border-radius: 8px;
+            color: #E0E1DD;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(74,124,157,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-3d:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(74,124,157,0.5);
+        }
+
+        .btn-3d.stop {
+            background: linear-gradient(135deg, #C87533 0%, #A0622A 100%);
+        }
+
+        .btn-3d.export {
+            background: linear-gradient(135deg, #D4AF37 0%, #8B7320 100%);
+        }
+
+        /* 3D Moon Toggle */
+        .moon-toggle {
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle at 30% 30%, #FFF9E6 0%, #E0D5B7 50%, #8B7355 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(255,249,230,0.4), inset -10px -10px 20px rgba(0,0,0,0.3);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.4s ease;
+            animation: moonRotate 20s linear infinite;
+        }
+
+        .moon-toggle:hover {
+            transform: scale(1.15);
+            box-shadow: 0 0 40px rgba(255,249,230,0.6);
+        }
+
+        @keyframes moonRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .moon-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #D4AF37;
+            border-radius: 50%;
+            animation: orbit 8s linear infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes orbit {
+            0% {
+                transform: rotate(0deg) translateX(40px) rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg) translateX(40px) rotate(-360deg);
+            }
+        }
+
+        /* Main Content Area */
+        .content {
+            display: grid;
+            grid-template-columns: 250px 1fr 300px;
+            gap: 16px;
+            padding: 16px;
+            min-height: 600px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: #1B263B;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .sidebar h3 {
+            color: #D4AF37;
+            font-size: 14px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .folder-tree {
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .folder-item {
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .folder-item:hover {
+            background: rgba(212,175,55,0.1);
+        }
+
+        /* 3D File Dashboard */
+        .file-dashboard {
+            background: #1B263B;
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .file-dashboard h3 {
+            color: #D4AF37;
+            font-size: 16px;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .file-3d-container {
+            height: 400px;
+            background: radial-gradient(circle at center, rgba(74,124,157,0.1) 0%, transparent 70%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-cube {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #4A7C9D 0%, #2C5F7F 100%);
+            border-radius: 8px;
+            position: absolute;
+            animation: float 3s ease-in-out infinite;
+            box-shadow: 0 10px 30px rgba(74,124,157,0.3);
+        }
+
+        .file-cube:nth-child(1) {
+            top: 20%;
+            left: 20%;
+            background: linear-gradient(135deg, #4A7C9D 0%, #2C5F7F 100%);
+            animation-delay: 0s;
+        }
+
+        .file-cube:nth-child(2) {
+            top: 60%;
+            left: 60%;
+            background: linear-gradient(135deg, #5FB878 0%, #3D9B5F 100%);
+            animation-delay: 1s;
+        }
+
+        .file-cube:nth-child(3) {
+            top: 40%;
+            right: 20%;
+            background: linear-gradient(135deg, #D4AF37 0%, #8B7320 100%);
+            animation-delay: 2s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(10deg);
+            }
+        }
+
+        .event-log {
+            margin-top: 20px;
+        }
+
+        .event-row {
+            background: rgba(27,38,59,0.6);
+            padding: 8px 12px;
+            border-left: 3px solid #4A7C9D;
+            margin-bottom: 4px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-family: 'Consolas', monospace;
+        }
+
+        .event-row.warning {
+            border-left-color: #C87533;
+        }
+
+        .event-row.critical {
+            border-left-color: #D32F2F;
+        }
+
+        /* 3D Stats Panel */
+        .stats-panel {
+            background: #1B263B;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .stats-panel h3 {
+            color: #D4AF37;
+            font-size: 14px;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .stat-3d {
+            margin-bottom: 24px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #E0E1DD;
+            opacity: 0.7;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #D4AF37;
+            margin-bottom: 8px;
+        }
+
+        .stat-chart {
+            height: 80px;
+            background: linear-gradient(180deg, rgba(74,124,157,0.2) 0%, transparent 100%);
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .bar-3d {
+            position: absolute;
+            bottom: 0;
+            width: 12px;
+            background: linear-gradient(135deg, #4A7C9D 0%, #2C5F7F 100%);
+            border-radius: 4px 4px 0 0;
+            box-shadow: 0 -4px 12px rgba(74,124,157,0.4);
+        }
+
+        .bar-3d:nth-child(1) { left: 10%; height: 40%; }
+        .bar-3d:nth-child(2) { left: 25%; height: 65%; }
+        .bar-3d:nth-child(3) { left: 40%; height: 85%; }
+        .bar-3d:nth-child(4) { left: 55%; height: 50%; }
+        .bar-3d:nth-child(5) { left: 70%; height: 70%; }
+
+        /* Threat Orb */
+        .threat-orb {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+            background: radial-gradient(circle at 30% 30%, #FFD700 0%, #D4AF37 50%, #8B7320 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 40px rgba(212,175,55,0.6), inset -10px -10px 30px rgba(0,0,0,0.3);
+            animation: pulse 2s ease-in-out infinite;
+            position: relative;
+        }
+
+        .threat-orb::before {
+            content: '';
+            position: absolute;
+            top: 20%;
+            left: 20%;
+            width: 30%;
+            height: 30%;
+            background: rgba(255,255,255,0.4);
+            border-radius: 50%;
+            filter: blur(10px);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 40px rgba(212,175,55,0.6), inset -10px -10px 30px rgba(0,0,0,0.3);
+            }
+            50% {
+                box-shadow: 0 0 60px rgba(212,175,55,0.9), inset -10px -10px 30px rgba(0,0,0,0.3);
+            }
+        }
+
+        .threat-level {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 32px;
+            font-weight: 700;
+            color: #D4AF37;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #1B263B;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #4A7C9D;
+        }
+
+        .status-item {
+            font-size: 12px;
+            color: #E0E1DD;
+        }
+
+        .status-value {
+            color: #D4AF37;
+            font-weight: 600;
+        }
+
+        /* Annotations */
+        .annotation {
+            position: absolute;
+            background: rgba(212,175,55,0.95);
+            color: #0D1B2A;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            z-index: 10;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(212,175,55,0.4);
+        }
+
+        .annotation::before {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: rgba(212,175,55,0.95);
+            transform: rotate(45deg);
+        }
+
+        .annotation.top::before {
+            bottom: -4px;
+            left: 50%;
+            margin-left: -4px;
+        }
+
+        .annotation.left::before {
+            right: -4px;
+            top: 50%;
+            margin-top: -4px;
+        }
+
+        .annotation-1 {
+            top: 50px;
+            left: 150px;
+        }
+
+        .annotation-2 {
+            top: 50px;
+            right: 100px;
+        }
+
+        .annotation-3 {
+            top: 250px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .annotation-4 {
+            top: 300px;
+            right: 200px;
+        }
+
+        .legend {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(27,38,59,0.5);
+            border-radius: 8px;
+            border: 1px solid #4A7C9D;
+        }
+
+        .legend h2 {
+            color: #D4AF37;
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .legend-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .legend-icon.owl {
+            background: linear-gradient(135deg, #D4AF37 0%, #8B7320 100%);
+        }
+
+        .legend-icon.moon {
+            background: radial-gradient(circle, #FFF9E6 0%, #8B7355 100%);
+        }
+
+        .legend-icon.file {
+            background: linear-gradient(135deg, #4A7C9D 0%, #2C5F7F 100%);
+        }
+
+        .legend-icon.stats {
+            background: linear-gradient(135deg, #D4AF37 0%, #8B7320 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="mockup-container">
+        <!-- Annotations -->
+        <div class="annotation annotation-1 top">🦉 3D Spline Owl - Interactive, 8 animated states</div>
+        <div class="annotation annotation-2 top">🌙 3D Moon Toggle - Rotates, particles, theme switch</div>
+        <div class="annotation annotation-3 top">📁 3D File Dashboard - Files as floating cubes</div>
+        <div class="annotation annotation-4 left">📊 3D Stats - Energy orb, bars, charts</div>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="owl-3d-container">
+                <div class="owl-3d-placeholder">
+                    <div class="owl-eye left"></div>
+                    <div class="owl-eye right"></div>
+                    <div class="owl-beak"></div>
+                </div>
+            </div>
+
+            <div class="title-section">
+                <h1>OwlWatcher</h1>
+                <p>File Security Monitor with Spline 3D</p>
+            </div>
+
+            <div class="header-controls">
+                <button class="btn-3d">Start Watching</button>
+                <button class="btn-3d stop">Stop</button>
+                <button class="btn-3d export">Export Audit</button>
+
+                <div class="moon-toggle">
+                    <div class="moon-particles">
+                        <div class="particle" style="animation-delay: 0s;"></div>
+                        <div class="particle" style="animation-delay: 2s;"></div>
+                        <div class="particle" style="animation-delay: 4s;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <h3>Watched Folders</h3>
+                <div class="folder-tree">
+                    <div class="folder-item">📁 ClaudeSkills</div>
+                    <div class="folder-item">  📁 scripts</div>
+                    <div class="folder-item">  📁 skills</div>
+                    <div class="folder-item">  📁 Example_Skills</div>
+                    <div class="folder-item">  📄 CLAUDE.md</div>
+                </div>
+            </div>
+
+            <!-- File Dashboard -->
+            <div class="file-dashboard">
+                <h3>3D File Visualization</h3>
+                <div class="file-3d-container">
+                    <div class="file-cube"></div>
+                    <div class="file-cube"></div>
+                    <div class="file-cube"></div>
+                </div>
+
+                <div class="event-log">
+                    <div class="event-row">19:45:23 [INFO] MODIFIED: scripts/broadcaster.py</div>
+                    <div class="event-row">19:45:25 [INFO] CREATED: docs/SPLINE_3D_INTEGRATION_DESIGN.md</div>
+                    <div class="event-row warning">19:45:28 [WARN] Rapid changes detected: 5 events in 2s</div>
+                </div>
+            </div>
+
+            <!-- Stats Panel -->
+            <div class="stats-panel">
+                <h3>3D Statistics</h3>
+
+                <div class="stat-3d">
+                    <div class="stat-label">Events/min (last 60 min)</div>
+                    <div class="stat-value">127</div>
+                    <div class="stat-chart">
+                        <div class="bar-3d"></div>
+                        <div class="bar-3d"></div>
+                        <div class="bar-3d"></div>
+                        <div class="bar-3d"></div>
+                        <div class="bar-3d"></div>
+                    </div>
+                </div>
+
+                <div class="stat-3d">
+                    <div class="stat-label">Threat Level</div>
+                    <div class="threat-orb"></div>
+                    <div class="threat-level">35</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-item">Status: <span class="status-value">Watching 1 dir(s)</span></div>
+            <div class="status-item">Events: <span class="status-value">127 events</span></div>
+            <div class="status-item">Alerts: <span class="status-value">0 alerts</span></div>
+            <div class="status-item">Uptime: <span class="status-value">38:39:18</span></div>
+        </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+        <h2>Spline 3D Integration Points</h2>
+
+        <div class="legend-item">
+            <div class="legend-icon owl">🦉</div>
+            <div>
+                <strong>3D Owl Mascot</strong><br>
+                Replaces 2D SVG with interactive Spline scene. Breathing, scanning, alert states. Responds to file events.
+            </div>
+        </div>
+
+        <div class="legend-item">
+            <div class="legend-icon moon">🌙</div>
+            <div>
+                <strong>3D Moon Toggle</strong><br>
+                Rotating moon/sun with phase transitions. Orbiting star particles. Smooth theme switching animation.
+            </div>
+        </div>
+
+        <div class="legend-item">
+            <div class="legend-icon file">📁</div>
+            <div>
+                <strong>3D File Dashboard</strong><br>
+                Files as floating 3D cubes. Color-coded by type. Pulse on modify, fade on delete. Orbital layout.
+            </div>
+        </div>
+
+        <div class="legend-item">
+            <div class="legend-icon stats">📊</div>
+            <div>
+                <strong>3D Stats Visualization</strong><br>
+                Energy orb for threat level, 3D bar charts for events, rotating ring for uptime. Real-time updates.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

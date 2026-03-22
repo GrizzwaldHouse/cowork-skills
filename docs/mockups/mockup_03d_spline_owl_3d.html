@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OwlWatcher - Living 3D Owl with Spline</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Spline viewer web component -->
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { overflow: hidden; background: #000; perspective: 1500px; }
+
+        /* Custom cursor */
+        .cursor-custom {
+            cursor: none;
+        }
+        .cursor-dot {
+            position: fixed;
+            width: 12px;
+            height: 12px;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.15s;
+        }
+        .cursor-center {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: currentColor;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+        }
+
+        /* 3D Perspective Layers */
+        .parallax-layer {
+            position: absolute;
+            inset: 0;
+            transition: transform 0.3s ease-out;
+        }
+
+        /* 3D Branch Platform */
+        @keyframes branchSway {
+            0%, 100% { transform: translate(-50%, -50%) rotateX(12deg) rotateZ(-2deg); }
+            50% { transform: translate(-50%, -50%) rotateX(12deg) rotateZ(2deg); }
+        }
+
+        .branch-platform {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) rotateX(12deg);
+            transform-style: preserve-3d;
+            animation: branchSway 6s ease-in-out infinite;
+        }
+
+        /* Spline Container with blend mode */
+        .spline-container {
+            position: absolute;
+            left: 52%;
+            top: 42%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 350px;
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-style: preserve-3d;
+        }
+
+        .spline-container spline-viewer {
+            width: 100%;
+            height: 100%;
+            mix-blend-mode: screen;
+            border-radius: 12px;
+        }
+
+        /* CSS 3D Fallback Owl */
+        .fallback-owl {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-style: preserve-3d;
+            position: relative;
+        }
+
+        .owl-body {
+            width: 140px;
+            height: 180px;
+            background: linear-gradient(135deg, #8B7355 0%, #5D4E3A 100%);
+            border-radius: 50% 50% 45% 45%;
+            position: relative;
+            transform: translateZ(20px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            animation: breathe 4s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: translateZ(20px) scale(1); }
+            50% { transform: translateZ(20px) scale(1.03); }
+        }
+
+        .owl-head {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%) translateZ(30px);
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #A0826D 0%, #8B7355 100%);
+            border-radius: 50%;
+        }
+
+        .owl-eye {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            background: #1A1A1A;
+            border-radius: 50%;
+            top: 35px;
+            transition: all 0.3s;
+        }
+        .owl-eye.left { left: 20px; }
+        .owl-eye.right { right: 20px; }
+
+        .owl-pupil {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s;
+            box-shadow: 0 0 15px currentColor;
+        }
+
+        .owl-beak {
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%) translateZ(5px);
+            width: 0;
+            height: 0;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-top: 18px solid #C87533;
+        }
+
+        .owl-wing {
+            position: absolute;
+            top: 60px;
+            width: 50px;
+            height: 90px;
+            background: linear-gradient(135deg, #A0826D 0%, #6B5846 100%);
+            border-radius: 40% 10% 60% 10%;
+            transform: translateZ(10px);
+        }
+        .owl-wing.left {
+            left: -20px;
+            transform: translateZ(10px) rotate(-15deg);
+        }
+        .owl-wing.right {
+            right: -20px;
+            transform: translateZ(10px) rotate(15deg);
+        }
+
+        /* 3D Orbiting Bugs */
+        @keyframes orbit3d-ring1 {
+            0% { transform: rotateY(0deg) translateX(200px) rotateY(0deg); }
+            100% { transform: rotateY(360deg) translateX(200px) rotateY(-360deg); }
+        }
+        @keyframes orbit3d-ring2 {
+            0% { transform: rotateY(0deg) translateX(180px) rotateZ(20deg) rotateY(0deg); }
+            100% { transform: rotateY(360deg) translateX(180px) rotateZ(20deg) rotateY(-360deg); }
+        }
+        @keyframes orbit3d-ring3 {
+            0% { transform: rotateY(0deg) translateX(220px) rotateZ(-20deg) rotateY(0deg); }
+            100% { transform: rotateY(360deg) translateX(220px) rotateZ(-20deg) rotateY(-360deg); }
+        }
+
+        @keyframes bugFlutter {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @keyframes bugGlow {
+            0%, 100% { filter: drop-shadow(0 0 8px currentColor); }
+            50% { filter: drop-shadow(0 0 16px currentColor); }
+        }
+
+        .bug-orbit-container {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform-style: preserve-3d;
+            pointer-events: none;
+        }
+
+        .bug-wrapper {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform-style: preserve-3d;
+            pointer-events: all;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .bug-wrapper:hover {
+            transform: scale(1.15);
+        }
+
+        .bug-icon {
+            animation: bugFlutter 2s ease-in-out infinite, bugGlow 3s ease-in-out infinite;
+        }
+
+        /* Bug catch animation */
+        @keyframes flyToOwl {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(var(--target-x), var(--target-y)) scale(0.3); }
+        }
+
+        @keyframes peck {
+            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+            50% { transform: translate(-50%, -50%) rotate(15deg) translateY(10px); }
+        }
+
+        @keyframes energyBurst {
+            0% { opacity: 1; transform: scale(0); }
+            50% { opacity: 0.8; }
+            100% { opacity: 0; transform: scale(3); }
+        }
+
+        /* State badges */
+        .state-badge {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 28px;
+            border-radius: 24px;
+            font-weight: 600;
+            font-size: 14px;
+            backdrop-filter: blur(12px);
+            border: 2px solid currentColor;
+            z-index: 100;
+            transition: all 0.5s;
+            box-shadow: 0 0 20px currentColor;
+        }
+
+        /* HUD */
+        .hud-text {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 8px currentColor;
+        }
+
+        /* State transition buttons */
+        .state-buttons {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .state-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 2px solid currentColor;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            color: currentColor;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 12px currentColor;
+        }
+
+        .state-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 20px currentColor;
+        }
+
+        .state-btn.active {
+            background: currentColor;
+            color: #000;
+        }
+
+        /* Scan beam for SCANNING state */
+        @keyframes scanBeam {
+            0%, 100% { transform: translate(-50%, -50%) rotate(-45deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            50% { transform: translate(-50%, -50%) rotate(45deg); opacity: 0.6; }
+            90% { opacity: 0; }
+        }
+
+        .scan-beam {
+            position: absolute;
+            left: 52%;
+            top: 42%;
+            width: 600px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, currentColor, transparent);
+            transform: translate(-50%, -50%) rotate(0deg);
+            animation: scanBeam 3s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 50;
+            box-shadow: 0 0 20px currentColor;
+        }
+
+        /* Alert pulse */
+        @keyframes alertPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Sleeping breath */
+        @keyframes sleepBreathe {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.6; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const OwlWatcher3D = () => {
+            const [state, setState] = useState('IDLE');
+            const [catching, setCatching] = useState(null);
+            const [mousePos, setMousePos] = useState({ x: 960, y: 540 });
+            const [parallaxOffset, setParallaxOffset] = useState({ x: 0, y: 0 });
+            const [splineLoaded, setSplineLoaded] = useState(false);
+            const cursorDotRef = useRef(null);
+            const cursorCenterRef = useRef(null);
+
+            const seasons = {
+                IDLE: {
+                    name: 'Summer Night',
+                    accent: '#4FD1C5',
+                    eyeColor: '#4FD1C5',
+                    eyeGlow: '#4FD1C5',
+                    bgOverlay: 'rgba(0,0,0,0)',
+                    filter: 'brightness(1) saturate(1)'
+                },
+                SCANNING: {
+                    name: 'Autumn Scan',
+                    accent: '#FB923C',
+                    eyeColor: '#FFD700',
+                    eyeGlow: '#FBBF24',
+                    bgOverlay: 'rgba(100,50,0,0.25)',
+                    filter: 'brightness(0.8) saturate(0.8) sepia(0.4) hue-rotate(-10deg)'
+                },
+                ALERT: {
+                    name: 'Winter Storm',
+                    accent: '#EF4444',
+                    eyeColor: '#FF1A1A',
+                    eyeGlow: '#EF4444',
+                    bgOverlay: 'rgba(80,0,0,0.35)',
+                    filter: 'brightness(0.7) saturate(1.3) hue-rotate(-20deg)'
+                },
+                SUCCESS: {
+                    name: 'Spring Bloom',
+                    accent: '#F59E0B',
+                    eyeColor: '#FFB800',
+                    eyeGlow: '#F59E0B',
+                    bgOverlay: 'rgba(80,0,80,0.2)',
+                    filter: 'brightness(1.1) saturate(1.2) hue-rotate(280deg)'
+                },
+                SLEEPING: {
+                    name: 'Deep Winter',
+                    accent: '#93B4DC',
+                    eyeColor: '#5A7A9E',
+                    eyeGlow: '#4A6A8E',
+                    bgOverlay: 'rgba(15,23,42,0.4)',
+                    filter: 'brightness(0.5) saturate(0.3) hue-rotate(200deg)'
+                }
+            };
+
+            const currentSeason = seasons[state];
+
+            /* 12 bug types with organic SVG shapes and orbit ring assignments */
+            const bugs = [
+                { id: 'docs', label: 'Documents', type: 'Moth', ring: 1, delay: 0, bodyColor: '#8B7355', wingColor: '#D4C5A9', glowColor: '#E8DCC8' },
+                { id: 'py', label: 'Python', type: 'Beetle', ring: 2, delay: 3, bodyColor: '#2E7D32', wingColor: '#4CAF50', glowColor: '#66BB6A' },
+                { id: 'cfg', label: 'Config', type: 'Firefly', ring: 3, delay: 6, bodyColor: '#1B1B1B', wingColor: '#333', glowColor: '#FFEB3B' },
+                { id: 'data', label: 'Data', type: 'Dragonfly', ring: 1, delay: 4, bodyColor: '#1565C0', wingColor: '#90CAF9', glowColor: '#42A5F5' },
+                { id: 'sec', label: 'Security', type: 'Spider', ring: 2, delay: 7, bodyColor: '#1A1A1A', wingColor: '#333', glowColor: '#CE93D8' },
+                { id: 'pkg', label: 'Package', type: 'Caterpillar', ring: 3, delay: 2, bodyColor: '#558B2F', wingColor: '#8BC34A', glowColor: '#AED581' },
+                { id: 'design', label: 'Design', type: 'Butterfly', ring: 1, delay: 8, bodyColor: '#1A1A1A', wingColor: '#EC407A', glowColor: '#F48FB1' },
+                { id: 'db', label: 'Database', type: 'PillBug', ring: 2, delay: 1, bodyColor: '#455A64', wingColor: '#78909C', glowColor: '#90A4AE' },
+                { id: 'test', label: 'Test', type: 'LightningBug', ring: 3, delay: 5, bodyColor: '#1B1B1B', wingColor: '#333', glowColor: '#76FF03' },
+                { id: 'log', label: 'Log', type: 'Ant', ring: 1, delay: 9, bodyColor: '#3E2723', wingColor: '#5D4037', glowColor: '#8D6E63' },
+                { id: 'tools', label: 'Tools', type: 'CarpenterBee', ring: 2, delay: 10, bodyColor: '#1A1A1A', wingColor: '#FFC107', glowColor: '#FFD54F' },
+                { id: 'docs2', label: 'Docs', type: 'Bookworm', ring: 3, delay: 11, bodyColor: '#4FD1C5', wingColor: '#80DEEA', glowColor: '#B2EBF2' }
+            ];
+
+            /* SVG Insect Bodies */
+            const InsectSVG = ({ bug }) => {
+                const { bodyColor, wingColor, glowColor, type } = bug;
+
+                if (type === 'Moth') return (
+                    <svg width="52" height="44" viewBox="0 0 52 44" className="bug-icon">
+                        <defs><filter id={`glow-${bug.id}`}><feGaussianBlur stdDeviation="2.5"/></filter></defs>
+                        <ellipse cx="18" cy="18" rx="14" ry="10" fill={wingColor} opacity="0.5" transform="rotate(-20,18,18)" filter={`url(#glow-${bug.id})`}/>
+                        <ellipse cx="34" cy="18" rx="14" ry="10" fill={wingColor} opacity="0.5" transform="rotate(20,34,18)" filter={`url(#glow-${bug.id})`}/>
+                        <ellipse cx="26" cy="24" rx="4" ry="10" fill={bodyColor}/>
+                        <line x1="22" y1="14" x2="16" y2="6" stroke={bodyColor} strokeWidth="1"/>
+                        <line x1="30" y1="14" x2="36" y2="6" stroke={bodyColor} strokeWidth="1"/>
+                        <circle cx="16" cy="5" r="1.5" fill={glowColor} opacity="0.8"/>
+                        <circle cx="36" cy="5" r="1.5" fill={glowColor} opacity="0.8"/>
+                    </svg>
+                );
+
+                if (type === 'Beetle') return (
+                    <svg width="40" height="48" viewBox="0 0 40 48" className="bug-icon">
+                        <ellipse cx="20" cy="28" rx="12" ry="16" fill={bodyColor}/>
+                        <ellipse cx="20" cy="12" rx="8" ry="6" fill={bodyColor}/>
+                        <circle cx="16" cy="10" r="2" fill={glowColor}/>
+                        <circle cx="24" cy="10" r="2" fill={glowColor}/>
+                        <line x1="8" y1="22" x2="2" y2="18" stroke={bodyColor} strokeWidth="1.2"/>
+                        <line x1="32" y1="22" x2="38" y2="18" stroke={bodyColor} strokeWidth="1.2"/>
+                    </svg>
+                );
+
+                if (type === 'Firefly' || type === 'LightningBug') return (
+                    <svg width="36" height="44" viewBox="0 0 36 44" className="bug-icon">
+                        <ellipse cx="18" cy="18" rx="6" ry="8" fill={bodyColor}/>
+                        <ellipse cx="18" cy="32" rx="5" ry="7" fill={glowColor} opacity="0.9"/>
+                        <circle cx="18" cy="32" r="12" fill={glowColor} opacity="0.3"/>
+                        <ellipse cx="12" cy="16" rx="6" ry="3" fill={wingColor} opacity="0.25" transform="rotate(-30,12,16)"/>
+                        <ellipse cx="24" cy="16" rx="6" ry="3" fill={wingColor} opacity="0.25" transform="rotate(30,24,16)"/>
+                    </svg>
+                );
+
+                if (type === 'Dragonfly') return (
+                    <svg width="64" height="40" viewBox="0 0 64 40" className="bug-icon">
+                        <ellipse cx="16" cy="14" rx="12" ry="5" fill={wingColor} opacity="0.3" transform="rotate(-15,16,14)"/>
+                        <ellipse cx="48" cy="14" rx="12" ry="5" fill={wingColor} opacity="0.3" transform="rotate(15,48,14)"/>
+                        <ellipse cx="18" cy="24" rx="10" ry="4" fill={wingColor} opacity="0.25" transform="rotate(-10,18,24)"/>
+                        <ellipse cx="46" cy="24" rx="10" ry="4" fill={wingColor} opacity="0.25" transform="rotate(10,46,24)"/>
+                        <ellipse cx="32" cy="20" rx="4" ry="14" fill={bodyColor}/>
+                        <circle cx="32" cy="8" r="4" fill={bodyColor}/>
+                        <circle cx="30" cy="7" r="1.5" fill={glowColor}/>
+                        <circle cx="34" cy="7" r="1.5" fill={glowColor}/>
+                    </svg>
+                );
+
+                if (type === 'Spider') return (
+                    <svg width="44" height="44" viewBox="0 0 44 44" className="bug-icon">
+                        <circle cx="22" cy="22" r="8" fill={bodyColor}/>
+                        <circle cx="22" cy="12" r="5" fill={bodyColor}/>
+                        {[0,1,2,3,4,5,6,7].map(i => (
+                            <line key={i} x1="22" y1="22" x2={22 + Math.cos((i*45)*Math.PI/180)*18} y2={22 + Math.sin((i*45)*Math.PI/180)*18} stroke={bodyColor} strokeWidth="1.5"/>
+                        ))}
+                        <circle cx="19" cy="10" r="1.5" fill={glowColor}/>
+                        <circle cx="25" cy="10" r="1.5" fill={glowColor}/>
+                    </svg>
+                );
+
+                if (type === 'Caterpillar') return (
+                    <svg width="56" height="28" viewBox="0 0 56 28" className="bug-icon">
+                        {[0,1,2,3,4,5].map(i => (
+                            <circle key={i} cx={8 + i*8} cy={16} r={i===0 ? 6 : 5} fill={i%2===0 ? bodyColor : wingColor} opacity={0.8}/>
+                        ))}
+                        <circle cx="6" cy="12" r="1.5" fill={glowColor}/>
+                        <circle cx="12" cy="12" r="1.5" fill={glowColor}/>
+                    </svg>
+                );
+
+                if (type === 'Butterfly') return (
+                    <svg width="56" height="48" viewBox="0 0 56 48" className="bug-icon">
+                        <ellipse cx="14" cy="16" rx="12" ry="10" fill={wingColor} opacity="0.55"/>
+                        <ellipse cx="42" cy="16" rx="12" ry="10" fill={wingColor} opacity="0.55"/>
+                        <ellipse cx="16" cy="30" rx="8" ry="10" fill={wingColor} opacity="0.4"/>
+                        <ellipse cx="40" cy="30" rx="8" ry="10" fill={wingColor} opacity="0.4"/>
+                        <ellipse cx="28" cy="24" rx="3" ry="14" fill={bodyColor}/>
+                        <line x1="26" y1="10" x2="20" y2="2" stroke={bodyColor} strokeWidth="0.8"/>
+                        <line x1="30" y1="10" x2="36" y2="2" stroke={bodyColor} strokeWidth="0.8"/>
+                    </svg>
+                );
+
+                if (type === 'PillBug') return (
+                    <svg width="40" height="32" viewBox="0 0 40 32" className="bug-icon">
+                        <ellipse cx="20" cy="18" rx="14" ry="10" fill={bodyColor}/>
+                        {[0,1,2,3,4].map(i => (
+                            <path key={i} d={`M ${8+i*6} 10 Q ${8+i*6} 18 ${8+i*6} 26`} stroke={wingColor} strokeWidth="1.5" fill="none" opacity="0.4"/>
+                        ))}
+                    </svg>
+                );
+
+                if (type === 'Ant') return (
+                    <svg width="44" height="32" viewBox="0 0 44 32" className="bug-icon">
+                        <ellipse cx="10" cy="18" rx="6" ry="5" fill={bodyColor}/>
+                        <ellipse cx="22" cy="18" rx="5" ry="4" fill={bodyColor}/>
+                        <ellipse cx="34" cy="18" rx="7" ry="5" fill={bodyColor}/>
+                        <line x1="4" y1="14" x2="0" y2="8" stroke={bodyColor} strokeWidth="1"/>
+                        <line x1="10" y1="14" x2="14" y2="8" stroke={bodyColor} strokeWidth="1"/>
+                    </svg>
+                );
+
+                if (type === 'CarpenterBee') return (
+                    <svg width="44" height="44" viewBox="0 0 44 44" className="bug-icon">
+                        <ellipse cx="14" cy="16" rx="8" ry="4" fill="rgba(255,255,255,0.15)" transform="rotate(-30,14,16)"/>
+                        <ellipse cx="30" cy="16" rx="8" ry="4" fill="rgba(255,255,255,0.15)" transform="rotate(30,30,16)"/>
+                        <ellipse cx="22" cy="26" rx="8" ry="12" fill={bodyColor}/>
+                        {[0,1,2].map(i => (
+                            <rect key={i} x="14" y={20+i*5} width="16" height="2.5" fill={wingColor} rx="1" opacity="0.7"/>
+                        ))}
+                        <circle cx="22" cy="14" r="5" fill={bodyColor}/>
+                        <circle cx="19" cy="12" r="1.5" fill={glowColor}/>
+                        <circle cx="25" cy="12" r="1.5" fill={glowColor}/>
+                    </svg>
+                );
+
+                /* Bookworm */
+                return (
+                    <svg width="48" height="28" viewBox="0 0 48 28" className="bug-icon">
+                        <path d="M 4 16 Q 12 8 20 16 Q 28 24 36 16 Q 42 10 46 14" stroke={bodyColor} strokeWidth="6" fill="none" strokeLinecap="round"/>
+                        <circle cx="46" cy="14" r="4" fill={bodyColor}/>
+                        <circle cx="44" cy="12" r="1.2" fill={glowColor}/>
+                        <circle cx="48" cy="12" r="1.2" fill={glowColor}/>
+                    </svg>
+                );
+            };
+
+            const handleMouseMove = (e) => {
+                const x = e.clientX;
+                const y = e.clientY;
+                setMousePos({ x, y });
+
+                // Parallax effect
+                const offsetX = (x - 960) / 40;
+                const offsetY = (y - 540) / 40;
+                setParallaxOffset({ x: offsetX, y: offsetY });
+
+                // Update cursor
+                if (cursorDotRef.current) {
+                    cursorDotRef.current.style.left = x + 'px';
+                    cursorDotRef.current.style.top = y + 'px';
+                }
+                if (cursorCenterRef.current) {
+                    cursorCenterRef.current.style.left = x + 'px';
+                    cursorCenterRef.current.style.top = y + 'px';
+                }
+            };
+
+            const catchBug = (bug) => {
+                if (catching) return;
+                setCatching(bug);
+                setTimeout(() => setCatching(null), 2000);
+            };
+
+            useEffect(() => {
+                const handleKeyPress = (e) => {
+                    if (e.key === '1') setState('IDLE');
+                    if (e.key === '2') setState('SCANNING');
+                    if (e.key === '3') setState('ALERT');
+                    if (e.key === '4') setState('SUCCESS');
+                    if (e.key === '5') setState('SLEEPING');
+                };
+                window.addEventListener('keydown', handleKeyPress);
+                return () => window.removeEventListener('keydown', handleKeyPress);
+            }, []);
+
+            return (
+                <div
+                    className="relative w-screen h-screen overflow-hidden cursor-custom"
+                    onMouseMove={handleMouseMove}
+                    style={{ background: '#000', color: currentSeason.accent }}
+                >
+                    {/* Custom cursor */}
+                    <div ref={cursorDotRef} className="cursor-dot" style={{ color: currentSeason.accent }} />
+                    <div ref={cursorCenterRef} className="cursor-center" style={{ color: currentSeason.accent }} />
+
+                    {/* LAYER 1: AI Background Image with parallax */}
+                    <div
+                        className="parallax-layer"
+                        style={{
+                            backgroundImage: `url('file:///C:/Users/daley/Downloads/a0ddd4a6-8f74-4e0b-a696-e4209cf44170.png')`,
+                            backgroundPosition: 'center top',
+                            backgroundSize: 'cover',
+                            filter: currentSeason.filter,
+                            transform: `translateZ(-100px) translate(${parallaxOffset.x * 0.5}px, ${parallaxOffset.y * 0.5}px)`,
+                            transition: 'filter 1s'
+                        }}
+                    />
+
+                    {/* LAYER 2: Gradient overlay layers with parallax depth */}
+                    <div
+                        className="parallax-layer"
+                        style={{
+                            background: `radial-gradient(ellipse at 30% 40%, ${currentSeason.accent}22 0%, transparent 50%)`,
+                            transform: `translateZ(-50px) translate(${parallaxOffset.x * 1.2}px, ${parallaxOffset.y * 1.2}px)`,
+                            pointerEvents: 'none'
+                        }}
+                    />
+                    <div
+                        className="parallax-layer"
+                        style={{
+                            background: `radial-gradient(ellipse at 70% 60%, ${currentSeason.accent}11 0%, transparent 50%)`,
+                            transform: `translateZ(-30px) translate(${parallaxOffset.x * 1.5}px, ${parallaxOffset.y * 1.5}px)`,
+                            pointerEvents: 'none'
+                        }}
+                    />
+
+                    {/* LAYER 3: State color overlay */}
+                    <div
+                        className="absolute inset-0 transition-all duration-1000 pointer-events-none"
+                        style={{ backgroundColor: currentSeason.bgOverlay, zIndex: 1 }}
+                    />
+
+                    {/* Alert pulse vignette */}
+                    {state === 'ALERT' && (
+                        <div
+                            className="absolute inset-0 pointer-events-none"
+                            style={{
+                                background: 'radial-gradient(ellipse at center, transparent 40%, rgba(239,68,68,0.3) 100%)',
+                                animation: 'alertPulse 0.8s ease-in-out infinite',
+                                zIndex: 2
+                            }}
+                        />
+                    )}
+
+                    {/* Scanning beam */}
+                    {state === 'SCANNING' && (
+                        <div className="scan-beam" style={{ background: `linear-gradient(90deg, transparent, ${currentSeason.accent}, transparent)` }} />
+                    )}
+
+                    {/* 3D Branch Platform */}
+                    <div className="branch-platform" style={{ zIndex: 10 }}>
+                        <div
+                            style={{
+                                width: '400px',
+                                height: '80px',
+                                background: `linear-gradient(135deg, #5D4E3A 0%, #3A2F24 100%)`,
+                                borderRadius: '50% / 40%',
+                                boxShadow: '0 30px 60px rgba(0,0,0,0.5)',
+                                transform: 'rotateX(60deg)',
+                                opacity: 0.6
+                            }}
+                        />
+                    </div>
+
+                    {/* SPLINE 3D OWL CONTAINER */}
+                    <div className="spline-container" style={{ zIndex: 20 }}>
+                        {/* TODO: Replace with actual Spline scene URL */}
+                        {/* <spline-viewer url="https://prod.spline.design/YOUR-SCENE-ID/scene.splinecode"></spline-viewer> */}
+
+                        {/* CSS 3D Fallback Owl */}
+                        <div className="fallback-owl">
+                            <div className="owl-body">
+                                <div className="owl-wing left" />
+                                <div className="owl-wing right" />
+                                <div className="owl-head">
+                                    <div className="owl-eye left">
+                                        <div className="owl-pupil" style={{ background: currentSeason.eyeColor, color: currentSeason.eyeGlow }} />
+                                    </div>
+                                    <div className="owl-eye right">
+                                        <div className="owl-pupil" style={{ background: currentSeason.eyeColor, color: currentSeason.eyeGlow }} />
+                                    </div>
+                                    <div className="owl-beak" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 3D ORBITING BUGS */}
+                    <div className="bug-orbit-container" style={{ zIndex: 15 }}>
+                        {bugs.map(bug => (
+                            <div
+                                key={bug.id}
+                                className="bug-wrapper"
+                                style={{
+                                    animation: `orbit3d-ring${bug.ring} ${20 + bug.ring * 5}s linear infinite`,
+                                    animationDelay: `${bug.delay}s`,
+                                    color: bug.glowColor
+                                }}
+                                onClick={() => catchBug(bug)}
+                            >
+                                <InsectSVG bug={bug} />
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* HUD OVERLAY */}
+                    <div className="absolute top-4 left-4 hud-text" style={{ color: currentSeason.accent, zIndex: 100 }}>
+                        Files: 1,287 / Scanned: 100%
+                    </div>
+                    <div className="state-badge" style={{ color: currentSeason.accent, zIndex: 100 }}>
+                        {currentSeason.name}
+                    </div>
+                    <div className="absolute top-4 right-4 text-right hud-text" style={{ color: currentSeason.accent, zIndex: 100 }}>
+                        Sync: Active<br/>Uplink: Stable
+                    </div>
+
+                    {/* Keyboard hints */}
+                    <div className="absolute bottom-16 left-4 hud-text" style={{ color: currentSeason.accent, opacity: 0.6, zIndex: 100 }}>
+                        Press 1-5 to change seasons • Click bugs to interact
+                    </div>
+
+                    {/* STATE BUTTONS */}
+                    <div className="state-buttons">
+                        <button className={`state-btn ${state === 'IDLE' ? 'active' : ''}`} onClick={() => setState('IDLE')} style={{ color: '#4FD1C5' }}>
+                            1: Summer
+                        </button>
+                        <button className={`state-btn ${state === 'SCANNING' ? 'active' : ''}`} onClick={() => setState('SCANNING')} style={{ color: '#FB923C' }}>
+                            2: Autumn
+                        </button>
+                        <button className={`state-btn ${state === 'ALERT' ? 'active' : ''}`} onClick={() => setState('ALERT')} style={{ color: '#EF4444' }}>
+                            3: Winter
+                        </button>
+                        <button className={`state-btn ${state === 'SUCCESS' ? 'active' : ''}`} onClick={() => setState('SUCCESS')} style={{ color: '#F59E0B' }}>
+                            4: Spring
+                        </button>
+                        <button className={`state-btn ${state === 'SLEEPING' ? 'active' : ''}`} onClick={() => setState('SLEEPING')} style={{ color: '#93B4DC' }}>
+                            5: Deep Winter
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<OwlWatcher3D />, document.getElementById('root'));
+    </script>
+</body>
+</html>

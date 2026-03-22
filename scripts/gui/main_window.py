@@ -338,12 +338,16 @@ class MainWindow(QMainWindow):
 
         self._settings = QSettings(QSETTINGS_ORG, QSETTINGS_APP)
         self._theme_manager = ThemeManager()
+        # Apply initial theme (default is DARK)
+        self._theme_manager.apply_theme(self._theme_manager.current_theme)
 
         self.setWindowTitle("OwlWatcher - File Security Monitor")
         self.setWindowIcon(QIcon(str(ASSETS_DIR / "owl_tray.svg")))
         self.setMinimumSize(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)
 
-        self.setStyleSheet(_STYLESHEET)
+        # NOTE: Stylesheet commented out to allow ThemeManager to control theming
+        # If specific widget styling is needed, add it to ThemeManager.apply_theme()
+        # self.setStyleSheet(_STYLESHEET)
 
         self._build_ui()
         self._connect_signals()
@@ -512,8 +516,10 @@ class MainWindow(QMainWindow):
 
     def _on_theme_toggle(self) -> None:
         """Handle theme toggle request from moon button."""
+        logger.debug("Theme toggle requested")
         new_theme = self._theme_manager.toggle_theme()
         theme_name = "Light" if new_theme.value == "light" else "Dark"
+        logger.info(f"Theme toggled to: {theme_name}")
         self.statusBar().showMessage(f"Switched to {theme_name} theme", 2000)
 
     # -- Folder tree ------------------------------------------------------

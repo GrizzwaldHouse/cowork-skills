@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, initial-scale=1.0">
+    <title>Mockup 04: Alert Critical State - OwlWatcher</title>
+    <style>
+        /* ===================================================================
+           MOCKUP 04: ALERT CRITICAL STATE
+           Theme: High-intensity red alert with aggressive animations, danger
+           beacon, screen shake, chromatic aberration, glitch effects
+           Developer: Marcus Daley
+           Date: 2026-02-24
+           =================================================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ===================================================================
+           NANO BANANA ASSET #1: Alert Background with Warning Stripes
+           Prompt: "Dark red gradient alert background with diagonal warning
+           stripes, urgent danger aesthetic, pulsing red vignette edges,
+           flickering emergency lights, 4K resolution, cybersecurity threat
+           visualization, no text or UI elements"
+           =================================================================== */
+        .alert-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg,
+                #1a0a0a 0%,
+                #3d0f0f 30%,
+                #1a0a0a 60%,
+                #000000 100%);
+            animation: background-pulse 2s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        @keyframes background-pulse {
+            0%, 100% {
+                filter: brightness(1);
+            }
+            50% {
+                filter: brightness(1.2);
+            }
+        }
+
+        /* Danger stripes overlay */
+        .danger-stripes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent 0px,
+                transparent 40px,
+                rgba(239, 68, 68, 0.1) 40px,
+                rgba(239, 68, 68, 0.1) 80px
+            );
+            animation: stripes-scroll 3s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes stripes-scroll {
+            from { background-position: 0 0; }
+            to { background-position: 80px 80px; }
+        }
+
+        /* Red vignette pulsing */
+        .red-vignette {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center,
+                transparent 0%,
+                transparent 40%,
+                rgba(239, 68, 68, 0.3) 70%,
+                rgba(239, 68, 68, 0.6) 100%);
+            animation: vignette-pulse 1.5s ease-in-out infinite;
+            z-index: 2;
+        }
+
+        @keyframes vignette-pulse {
+            0%, 100% {
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* Warning beacon sweep */
+        .beacon-sweep {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200%;
+            height: 4px;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(239, 68, 68, 0.8) 50%,
+                transparent 100%);
+            transform-origin: center left;
+            animation: beacon-rotate 4s linear infinite;
+            filter: blur(4px);
+            z-index: 3;
+        }
+
+        @keyframes beacon-rotate {
+            from {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        /* Flickering lights effect */
+        .flicker-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(239, 68, 68, 0.1);
+            animation: flicker 0.3s steps(4, end) infinite;
+            z-index: 4;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 0; }
+            10%, 30%, 50%, 70%, 90% { opacity: 1; }
+            20%, 40%, 60%, 80% { opacity: 0.3; }
+        }
+
+        /* Screen shake container */
+        .screen-shake {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            animation: screen-shake 0.5s ease-in-out infinite;
+            z-index: 10;
+        }
+
+        @keyframes screen-shake {
+            0%, 100% { transform: translate(0, 0); }
+            10% { transform: translate(-2px, 2px); }
+            20% { transform: translate(2px, -2px); }
+            30% { transform: translate(-2px, -2px); }
+            40% { transform: translate(2px, 2px); }
+            50% { transform: translate(-2px, 2px); }
+            60% { transform: translate(2px, -2px); }
+            70% { transform: translate(-2px, -2px); }
+            80% { transform: translate(2px, 2px); }
+            90% { transform: translate(-2px, 2px); }
+        }
+
+        /* ===================================================================
+           SPLINE 3D ELEMENT #1: Owl in Alarm State (256px)
+           Scene: owl_alarm.splinecode with aggressive animations
+           =================================================================== */
+        .owl-alarm-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 256px;
+            height: 256px;
+            z-index: 100;
+            perspective: 1000px;
+        }
+
+        .owl-alarm {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            animation: owl-alarm-shake 0.3s ease-in-out infinite;
+        }
+
+        @keyframes owl-alarm-shake {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg) scale(1);
+            }
+            25% {
+                transform: translate(-3px, 2px) rotate(-2deg) scale(1.02);
+            }
+            50% {
+                transform: translate(3px, -2px) rotate(2deg) scale(0.98);
+            }
+            75% {
+                transform: translate(-2px, -3px) rotate(-1deg) scale(1.02);
+            }
+        }
+
+        .owl-alarm::before {
+            content: '🦉';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 200px;
+            filter: drop-shadow(0 0 60px rgba(239, 68, 68, 1))
+                    drop-shadow(0 0 30px rgba(220, 38, 38, 0.8))
+                    saturate(1.5)
+                    hue-rotate(20deg);
+            animation: owl-glow-danger 0.5s ease-in-out infinite;
+        }
+
+        @keyframes owl-glow-danger {
+            0%, 100% {
+                filter: drop-shadow(0 0 60px rgba(239, 68, 68, 1))
+                        drop-shadow(0 0 30px rgba(220, 38, 38, 0.8))
+                        saturate(1.5)
+                        hue-rotate(20deg);
+            }
+            50% {
+                filter: drop-shadow(0 0 90px rgba(239, 68, 68, 1))
+                        drop-shadow(0 0 50px rgba(220, 38, 38, 1))
+                        saturate(2)
+                        hue-rotate(30deg);
+            }
+        }
+
+        /* Energy discharge particles */
+        .discharge-particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle,
+                rgba(239, 68, 68, 1) 0%,
+                rgba(220, 38, 38, 0.6) 50%,
+                transparent 100%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: discharge-burst 1s ease-out infinite;
+        }
+
+        .discharge-particle:nth-child(1) {
+            top: 20%; left: 20%;
+            animation-delay: 0s;
+            animation-duration: 0.8s;
+        }
+        .discharge-particle:nth-child(2) {
+            top: 30%; right: 15%;
+            animation-delay: 0.2s;
+            animation-duration: 1s;
+        }
+        .discharge-particle:nth-child(3) {
+            bottom: 25%; left: 15%;
+            animation-delay: 0.4s;
+            animation-duration: 0.9s;
+        }
+        .discharge-particle:nth-child(4) {
+            bottom: 20%; right: 20%;
+            animation-delay: 0.6s;
+            animation-duration: 1.1s;
+        }
+        .discharge-particle:nth-child(5) {
+            top: 10%; left: 50%;
+            animation-delay: 0.3s;
+            animation-duration: 0.85s;
+        }
+        .discharge-particle:nth-child(6) {
+            bottom: 10%; left: 50%;
+            animation-delay: 0.5s;
+            animation-duration: 0.95s;
+        }
+
+        @keyframes discharge-burst {
+            0% {
+                transform: scale(0) translate(0, 0);
+                opacity: 1;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: scale(3) translate(var(--random-x, 20px), var(--random-y, -20px));
+                opacity: 0;
+            }
+        }
+
+        /* ===================================================================
+           SPLINE 3D ELEMENT #2: Spinning Danger Orb (64px)
+           Scene: danger_orb.splinecode with electrical arcs
+           =================================================================== */
+        .danger-orb-container {
+            position: absolute;
+            top: 25%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 128px;
+            height: 128px;
+            z-index: 90;
+        }
+
+        .danger-orb {
+            position: relative;
+            width: 64px;
+            height: 64px;
+            margin: 32px auto;
+            background: radial-gradient(circle,
+                rgba(239, 68, 68, 1) 0%,
+                rgba(220, 38, 38, 0.8) 40%,
+                rgba(185, 28, 28, 0.4) 70%,
+                transparent 100%);
+            border-radius: 50%;
+            animation: orb-spin-pulse 2s linear infinite;
+            box-shadow:
+                0 0 40px rgba(239, 68, 68, 0.9),
+                0 0 80px rgba(220, 38, 38, 0.6),
+                inset 0 0 20px rgba(239, 68, 68, 0.8);
+        }
+
+        @keyframes orb-spin-pulse {
+            0%, 100% {
+                transform: rotate(0deg) scale(1);
+                box-shadow:
+                    0 0 40px rgba(239, 68, 68, 0.9),
+                    0 0 80px rgba(220, 38, 38, 0.6),
+                    inset 0 0 20px rgba(239, 68, 68, 0.8);
+            }
+            50% {
+                transform: rotate(180deg) scale(1.2);
+                box-shadow:
+                    0 0 60px rgba(239, 68, 68, 1),
+                    0 0 120px rgba(220, 38, 38, 0.8),
+                    inset 0 0 30px rgba(239, 68, 68, 1);
+            }
+        }
+
+        .danger-orb::before {
+            content: '⚠️';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 32px;
+            animation: warning-rotate 1s linear infinite reverse;
+        }
+
+        @keyframes warning-rotate {
+            from { transform: translate(-50%, -50%) rotate(360deg); }
+            to { transform: translate(-50%, -50%) rotate(0deg); }
+        }
+
+        /* Electrical arcs */
+        .electrical-arc {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 60px;
+            background: linear-gradient(to bottom,
+                rgba(239, 68, 68, 1) 0%,
+                rgba(239, 68, 68, 0.6) 50%,
+                transparent 100%);
+            transform-origin: top center;
+            filter: blur(1px);
+            animation: arc-zap 0.8s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .electrical-arc:nth-child(1) {
+            animation-delay: 0s;
+            transform: translate(-50%, -50%) rotate(0deg);
+        }
+        .electrical-arc:nth-child(2) {
+            animation-delay: 0.2s;
+            transform: translate(-50%, -50%) rotate(60deg);
+        }
+        .electrical-arc:nth-child(3) {
+            animation-delay: 0.4s;
+            transform: translate(-50%, -50%) rotate(120deg);
+        }
+        .electrical-arc:nth-child(4) {
+            animation-delay: 0.6s;
+            transform: translate(-50%, -50%) rotate(180deg);
+        }
+        .electrical-arc:nth-child(5) {
+            animation-delay: 0.1s;
+            transform: translate(-50%, -50%) rotate(240deg);
+        }
+        .electrical-arc:nth-child(6) {
+            animation-delay: 0.3s;
+            transform: translate(-50%, -50%) rotate(300deg);
+        }
+
+        @keyframes arc-zap {
+            0%, 100% {
+                opacity: 0;
+                height: 60px;
+            }
+            20% {
+                opacity: 1;
+                height: 80px;
+            }
+            40% {
+                opacity: 0.6;
+                height: 90px;
+            }
+            60% {
+                opacity: 1;
+                height: 70px;
+            }
+            80% {
+                opacity: 0;
+                height: 60px;
+            }
+        }
+
+        /* Siren sound waves visualization */
+        .siren-wave {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 64px;
+            height: 64px;
+            border: 2px solid rgba(239, 68, 68, 0.8);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: wave-expand 2s ease-out infinite;
+            pointer-events: none;
+        }
+
+        .siren-wave:nth-child(1) { animation-delay: 0s; }
+        .siren-wave:nth-child(2) { animation-delay: 0.5s; }
+        .siren-wave:nth-child(3) { animation-delay: 1s; }
+        .siren-wave:nth-child(4) { animation-delay: 1.5s; }
+
+        @keyframes wave-expand {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(3);
+                opacity: 0;
+            }
+        }
+
+        /* ===================================================================
+           SPLINE 3D ELEMENT #3: File Cubes with Danger Highlights
+           Scene: file_cubes_danger.splinecode (6 cubes, bottom panel)
+           =================================================================== */
+        .file-panel-danger {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 250px;
+            background: linear-gradient(0deg,
+                rgba(26, 10, 10, 0.95) 0%,
+                rgba(61, 15, 15, 0.8) 100%);
+            backdrop-filter: blur(10px);
+            border-top: 3px solid rgba(239, 68, 68, 0.6);
+            padding: 30px;
+            z-index: 80;
+            animation: panel-glow-pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes panel-glow-pulse {
+            0%, 100% {
+                border-top-color: rgba(239, 68, 68, 0.6);
+                box-shadow: 0 -4px 30px rgba(239, 68, 68, 0.3);
+            }
+            50% {
+                border-top-color: rgba(239, 68, 68, 1);
+                box-shadow: 0 -4px 50px rgba(239, 68, 68, 0.6);
+            }
+        }
+
+        .file-panel-header-danger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .file-panel-title-danger {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ef4444;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            animation: title-blink 0.5s ease-in-out infinite;
+        }
+
+        @keyframes title-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .threat-count {
+            font-size: 14px;
+            color: #ffffff;
+            background: linear-gradient(135deg,
+                rgba(239, 68, 68, 0.9) 0%,
+                rgba(220, 38, 38, 0.9) 100%);
+            padding: 6px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(239, 68, 68, 1);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+            font-weight: 600;
+            animation: threat-pulse 0.8s ease-in-out infinite;
+        }
+
+        @keyframes threat-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 30px rgba(239, 68, 68, 0.9);
+            }
+        }
+
+        .file-grid-danger {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 20px;
+        }
+
+        .file-cube-danger {
+            width: 100%;
+            aspect-ratio: 1;
+            background: linear-gradient(135deg,
+                rgba(61, 15, 15, 0.9) 0%,
+                rgba(26, 10, 10, 0.9) 100%);
+            border: 2px solid rgba(239, 68, 68, 0.6);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            backdrop-filter: blur(5px);
+            animation: cube-danger-shake 0.5s ease-in-out infinite;
+        }
+
+        @keyframes cube-danger-shake {
+            0%, 100% {
+                transform: translate(0, 0);
+            }
+            25% {
+                transform: translate(-1px, 1px);
+            }
+            50% {
+                transform: translate(1px, -1px);
+            }
+            75% {
+                transform: translate(-1px, -1px);
+            }
+        }
+
+        .file-cube-danger:hover {
+            transform: scale(1.1) translateY(-10px);
+            border-color: rgba(239, 68, 68, 1);
+            box-shadow: 0 10px 40px rgba(239, 68, 68, 0.6);
+            animation: none;
+        }
+
+        .file-cube-danger::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            background: linear-gradient(45deg,
+                rgba(239, 68, 68, 0.4) 0%,
+                transparent 100%);
+            border-radius: 12px;
+            opacity: 0;
+            animation: danger-glow 1s ease-in-out infinite;
+            z-index: -1;
+            filter: blur(8px);
+        }
+
+        @keyframes danger-glow {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .file-icon-danger {
+            font-size: 48px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.8))
+                    saturate(0.5)
+                    hue-rotate(-10deg);
+            animation: icon-flicker 0.3s steps(2, end) infinite;
+        }
+
+        @keyframes icon-flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .file-name-danger {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .danger-indicator {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle,
+                rgba(239, 68, 68, 1) 0%,
+                rgba(220, 38, 38, 0.8) 60%,
+                transparent 100%);
+            border-radius: 50%;
+            border: 2px solid rgba(239, 68, 68, 1);
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.9);
+            animation: danger-pulse 0.6s ease-in-out infinite;
+        }
+
+        @keyframes danger-pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3);
+                opacity: 0.7;
+            }
+        }
+
+        /* Crack pattern overlay */
+        .crack-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(135deg, transparent 45%, rgba(239, 68, 68, 0.3) 47%, rgba(239, 68, 68, 0.3) 53%, transparent 55%),
+                linear-gradient(45deg, transparent 45%, rgba(239, 68, 68, 0.2) 47%, rgba(239, 68, 68, 0.2) 53%, transparent 55%);
+            border-radius: 12px;
+            opacity: 0;
+            animation: crack-appear 2s ease-in forwards;
+            pointer-events: none;
+        }
+
+        @keyframes crack-appear {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* ===================================================================
+           NANO BANANA ASSET #2: Alert Modal Overlay
+           Prompt: "Critical threat detection modal with glass crack effect,
+           red holographic borders, danger aesthetic, translucent dark red
+           background with blur, warning icons, no background"
+           =================================================================== */
+        .alert-modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            animation: modal-fade-in 0.5s ease-out forwards;
+        }
+
+        @keyframes modal-fade-in {
+            from {
+                opacity: 0;
+                backdrop-filter: blur(0px);
+            }
+            to {
+                opacity: 1;
+                backdrop-filter: blur(8px);
+            }
+        }
+
+        .alert-modal {
+            width: 700px;
+            background: linear-gradient(135deg,
+                rgba(61, 15, 15, 0.95) 0%,
+                rgba(26, 10, 10, 0.95) 100%);
+            border: 3px solid rgba(239, 68, 68, 0.8);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow:
+                0 0 60px rgba(239, 68, 68, 0.6),
+                inset 0 0 40px rgba(239, 68, 68, 0.1);
+            position: relative;
+            animation: modal-entrance 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes modal-entrance {
+            from {
+                transform: scale(0.8) translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Glass crack effect on modal */
+        .modal-crack {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(135deg, transparent 48%, rgba(239, 68, 68, 0.4) 49%, rgba(239, 68, 68, 0.4) 51%, transparent 52%),
+                linear-gradient(45deg, transparent 48%, rgba(239, 68, 68, 0.3) 49%, rgba(239, 68, 68, 0.3) 51%, transparent 52%),
+                radial-gradient(ellipse at 30% 40%, transparent 40%, rgba(239, 68, 68, 0.2) 41%, rgba(239, 68, 68, 0.2) 43%, transparent 44%);
+            border-radius: 16px;
+            pointer-events: none;
+            animation: crack-expand 1s ease-out forwards;
+        }
+
+        @keyframes crack-expand {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle,
+                rgba(239, 68, 68, 0.4) 0%,
+                transparent 70%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            animation: icon-danger-pulse 0.8s ease-in-out infinite;
+        }
+
+        @keyframes icon-danger-pulse {
+            0%, 100% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.8));
+            }
+            50% {
+                transform: scale(1.1);
+                filter: drop-shadow(0 0 40px rgba(239, 68, 68, 1));
+            }
+        }
+
+        .modal-title-group {
+            flex: 1;
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ef4444;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
+            animation: title-urgent-blink 0.5s ease-in-out infinite;
+        }
+
+        @keyframes title-urgent-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .modal-subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        .threat-details {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .threat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .threat-row:last-child {
+            border-bottom: none;
+        }
+
+        .threat-label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .threat-value {
+            font-size: 14px;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .threat-value.critical {
+            color: #ef4444;
+            animation: value-blink 0.8s ease-in-out infinite;
+        }
+
+        @keyframes value-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Threat severity meter */
+        .severity-meter {
+            margin: 20px 0;
+        }
+
+        .severity-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .severity-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .severity-fill {
+            height: 100%;
+            width: 90%;
+            background: linear-gradient(90deg,
+                rgba(239, 68, 68, 1) 0%,
+                rgba(220, 38, 38, 0.9) 50%,
+                rgba(185, 28, 28, 0.8) 100%);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
+            animation: severity-pulse-bar 1s ease-in-out infinite;
+            position: relative;
+        }
+
+        @keyframes severity-pulse-bar {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(239, 68, 68, 1);
+            }
+        }
+
+        .severity-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.3) 50%,
+                transparent 100%);
+            animation: severity-shine 2s linear infinite;
+        }
+
+        @keyframes severity-shine {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(200%); }
+        }
+
+        .severity-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 11px;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+            z-index: 1;
+        }
+
+        /* Countdown timer */
+        .countdown-timer {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .countdown-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .countdown-value {
+            font-size: 48px;
+            font-weight: 700;
+            color: #ef4444;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 30px rgba(239, 68, 68, 0.9);
+            animation: countdown-blink 1s steps(1, end) infinite;
+        }
+
+        @keyframes countdown-blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.6; }
+        }
+
+        /* Action buttons */
+        .modal-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .action-button {
+            padding: 15px 20px;
+            border: 2px solid;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .action-button.investigate {
+            background: linear-gradient(135deg,
+                rgba(239, 68, 68, 0.3) 0%,
+                rgba(220, 38, 38, 0.3) 100%);
+            border-color: rgba(239, 68, 68, 0.8);
+            color: #ef4444;
+        }
+
+        .action-button.investigate:hover {
+            background: linear-gradient(135deg,
+                rgba(239, 68, 68, 0.5) 0%,
+                rgba(220, 38, 38, 0.5) 100%);
+            border-color: rgba(239, 68, 68, 1);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .action-button.quarantine {
+            background: linear-gradient(135deg,
+                rgba(251, 146, 60, 0.3) 0%,
+                rgba(249, 115, 22, 0.3) 100%);
+            border-color: rgba(251, 146, 60, 0.8);
+            color: #fb923c;
+        }
+
+        .action-button.quarantine:hover {
+            background: linear-gradient(135deg,
+                rgba(251, 146, 60, 0.5) 0%,
+                rgba(249, 115, 22, 0.5) 100%);
+            border-color: rgba(251, 146, 60, 1);
+            box-shadow: 0 0 20px rgba(251, 146, 60, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .action-button.dismiss {
+            background: linear-gradient(135deg,
+                rgba(100, 100, 100, 0.3) 0%,
+                rgba(80, 80, 80, 0.3) 100%);
+            border-color: rgba(150, 150, 150, 0.8);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .action-button.dismiss:hover {
+            background: linear-gradient(135deg,
+                rgba(100, 100, 100, 0.5) 0%,
+                rgba(80, 80, 80, 0.5) 100%);
+            border-color: rgba(150, 150, 150, 1);
+            box-shadow: 0 0 20px rgba(150, 150, 150, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* ===================================================================
+           CHROMATIC ABERRATION EFFECT
+           =================================================================== */
+        .chromatic-aberration {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 300;
+            mix-blend-mode: screen;
+            animation: aberration-glitch 3s ease-in-out infinite;
+        }
+
+        @keyframes aberration-glitch {
+            0%, 90%, 100% {
+                text-shadow: none;
+                opacity: 0;
+            }
+            92% {
+                text-shadow:
+                    2px 0 0 rgba(255, 0, 0, 0.5),
+                    -2px 0 0 rgba(0, 255, 255, 0.5);
+                opacity: 0.8;
+            }
+            94% {
+                text-shadow:
+                    -2px 0 0 rgba(255, 0, 0, 0.5),
+                    2px 0 0 rgba(0, 255, 255, 0.5);
+                opacity: 0.6;
+            }
+        }
+
+        /* ===================================================================
+           ANNOTATIONS
+           =================================================================== */
+        .annotation {
+            position: absolute;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            pointer-events: none;
+            z-index: 350;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .annotation.nano-banana {
+            background: rgba(147, 51, 234, 0.95);
+            color: white;
+            border: 2px solid rgba(147, 51, 234, 1);
+        }
+
+        .annotation.spline-3d {
+            background: rgba(251, 146, 60, 0.95);
+            color: white;
+            border: 2px solid rgba(251, 146, 60, 1);
+        }
+    </style>
+</head>
+<body>
+    <!-- NANO BANANA: Alert background with warning stripes -->
+    <div class="alert-background"></div>
+    <div class="danger-stripes"></div>
+    <div class="red-vignette"></div>
+    <div class="beacon-sweep"></div>
+    <div class="flicker-overlay"></div>
+
+    <!-- Screen shake effect container -->
+    <div class="screen-shake">
+        <!-- SPLINE 3D: Owl in alarm state (256px) -->
+        <div class="owl-alarm-container">
+            <div class="owl-alarm">
+                <div class="discharge-particle" style="--random-x: 30px; --random-y: -30px;"></div>
+                <div class="discharge-particle" style="--random-x: -25px; --random-y: -35px;"></div>
+                <div class="discharge-particle" style="--random-x: 35px; --random-y: 25px;"></div>
+                <div class="discharge-particle" style="--random-x: -30px; --random-y: 30px;"></div>
+                <div class="discharge-particle" style="--random-x: 20px; --random-y: -40px;"></div>
+                <div class="discharge-particle" style="--random-x: -20px; --random-y: 40px;"></div>
+            </div>
+        </div>
+
+        <!-- SPLINE 3D: Spinning danger orb (64px) -->
+        <div class="danger-orb-container">
+            <div class="siren-wave"></div>
+            <div class="siren-wave"></div>
+            <div class="siren-wave"></div>
+            <div class="siren-wave"></div>
+            <div class="danger-orb">
+                <div class="electrical-arc"></div>
+                <div class="electrical-arc"></div>
+                <div class="electrical-arc"></div>
+                <div class="electrical-arc"></div>
+                <div class="electrical-arc"></div>
+                <div class="electrical-arc"></div>
+            </div>
+        </div>
+
+        <!-- SPLINE 3D: File cubes with danger highlights -->
+        <div class="file-panel-danger">
+            <div class="file-panel-header-danger">
+                <div class="file-panel-title-danger">⚠️ CRITICAL THREATS DETECTED</div>
+                <div class="threat-count">3 Active Threats</div>
+            </div>
+
+            <div class="file-grid-danger">
+                <div class="file-cube-danger">
+                    <div class="danger-indicator"></div>
+                    <div class="crack-overlay"></div>
+                    <div class="file-icon-danger">📄</div>
+                    <div class="file-name-danger">Corrupted</div>
+                </div>
+                <div class="file-cube-danger">
+                    <div class="danger-indicator"></div>
+                    <div class="crack-overlay"></div>
+                    <div class="file-icon-danger">🐍</div>
+                    <div class="file-name-danger">Malicious</div>
+                </div>
+                <div class="file-cube-danger">
+                    <div class="danger-indicator"></div>
+                    <div class="crack-overlay"></div>
+                    <div class="file-icon-danger">⚙️</div>
+                    <div class="file-name-danger">Tampered</div>
+                </div>
+                <div class="file-cube-danger">
+                    <div class="file-icon-danger">📊</div>
+                    <div class="file-name-danger">Clean</div>
+                </div>
+                <div class="file-cube-danger">
+                    <div class="file-icon-danger">🔒</div>
+                    <div class="file-name-danger">Secure</div>
+                </div>
+                <div class="file-cube-danger">
+                    <div class="file-icon-danger">📦</div>
+                    <div class="file-name-danger">Verified</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NANO BANANA: Alert modal overlay -->
+    <div class="alert-modal-overlay">
+        <div class="alert-modal">
+            <div class="modal-crack"></div>
+
+            <div class="modal-header">
+                <div class="modal-icon">🛡️</div>
+                <div class="modal-title-group">
+                    <div class="modal-title">SECURITY BREACH</div>
+                    <div class="modal-subtitle">Multiple unauthorized file modifications detected</div>
+                </div>
+            </div>
+
+            <div class="threat-details">
+                <div class="threat-row">
+                    <span class="threat-label">Threat Level</span>
+                    <span class="threat-value critical">CRITICAL</span>
+                </div>
+                <div class="threat-row">
+                    <span class="threat-label">Affected Files</span>
+                    <span class="threat-value">3 of 1,247</span>
+                </div>
+                <div class="threat-row">
+                    <span class="threat-label">Detection Time</span>
+                    <span class="threat-value">2m 34s ago</span>
+                </div>
+                <div class="threat-row">
+                    <span class="threat-label">Source IP</span>
+                    <span class="threat-value critical">192.168.1.xxx</span>
+                </div>
+            </div>
+
+            <div class="severity-meter">
+                <div class="severity-label">Threat Severity</div>
+                <div class="severity-bar">
+                    <div class="severity-fill">
+                        <div class="severity-text">9/10 CRITICAL</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="countdown-timer">
+                <div class="countdown-label">Auto-Quarantine In</div>
+                <div class="countdown-value" id="countdown">00:29</div>
+            </div>
+
+            <div class="modal-actions">
+                <div class="action-button investigate">🔍 Investigate</div>
+                <div class="action-button quarantine">🔒 Quarantine Now</div>
+                <div class="action-button dismiss">✕ Dismiss</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chromatic aberration effect -->
+    <div class="chromatic-aberration"></div>
+
+    <!-- ANNOTATIONS -->
+    <div class="annotation nano-banana" style="top: 20px; left: 20px;">
+        NANO BANANA PRO<br>Alert Background<br>Warning Stripes
+    </div>
+    <div class="annotation spline-3d" style="top: 50%; left: 30px; transform: translateY(-50%);">
+        SPLINE 3D<br>256px Alarm Owl<br>Discharge Particles
+    </div>
+    <div class="annotation spline-3d" style="top: 25%; left: 50%; transform: translateX(-50%);">
+        SPLINE 3D<br>64px Danger Orb<br>Electrical Arcs
+    </div>
+    <div class="annotation spline-3d" style="bottom: 280px; left: 50%; transform: translateX(-50%);">
+        SPLINE 3D<br>6 Danger File Cubes<br>Crack Overlays
+    </div>
+    <div class="annotation nano-banana" style="top: 50%; right: 30px; transform: translateY(-50%);">
+        NANO BANANA PRO<br>Alert Modal<br>Glass Crack FX
+    </div>
+
+    <script>
+        // Countdown timer
+        let seconds = 29;
+        const countdownEl = document.getElementById('countdown');
+
+        setInterval(() => {
+            seconds--;
+            if (seconds < 0) seconds = 29;
+
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            countdownEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }, 1000);
+
+        // Action button handlers
+        document.querySelector('.action-button.investigate').addEventListener('click', () => {
+            alert('🔍 INVESTIGATE\n\nIn production:\n- Opens forensic analysis panel\n- Shows file modification history\n- Displays network traffic logs\n- Traces source IP geolocation\n- Generates threat intelligence report');
+        });
+
+        document.querySelector('.action-button.quarantine').addEventListener('click', () => {
+            alert('🔒 QUARANTINE NOW\n\nIn production:\n- Immediately isolates affected files\n- Terminates suspicious processes\n- Creates secure backup\n- Revokes file permissions\n- Logs quarantine action to audit trail\n- Notifies security team');
+        });
+
+        document.querySelector('.action-button.dismiss').addEventListener('click', () => {
+            alert('✕ DISMISS ALERT\n\nIn production:\n- Marks threat as false positive\n- Returns to normal state\n- Logs dismissal reason\n- Restores owl to idle state\n- Clears all danger indicators\n- Resumes normal monitoring');
+        });
+
+        // File cube click handlers
+        document.querySelectorAll('.file-cube-danger').forEach(cube => {
+            cube.addEventListener('click', function() {
+                const fileName = this.querySelector('.file-name-danger').textContent;
+                const hasThreat = this.querySelector('.danger-indicator') !== null;
+
+                if (hasThreat) {
+                    alert(`⚠️ THREAT FILE: ${fileName}\n\nIn production:\n- Shows detailed threat analysis\n- Displays file hash comparison\n- Shows modification timeline\n- Lists detected malware signatures\n- Provides remediation options\n- Enables manual review`);
+                } else {
+                    alert(`✓ CLEAN FILE: ${fileName}\n\nIn production:\n- Confirms file integrity\n- Shows verification checksum\n- Displays last scan time\n- Shows sync status\n- No action required`);
+                }
+            });
+        });
+
+        // Owl click handler
+        document.querySelector('.owl-alarm').addEventListener('click', () => {
+            alert('🦉 ALARM OWL CLICKED\n\nIn production:\n- Shows detailed system status\n- Lists all active threats\n- Displays security timeline\n- Enables manual intervention\n- Provides threat override options');
+        });
+
+        // Danger orb click handler
+        document.querySelector('.danger-orb').addEventListener('click', () => {
+            alert('⚠️ DANGER BEACON CLICKED\n\nIn production:\n- Silences alarm temporarily\n- Shows alert configuration\n- Adjusts threat sensitivity\n- Enables do-not-disturb mode\n- Logs user acknowledgment');
+        });
+
+        // Enhanced screen shake on threat escalation (simulated)
+        let shakeIntensity = 1;
+        setInterval(() => {
+            // Simulate threat escalation every 10 seconds
+            if (Math.random() > 0.9) {
+                shakeIntensity = 2;
+                document.querySelector('.screen-shake').style.animationDuration = '0.2s';
+
+                setTimeout(() => {
+                    shakeIntensity = 1;
+                    document.querySelector('.screen-shake').style.animationDuration = '0.5s';
+                }, 2000);
+            }
+        }, 10000);
+    </script>
+</body>
+</html>

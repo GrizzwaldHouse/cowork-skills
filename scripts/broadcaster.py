@@ -52,6 +52,7 @@ SKILL_ROOT_DIRS: list[Path] = [
     BASE_DIR / "Example_Skills",
     BASE_DIR / "Skill_Creator",
     BASE_DIR / "Blog_Automation_Prompt",
+    BASE_DIR / "skills",  # Enterprise skills and custom skill packages
 ]
 
 # Files tracked per skill.

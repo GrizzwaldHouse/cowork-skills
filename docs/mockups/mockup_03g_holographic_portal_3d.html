@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0">
+    <title>OwlWatcher Guardian Tree - Holographic Portal</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            overflow: hidden;
+            cursor: none;
+            font-family: 'Courier New', monospace;
+        }
+        .bg-image {
+            background-image: url('file:///C:/Users/daley/Downloads/a0ddd4a6-8f74-4e0b-a696-e4209cf44170.png');
+            background-size: cover;
+            background-position: center;
+            transition: filter 1.5s ease;
+        }
+        @keyframes portalRotateCW {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes portalRotateCCW {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(-360deg); }
+        }
+        @keyframes portalPulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+        @keyframes particleFlow {
+            from {
+                offset-distance: 0%;
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            to {
+                offset-distance: 100%;
+                opacity: 0;
+            }
+        }
+        @keyframes globeRotate {
+            from { transform: rotateY(0deg); }
+            to { transform: rotateY(360deg); }
+        }
+        @keyframes equatorRotate {
+            from { transform: rotateX(90deg) rotateZ(0deg); }
+            to { transform: rotateX(90deg) rotateZ(360deg); }
+        }
+        @keyframes scanLine {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        @keyframes dataStream {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            to {
+                transform: translateY(400%);
+                opacity: 0;
+            }
+        }
+        @keyframes bugPulse {
+            0%, 100% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.15); filter: brightness(1.5); }
+        }
+        @keyframes bugLift {
+            0% { transform: translateZ(0px); }
+            100% { transform: translateZ(150px); }
+        }
+        @keyframes owlReach {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(80px); }
+        }
+        @keyframes energyBurst {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+        @keyframes sparkFly {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0);
+                opacity: 0;
+            }
+        }
+        @keyframes dissolve {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(10px, -15px); }
+            50% { transform: translate(-5px, -25px); }
+            75% { transform: translate(-10px, -10px); }
+        }
+        @keyframes fireflyPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        @keyframes snowfall {
+            from { transform: translate(0, -10px) rotate(0deg); }
+            to { transform: translate(var(--drift), 1100px) rotate(360deg); }
+        }
+        @keyframes petalfall {
+            from { transform: translate(0, -10px) rotateZ(0deg); }
+            to { transform: translate(var(--drift), 1100px) rotateZ(720deg); }
+        }
+        @keyframes lightning {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.4; }
+        }
+        @keyframes vignettePulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+        @keyframes searchlight {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.7; }
+        }
+        .portal-ring-outer {
+            animation: portalRotateCW 8s linear infinite;
+        }
+        .portal-ring-middle {
+            animation: portalRotateCCW 6s linear infinite;
+        }
+        .portal-ring-inner {
+            animation: portalPulse 2s ease-in-out infinite;
+        }
+        .particle-flow {
+            animation: particleFlow 3s linear infinite;
+        }
+        .globe-container {
+            perspective: 800px;
+            transform-style: preserve-3d;
+        }
+        .globe-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 200px;
+            margin: -100px 0 0 -100px;
+            border: 2px solid;
+            border-radius: 50%;
+            transform-style: preserve-3d;
+            box-shadow: 0 0 20px currentColor;
+        }
+        .globe-ring-1 {
+            animation: globeRotate 20s linear infinite;
+            transform: rotateY(0deg);
+        }
+        .globe-ring-2 {
+            animation: globeRotate 20s linear infinite;
+            transform: rotateY(60deg);
+        }
+        .globe-ring-3 {
+            animation: globeRotate 20s linear infinite;
+            transform: rotateY(120deg);
+        }
+        .globe-ring-equator {
+            animation: equatorRotate 30s linear infinite;
+            transform: rotateX(90deg);
+        }
+        .bug-node {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            transform-style: preserve-3d;
+            cursor: pointer;
+            pointer-events: auto;
+            animation: bugPulse 3s ease-in-out infinite;
+        }
+        .scan-sweep {
+            animation: scanLine 4s linear infinite;
+        }
+        .data-stream {
+            animation: dataStream linear infinite;
+        }
+        .catching .bug-lift {
+            animation: bugLift 0.4s ease-out forwards;
+        }
+        .catching .owl-reach {
+            animation: owlReach 0.8s ease-in-out forwards;
+        }
+        .energy-burst-ring {
+            animation: energyBurst 0.4s ease-out forwards;
+        }
+        .spark-particle {
+            animation: sparkFly 0.6s ease-out forwards;
+        }
+        .dissolving {
+            animation: dissolve 0.6s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Season configurations
+        const seasons = {
+            IDLE: {
+                name: 'Summer Night',
+                accent: '#4FD1C5',
+                eyeColor: 'radial-gradient(circle, #7FFFED 20%, #4FD1C5 60%, #2A9D8F)',
+                eyeGlow: '0 0 18px 5px #4FD1C5',
+                bgOverlay: 'rgba(0,0,0,0)',
+                bgFilter: 'brightness(1) saturate(1)',
+                portalInner: 'rgba(0,30,30,0.9)'
+            },
+            SCANNING: {
+                name: 'Autumn Scan',
+                accent: '#FB923C',
+                eyeColor: 'radial-gradient(circle, #FFF8DC 20%, #FFD700 60%, #B8860B)',
+                eyeGlow: '0 0 18px 5px #FBBF24',
+                bgOverlay: 'rgba(100,50,0,0.25)',
+                bgFilter: 'brightness(0.8) saturate(0.8) sepia(0.4) hue-rotate(-10deg)',
+                portalInner: 'rgba(40,20,0,0.9)'
+            },
+            ALERT: {
+                name: 'Winter Storm',
+                accent: '#EF4444',
+                eyeColor: 'radial-gradient(circle, #FF4444 30%, #FF1A1A 70%, #8B0000)',
+                eyeGlow: '0 0 25px 8px #EF4444',
+                bgOverlay: 'rgba(80,0,0,0.35)',
+                bgFilter: 'brightness(0.7) saturate(1.3) hue-rotate(-20deg)',
+                portalInner: 'rgba(40,0,0,0.9)'
+            },
+            SUCCESS: {
+                name: 'Spring Bloom',
+                accent: '#F59E0B',
+                eyeColor: 'radial-gradient(circle, #FFFACD 20%, #FFB800 60%, #CC8800)',
+                eyeGlow: '0 0 18px 5px #F59E0B',
+                bgOverlay: 'rgba(80,0,80,0.2)',
+                bgFilter: 'brightness(1.1) saturate(1.2) hue-rotate(280deg)',
+                portalInner: 'rgba(30,10,30,0.9)'
+            },
+            SLEEPING: {
+                name: 'Deep Winter',
+                accent: '#93B4DC',
+                eyeColor: 'radial-gradient(circle, #7A9ABE 30%, #5A7A9E 70%, #3A5A7E)',
+                eyeGlow: '0 0 4px 1px #4A6A8E',
+                bgOverlay: 'rgba(15,23,42,0.4)',
+                bgFilter: 'brightness(0.5) saturate(0.3) hue-rotate(200deg)',
+                portalInner: 'rgba(10,15,30,0.9)'
+            }
+        };
+
+        // Bug node configurations
+        const bugNodes = [
+            { id: 1, name: 'Documents', type: 'Moth', glowColor: '#E8DCC8', lat: 30, lon: 0 },
+            { id: 2, name: 'Python', type: 'Beetle', glowColor: '#66BB6A', lat: 30, lon: 90 },
+            { id: 3, name: 'Config', type: 'Firefly', glowColor: '#FFEB3B', lat: 30, lon: 180 },
+            { id: 4, name: 'Data', type: 'Dragonfly', glowColor: '#42A5F5', lat: 30, lon: 270 },
+            { id: 5, name: 'Security', type: 'Spider', glowColor: '#CE93D8', lat: 0, lon: 45 },
+            { id: 6, name: 'Package', type: 'Caterpillar', glowColor: '#AED581', lat: 0, lon: 135 },
+            { id: 7, name: 'Design', type: 'Butterfly', glowColor: '#F48FB1', lat: 0, lon: 225 },
+            { id: 8, name: 'Database', type: 'PillBug', glowColor: '#90A4AE', lat: 0, lon: 315 },
+            { id: 9, name: 'Test', type: 'LightningBug', glowColor: '#76FF03', lat: -30, lon: 30 },
+            { id: 10, name: 'Log', type: 'Ant', glowColor: '#8D6E63', lat: -30, lon: 120 },
+            { id: 11, name: 'Tools', type: 'CarpenterBee', glowColor: '#FFD54F', lat: -30, lon: 210 },
+            { id: 12, name: 'Docs', type: 'Bookworm', glowColor: '#B2EBF2', lat: -30, lon: 300 }
+        ];
+
+        // Bug SVG components
+        const BugSVG = ({ type, color }) => {
+            const svgs = {
+                Moth: (
+                    <svg viewBox="0 0 40 40" className="w-full h-full">
+                        <ellipse cx="12" cy="20" rx="10" ry="15" fill={color} opacity="0.8" />
+                        <ellipse cx="28" cy="20" rx="10" ry="15" fill={color} opacity="0.8" />
+                        <rect x="18" y="12" width="4" height="16" rx="2" fill={color} />
+                        <circle cx="20" cy="10" r="3" fill={color} />
+                    </svg>
+                ),
+                Beetle: (
+                    <svg viewBox="0 0 40 40" className="w-full h-full">
+                        <ellipse cx="20" cy="22" rx="12" ry="15" fill={color} />
+                        <circle cx="20" cy="12" r="6" fill={color} />
+                        <path d="M 8 18 Q 5 22 8 26" stroke={color} strokeWidth="2" fill="none" />
+                        <path d="M 32 18 Q 35 22 32 26" stroke={color} strokeWidth="2" fill="none" />
+                    </svg>
+                ),
+                Firefly: (
+                    <svg viewBox="0 0 40 40" className="w-full h-full">
+                        <ellipse cx="20" cy="18" rx="6" ry="8" fill={color} opacity="0.7" />
+                        <ellipse cx="20" cy="28" rx="8" ry="10" fill={color} />
+                        <circle cx="20" cy="28" r="6" fill={color} opacity="0.9" filter="url(#glow)" />
+                        <defs>
+                            <filter id="glow">
+                                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                        </defs>
+                    </svg>
+                ),
+                Dragonfly: (
+                    <svg viewBox="0 0 40 40" className="w-full h-full">
+                        <ellipse cx="12" cy="14" rx="8" ry="4" fill={color} opacity="0.7" />
+                        <ellipse cx="28" cy="14" rx="8" ry="4" fill={color} opacity="0.7" />
+                        <ellipse cx="12" cy="22" rx="8" ry="4" fill={color} opacity="0.7" />
+                        <ellipse cx="28" cy="22" rx="8" ry="4" fill={color} opacity="0.7" />
+                        <rect x="18" y="10" width="4" height="22" rx="2" fill={color} />
+                    </svg>
+                ),
+                Spider: (
+                    <svg viewBox="0 0 40 40" className="w-full h-full">
+                        <circle cx="20" cy="20" r="8" fill={color} />
+                        {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
+                            <line
+                                key={i}
+                                x1="20" y1="20"
+                                x2={20 + Math.cos(angle * Math.PI / 180) * 15}
+                                y2={20 + Math.sin(angle * Math.PI / 180) * 15}
+                                stroke={color}
+                                strokeWidth="2"
+                            />
+                        ))}
+                    </svg>
+                ),
+                Caterpillar: (
+                    <svg viewBox="0 0 40 40" className="w-full h-full">
+                        {[0, 1, 2, 3, 4].map(i => (
+                            <circle key={i} cx={8 + i * 6} cy={20} r="4" fill={color} opacity={1 - i * 0.1} />
+                        ))}
+                    </svg>
+                ),
+                Butterfly: (
+                    <svg viewBox="0 0 40 40" className="w-full h-full">
+                        <path d="M 12 20 Q 8 12 15 8 Q 18 15 20 20" fill={color} opacity="0.8" />
+                        <path d="M 28 20 Q 32 12 25 8 Q 22 15 20 20" fill={color} opacity="0.8" />
+                        <path d="M 12 20 Q 8 28 15 32 Q 18 25 20 20" fill={color} opacity="0.8" />
+                        <path d="M 28 20 Q 32 28 25 32 Q 22 25 20 20" fill={color} opacity="0.8" />
+                        <rect x="19" y="10" width="2" height="20" fill={color} />
+                    </svg>
+                ),
+                PillBug: (
+                    <svg viewBox="0 0 40 40" className="w-full h-full">
+                        <ellipse cx="20" cy="20" rx="10" ry="14" fill={color} />
+                        {[0, 1, 2, 3, 4].map(i => (
+                            <line key={i} x1="10" y1={10 + i * 5} x2="30" y2={10 + i * 5} stroke="rgba(0,0,0,0.2)" strokeWidth="1" />
+                        ))}
+                    </svg>
+                ),
+                LightningBug: (
+                    <svg viewBox="0 0 40 40" className="w-full h-full">
+                        <ellipse cx="20" cy="16" rx="6" ry="8" fill={color} opacity="0.7" />
+                        <ellipse cx="20" cy="26" rx="7" ry="9" fill={color} />
+                        <path d="M 20 26 L 18 36 L 22 36 Z" fill={color} filter="url(#glow)" />
+                    </svg>
+                ),
+                Ant: (
+                    <svg viewBox="0 0 40 40" className="w-full h-full">
+                        <circle cx="12" cy="15" r="4" fill={color} />
+                        <circle cx="20" cy="20" r="5" fill={color} />
+                        <circle cx="28" cy="25" r="4" fill={color} />
+                        <line x1="12" y1="15" x2="20" y2="20" stroke={color} strokeWidth="2" />
+                        <line x1="20" y1="20" x2="28" y2="25" stroke={color} strokeWidth="2" />
+                    </svg>
+                ),
+                CarpenterBee: (
+                    <svg viewBox="0 0 40 40" className="w-full h-full">
+                        <ellipse cx="20" cy="20" rx="10" ry="12" fill={color} />
+                        <rect x="16" y="14" width="8" height="3" fill="rgba(0,0,0,0.3)" />
+                        <rect x="16" y="23" width="8" height="3" fill="rgba(0,0,0,0.3)" />
+                        <ellipse cx="10" cy="18" rx="6" ry="3" fill={color} opacity="0.6" />
+                        <ellipse cx="30" cy="18" rx="6" ry="3" fill={color} opacity="0.6" />
+                    </svg>
+                ),
+                Bookworm: (
+                    <svg viewBox="0 0 40 40" className="w-full h-full">
+                        <path d="M 10 25 Q 12 20 15 18 Q 18 16 20 15 Q 22 16 25 18 Q 28 20 30 25"
+                              stroke={color} strokeWidth="4" fill="none" strokeLinecap="round" />
+                        <circle cx="20" cy="15" r="3" fill={color} />
+                    </svg>
+                )
+            };
+            return svgs[type] || svgs.Moth;
+        };
+
+        function App() {
+            const [state, setState] = useState('IDLE');
+            const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+            const [catching, setCatching] = useState(null);
+            const [catchStep, setCatchStep] = useState('');
+            const [globePaused, setGlobePaused] = useState(false);
+            const globeRef = useRef(null);
+
+            useEffect(() => {
+                const handleMouseMove = (e) => {
+                    setMousePos({ x: e.clientX, y: e.clientY });
+                };
+                const handleKeyPress = (e) => {
+                    const states = ['IDLE', 'SCANNING', 'ALERT', 'SUCCESS', 'SLEEPING'];
+                    const key = parseInt(e.key);
+                    if (key >= 1 && key <= 5) {
+                        setState(states[key - 1]);
+                    }
+                };
+                window.addEventListener('mousemove', handleMouseMove);
+                window.addEventListener('keydown', handleKeyPress);
+                return () => {
+                    window.removeEventListener('mousemove', handleMouseMove);
+                    window.removeEventListener('keydown', handleKeyPress);
+                };
+            }, []);
+
+            const season = seasons[state];
+
+            const handleBugClick = (bug) => {
+                if (catching) return;
+                setCatching(bug.id);
+                setGlobePaused(true);
+
+                const timeline = [
+                    { delay: 0, step: 'Node pulsing', duration: 300 },
+                    { delay: 300, step: 'Lifting off globe', duration: 400 },
+                    { delay: 700, step: 'Owl reaching', duration: 400 },
+                    { delay: 1100, step: 'Energy burst!', duration: 400 },
+                    { delay: 1500, step: 'Dissolving particles', duration: 600 },
+                    { delay: 2100, step: 'Respawning node', duration: 900 }
+                ];
+
+                timeline.forEach(({ delay, step }) => {
+                    setTimeout(() => setCatchStep(step), delay);
+                });
+
+                setTimeout(() => {
+                    setCatching(null);
+                    setCatchStep('');
+                    setGlobePaused(false);
+                }, 3000);
+            };
+
+            // Position bug on 3D globe surface
+            const getBugPosition = (bug, radius = 100) => {
+                const latRad = bug.lat * Math.PI / 180;
+                const lonRad = bug.lon * Math.PI / 180;
+
+                return {
+                    transform: `
+                        rotateY(${bug.lon}deg)
+                        translateZ(${radius}px)
+                        rotateY(${-bug.lon}deg)
+                        rotateX(${-bug.lat}deg)
+                    `
+                };
+            };
+
+            return (
+                <div className="relative w-screen h-screen overflow-hidden">
+                    {/* Background */}
+                    <div
+                        className="absolute inset-0 bg-image"
+                        style={{ filter: season.bgFilter }}
+                    />
+                    <div
+                        className="absolute inset-0"
+                        style={{ backgroundColor: season.bgOverlay }}
+                    />
+
+                    {/* Weather Effects */}
+                    {state === 'IDLE' && (
+                        <div className="absolute inset-0 pointer-events-none z-10">
+                            {Array.from({ length: 18 }).map((_, i) => (
+                                <div
+                                    key={i}
+                                    className="absolute w-2 h-2 rounded-full"
+                                    style={{
+                                        left: `${Math.random() * 100}%`,
+                                        top: `${Math.random() * 100}%`,
+                                        backgroundColor: season.accent,
+                                        boxShadow: `0 0 10px ${season.accent}`,
+                                        animation: `float ${3 + Math.random() * 2}s ease-in-out infinite, fireflyPulse ${1 + Math.random()}s ease-in-out infinite`,
+                                        animationDelay: `${Math.random() * 2}s`
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    {state === 'SLEEPING' && (
+                        <div className="absolute inset-0 pointer-events-none z-10">
+                            {Array.from({ length: 50 }).map((_, i) => (
+                                <div
+                                    key={i}
+                                    className="absolute text-white text-xl"
+                                    style={{
+                                        left: `${Math.random() * 100}%`,
+                                        '--drift': `${(Math.random() - 0.5) * 200}px`,
+                                        animation: `snowfall ${8 + Math.random() * 4}s linear infinite`,
+                                        animationDelay: `${Math.random() * 8}s`
+                                    }}
+                                >
+                                    ❄
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {state === 'SUCCESS' && (
+                        <div className="absolute inset-0 pointer-events-none z-10">
+                            {Array.from({ length: 50 }).map((_, i) => (
+                                <div
+                                    key={i}
+                                    className="absolute text-pink-300 text-2xl"
+                                    style={{
+                                        left: `${Math.random() * 100}%`,
+                                        '--drift': `${(Math.random() - 0.5) * 150}px`,
+                                        animation: `petalfall ${6 + Math.random() * 3}s linear infinite`,
+                                        animationDelay: `${Math.random() * 6}s`
+                                    }}
+                                >
+                                    🌸
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {state === 'SCANNING' && (
+                        <div className="absolute inset-0 pointer-events-none z-10">
+                            {Array.from({ length: 25 }).map((_, i) => (
+                                <div
+                                    key={i}
+                                    className="absolute text-2xl"
+                                    style={{
+                                        left: `${Math.random() * 100}%`,
+                                        '--drift': `${(Math.random() - 0.5) * 100}px`,
+                                        animation: `snowfall ${5 + Math.random() * 3}s linear infinite`,
+                                        animationDelay: `${Math.random() * 5}s`
+                                    }}
+                                >
+                                    {['🍂', '🍁', '🍃'][Math.floor(Math.random() * 3)]}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {state === 'ALERT' && (
+                        <>
+                            <div
+                                className="absolute inset-0 pointer-events-none z-10"
+                                style={{
+                                    background: 'radial-gradient(circle at center, transparent 40%, rgba(139, 0, 0, 0.6) 100%)',
+                                    animation: 'vignettePulse 2s ease-in-out infinite'
+                                }}
+                            />
+                            <div
+                                className="absolute inset-0 pointer-events-none z-10 bg-white"
+                                style={{
+                                    animation: 'lightning 5s ease-in-out infinite',
+                                    animationDelay: '2s'
+                                }}
+                            />
+                        </>
+                    )}
+
+                    {/* Portal */}
+                    <div
+                        className="absolute z-20"
+                        style={{ left: '50%', top: '55%', transform: 'translate(-50%, -50%)' }}
+                    >
+                        {/* Portal Rings */}
+                        <div className="relative">
+                            {/* Outer Ring */}
+                            <div
+                                className="absolute portal-ring-outer"
+                                style={{
+                                    left: '50%',
+                                    top: '50%',
+                                    transform: 'translate(-50%, -50%)',
+                                    width: '320px',
+                                    height: '420px',
+                                    border: `3px solid ${season.accent}`,
+                                    borderRadius: '50%',
+                                    boxShadow: `0 0 30px ${season.accent}`
+                                }}
+                            />
+
+                            {/* Middle Ring */}
+                            <div
+                                className="absolute portal-ring-middle"
+                                style={{
+                                    left: '50%',
+                                    top: '50%',
+                                    transform: 'translate(-50%, -50%)',
+                                    width: '300px',
+                                    height: '400px',
+                                    border: `2px dashed ${season.accent}`,
+                                    borderRadius: '50%',
+                                    boxShadow: `0 0 20px ${season.accent}`
+                                }}
+                            />
+
+                            {/* Inner Ring */}
+                            <div
+                                className="absolute portal-ring-inner"
+                                style={{
+                                    left: '50%',
+                                    top: '50%',
+                                    transform: 'translate(-50%, -50%)',
+                                    width: '280px',
+                                    height: '380px',
+                                    border: `2px solid ${season.accent}`,
+                                    borderRadius: '50%',
+                                    boxShadow: `0 0 40px ${season.accent}, inset 0 0 40px ${season.accent}`
+                                }}
+                            />
+
+                            {/* Portal Inner Void */}
+                            <div
+                                className="absolute"
+                                style={{
+                                    left: '50%',
+                                    top: '50%',
+                                    transform: 'translate(-50%, -50%)',
+                                    width: '280px',
+                                    height: '380px',
+                                    borderRadius: '50%',
+                                    background: `radial-gradient(ellipse at center, ${season.portalInner} 0%, ${season.accent}33 100%)`,
+                                    overflow: 'hidden'
+                                }}
+                            >
+                                {/* Scan Line (SCANNING only) */}
+                                {state === 'SCANNING' && (
+                                    <div
+                                        className="absolute scan-sweep"
+                                        style={{
+                                            left: '50%',
+                                            top: '50%',
+                                            width: '2px',
+                                            height: '100%',
+                                            background: `linear-gradient(transparent, ${season.accent}, transparent)`,
+                                            transformOrigin: 'top center'
+                                        }}
+                                    />
+                                )}
+
+                                {/* Data Streams */}
+                                {Array.from({ length: 8 }).map((_, i) => (
+                                    <div
+                                        key={i}
+                                        className="absolute data-stream"
+                                        style={{
+                                            left: `${10 + i * 12}%`,
+                                            top: 0,
+                                            width: '1px',
+                                            height: '40px',
+                                            background: `linear-gradient(transparent, ${season.accent}99, transparent)`,
+                                            animationDuration: `${2 + Math.random()}s`,
+                                            animationDelay: `${Math.random() * 2}s`
+                                        }}
+                                    />
+                                ))}
+
+                                {/* Scan Lines */}
+                                {Array.from({ length: 10 }).map((_, i) => (
+                                    <div
+                                        key={i}
+                                        className="absolute"
+                                        style={{
+                                            left: 0,
+                                            right: 0,
+                                            top: `${i * 10}%`,
+                                            height: '1px',
+                                            background: `${season.accent}22`,
+                                            animation: 'dataStream 3s linear infinite',
+                                            animationDelay: `${i * 0.3}s`
+                                        }}
+                                    />
+                                ))}
+
+                                {/* Spline Viewer Placeholder */}
+                                {/* <spline-viewer
+                                    url="YOUR_SPLINE_SCENE_URL_HERE"
+                                    style={{
+                                        width: '280px',
+                                        height: '360px',
+                                        mixBlendMode: 'screen'
+                                    }}
+                                /> */}
+
+                                {/* CSS 3D Globe */}
+                                <div
+                                    ref={globeRef}
+                                    className="globe-container absolute inset-0"
+                                    style={{
+                                        pointerEvents: 'none'
+                                    }}
+                                >
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: '50%',
+                                        left: '50%',
+                                        width: 0,
+                                        height: 0,
+                                        transformStyle: 'preserve-3d',
+                                        animation: globePaused ? 'none' : 'globeRotate 20s linear infinite'
+                                    }}>
+                                        {/* Globe Rings */}
+                                        <div className="globe-ring globe-ring-1" style={{ color: season.accent }} />
+                                        <div className="globe-ring globe-ring-2" style={{ color: season.accent }} />
+                                        <div className="globe-ring globe-ring-3" style={{ color: season.accent }} />
+                                        <div className="globe-ring globe-ring-equator" style={{ color: season.accent }} />
+
+                                        {/* Bug Nodes */}
+                                        {bugNodes.map(bug => (
+                                            <div
+                                                key={bug.id}
+                                                className={`bug-node ${catching === bug.id ? 'bug-lift' : ''}`}
+                                                style={{
+                                                    ...getBugPosition(bug),
+                                                    filter: `drop-shadow(0 0 8px ${bug.glowColor})`,
+                                                    animationDelay: `${bug.id * 0.2}s`
+                                                }}
+                                                onClick={() => handleBugClick(bug)}
+                                            >
+                                                <BugSVG type={bug.type} color={bug.glowColor} />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Particle Flow around Portal */}
+                            {Array.from({ length: 20 }).map((_, i) => {
+                                const angle = (i / 20) * 360;
+                                return (
+                                    <div
+                                        key={i}
+                                        className="absolute w-1.5 h-1.5 rounded-full particle-flow"
+                                        style={{
+                                            left: '50%',
+                                            top: '50%',
+                                            background: season.accent,
+                                            boxShadow: `0 0 6px ${season.accent}`,
+                                            offsetPath: `path('M 0,0 Q ${150 * Math.cos(angle * Math.PI / 180)},${190 * Math.sin(angle * Math.PI / 180)} 0,0')`,
+                                            animationDelay: `${i * 0.15}s`
+                                        }}
+                                    />
+                                );
+                            })}
+                        </div>
+
+                        {/* Catching Energy Burst */}
+                        {catching && catchStep === 'Energy burst!' && (
+                            <>
+                                <div
+                                    className="absolute energy-burst-ring"
+                                    style={{
+                                        left: '50%',
+                                        top: '28%',
+                                        transform: 'translate(-50%, -50%)',
+                                        width: '60px',
+                                        height: '60px',
+                                        border: `4px solid ${season.accent}`,
+                                        borderRadius: '50%',
+                                        boxShadow: `0 0 40px ${season.accent}`
+                                    }}
+                                />
+                                {Array.from({ length: 12 }).map((_, i) => {
+                                    const angle = (i / 12) * 360;
+                                    const tx = Math.cos(angle * Math.PI / 180) * 100;
+                                    const ty = Math.sin(angle * Math.PI / 180) * 100;
+                                    return (
+                                        <div
+                                            key={i}
+                                            className="absolute w-2 h-2 rounded-full spark-particle"
+                                            style={{
+                                                left: '50%',
+                                                top: '28%',
+                                                background: season.accent,
+                                                boxShadow: `0 0 10px ${season.accent}`,
+                                                '--tx': `${tx}px`,
+                                                '--ty': `${ty}px`
+                                            }}
+                                        />
+                                    );
+                                })}
+                            </>
+                        )}
+                    </div>
+
+                    {/* Owl */}
+                    <div
+                        className={`absolute z-30 ${catching ? 'owl-reach' : ''}`}
+                        style={{
+                            left: '50%',
+                            top: '28%',
+                            transform: 'translate(-50%, -50%)',
+                            transformStyle: 'preserve-3d'
+                        }}
+                    >
+                        <div style={{ transform: 'rotateX(15deg)' }}>
+                            {/* Body */}
+                            <div
+                                className="relative"
+                                style={{
+                                    width: '90px',
+                                    height: '120px',
+                                    margin: '0 auto',
+                                    background: 'linear-gradient(180deg, #8B7355 0%, #6B5345 100%)',
+                                    borderRadius: '45% 45% 40% 40%',
+                                    boxShadow: 'inset 0 -20px 30px rgba(0,0,0,0.3)'
+                                }}
+                            >
+                                {/* Feather texture */}
+                                <div className="absolute inset-0 opacity-20">
+                                    {Array.from({ length: 8 }).map((_, i) => (
+                                        <div
+                                            key={i}
+                                            className="absolute left-1/2 transform -translate-x-1/2"
+                                            style={{
+                                                top: `${20 + i * 10}px`,
+                                                width: '70%',
+                                                height: '1px',
+                                                background: 'rgba(0,0,0,0.3)',
+                                                borderRadius: '50%'
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+
+                                {/* Wings */}
+                                <div
+                                    className="absolute"
+                                    style={{
+                                        left: '-25px',
+                                        top: '30px',
+                                        width: '35px',
+                                        height: '60px',
+                                        background: 'linear-gradient(90deg, #8B7355 0%, #6B5345 100%)',
+                                        borderRadius: '50% 20% 20% 50%',
+                                        transform: 'rotate(-15deg)'
+                                    }}
+                                />
+                                <div
+                                    className="absolute"
+                                    style={{
+                                        right: '-25px',
+                                        top: '30px',
+                                        width: '35px',
+                                        height: '60px',
+                                        background: 'linear-gradient(270deg, #8B7355 0%, #6B5345 100%)',
+                                        borderRadius: '20% 50% 50% 20%',
+                                        transform: 'rotate(15deg)'
+                                    }}
+                                />
+
+                                {/* Head */}
+                                <div
+                                    className="absolute"
+                                    style={{
+                                        left: '50%',
+                                        top: '-45px',
+                                        transform: 'translateX(-50%)',
+                                        width: '80px',
+                                        height: '70px',
+                                        background: 'linear-gradient(180deg, #9B8365 0%, #7B6355 100%)',
+                                        borderRadius: '50% 50% 45% 45%'
+                                    }}
+                                >
+                                    {/* Ear tufts */}
+                                    <div
+                                        className="absolute"
+                                        style={{
+                                            left: '5px',
+                                            top: '-8px',
+                                            width: '0',
+                                            height: '0',
+                                            borderLeft: '8px solid transparent',
+                                            borderRight: '8px solid transparent',
+                                            borderBottom: `20px solid #8B7355`
+                                        }}
+                                    />
+                                    <div
+                                        className="absolute"
+                                        style={{
+                                            right: '5px',
+                                            top: '-8px',
+                                            width: '0',
+                                            height: '0',
+                                            borderLeft: '8px solid transparent',
+                                            borderRight: '8px solid transparent',
+                                            borderBottom: `20px solid #8B7355`
+                                        }}
+                                    />
+
+                                    {/* Eyes */}
+                                    <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex gap-3">
+                                        {/* Left Eye */}
+                                        <div
+                                            className="relative"
+                                            style={{
+                                                width: state === 'SLEEPING' ? '32px' : '32px',
+                                                height: state === 'SLEEPING' ? '3px' : '36px',
+                                                background: '#2D2D2D',
+                                                borderRadius: '50%',
+                                                transition: 'all 0.5s ease'
+                                            }}
+                                        >
+                                            {state !== 'SLEEPING' && (
+                                                <>
+                                                    <div
+                                                        className="absolute inset-1 rounded-full"
+                                                        style={{
+                                                            background: season.eyeColor,
+                                                            boxShadow: season.eyeGlow
+                                                        }}
+                                                    />
+                                                    <div
+                                                        className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black rounded-full transition-all duration-300"
+                                                        style={{
+                                                            width: state === 'ALERT' ? '3px' : '8px',
+                                                            height: state === 'ALERT' ? '20px' : '12px'
+                                                        }}
+                                                    />
+                                                    <div
+                                                        className="absolute w-2 h-2 bg-white rounded-full"
+                                                        style={{
+                                                            left: '20%',
+                                                            top: '25%',
+                                                            opacity: 0.9
+                                                        }}
+                                                    />
+                                                </>
+                                            )}
+                                        </div>
+
+                                        {/* Right Eye */}
+                                        <div
+                                            className="relative"
+                                            style={{
+                                                width: state === 'SLEEPING' ? '32px' : '32px',
+                                                height: state === 'SLEEPING' ? '3px' : '36px',
+                                                background: '#2D2D2D',
+                                                borderRadius: '50%',
+                                                transition: 'all 0.5s ease'
+                                            }}
+                                        >
+                                            {state !== 'SLEEPING' && (
+                                                <>
+                                                    <div
+                                                        className="absolute inset-1 rounded-full"
+                                                        style={{
+                                                            background: season.eyeColor,
+                                                            boxShadow: season.eyeGlow
+                                                        }}
+                                                    />
+                                                    <div
+                                                        className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black rounded-full transition-all duration-300"
+                                                        style={{
+                                                            width: state === 'ALERT' ? '3px' : '8px',
+                                                            height: state === 'ALERT' ? '20px' : '12px'
+                                                        }}
+                                                    />
+                                                    <div
+                                                        className="absolute w-2 h-2 bg-white rounded-full"
+                                                        style={{
+                                                            left: '20%',
+                                                            top: '25%',
+                                                            opacity: 0.9
+                                                        }}
+                                                    />
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Searchlight Cones (SCANNING only) */}
+                                    {state === 'SCANNING' && (
+                                        <>
+                                            <div
+                                                className="absolute"
+                                                style={{
+                                                    left: '15px',
+                                                    top: '100%',
+                                                    width: '0',
+                                                    height: '0',
+                                                    borderLeft: '25px solid transparent',
+                                                    borderRight: '25px solid transparent',
+                                                    borderTop: `180px solid ${season.accent}44`,
+                                                    animation: 'searchlight 2s ease-in-out infinite',
+                                                    transformOrigin: 'top center'
+                                                }}
+                                            />
+                                            <div
+                                                className="absolute"
+                                                style={{
+                                                    right: '15px',
+                                                    top: '100%',
+                                                    width: '0',
+                                                    height: '0',
+                                                    borderLeft: '25px solid transparent',
+                                                    borderRight: '25px solid transparent',
+                                                    borderTop: `180px solid ${season.accent}44`,
+                                                    animation: 'searchlight 2s ease-in-out infinite',
+                                                    animationDelay: '0.1s',
+                                                    transformOrigin: 'top center'
+                                                }}
+                                            />
+                                        </>
+                                    )}
+
+                                    {/* Beak */}
+                                    <div
+                                        className="absolute"
+                                        style={{
+                                            left: '50%',
+                                            bottom: '8px',
+                                            transform: 'translateX(-50%)',
+                                            width: '0',
+                                            height: '0',
+                                            borderLeft: '8px solid transparent',
+                                            borderRight: '8px solid transparent',
+                                            borderTop: '14px solid #D4A574'
+                                        }}
+                                    />
+                                </div>
+
+                                {/* Talons */}
+                                <div
+                                    className="absolute"
+                                    style={{
+                                        left: '50%',
+                                        bottom: '-20px',
+                                        transform: 'translateX(-50%)',
+                                        display: 'flex',
+                                        gap: '15px'
+                                    }}
+                                >
+                                    {[0, 1].map(i => (
+                                        <div key={i} className="flex gap-1">
+                                            {[0, 1, 2].map(j => (
+                                                <div
+                                                    key={j}
+                                                    style={{
+                                                        width: '3px',
+                                                        height: '18px',
+                                                        background: '#3D3D3D',
+                                                        borderRadius: '2px',
+                                                        transform: `rotate(${(j - 1) * 8}deg)`
+                                                    }}
+                                                />
+                                            ))}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Catch Step Label */}
+                        {catchStep && (
+                            <div
+                                className="absolute left-1/2 transform -translate-x-1/2 -top-16 text-white font-mono text-sm px-3 py-1 rounded"
+                                style={{
+                                    background: `${season.accent}dd`,
+                                    boxShadow: `0 0 20px ${season.accent}`,
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                {catchStep}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* HUD Overlay */}
+                    <div className="absolute inset-0 z-[60] pointer-events-none text-white/40 font-mono text-sm">
+                        {/* Top Left */}
+                        <div className="absolute top-6 left-6" style={{ textShadow: '0 0 10px rgba(0,0,0,0.8)' }}>
+                            <div>Files: 1,287</div>
+                            <div className="mt-1">Scanned: 100%</div>
+                        </div>
+
+                        {/* Top Center */}
+                        <div
+                            className="absolute top-6 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-lg font-bold text-base"
+                            style={{
+                                background: `${season.accent}33`,
+                                border: `2px solid ${season.accent}`,
+                                boxShadow: `0 0 20px ${season.accent}`,
+                                color: season.accent
+                            }}
+                        >
+                            {season.name.toUpperCase()}
+                        </div>
+
+                        {/* Top Right */}
+                        <div className="absolute top-6 right-6 text-right" style={{ textShadow: '0 0 10px rgba(0,0,0,0.8)' }}>
+                            <div>Sync: Active</div>
+                            <div className="mt-1">Uplink: Stable</div>
+                        </div>
+
+                        {/* Bottom Left */}
+                        <div className="absolute bottom-24 left-6" style={{ textShadow: '0 0 10px rgba(0,0,0,0.8)' }}>
+                            <div style={{ color: state === 'ALERT' ? '#EF4444' : 'inherit' }}>
+                                Threats: {state === 'ALERT' ? '3 ACTIVE' : '0'}
+                            </div>
+                        </div>
+
+                        {/* Bottom Right */}
+                        <div className="absolute bottom-24 right-6 text-right" style={{ textShadow: '0 0 10px rgba(0,0,0,0.8)' }}>
+                            <div>Mode: {state}</div>
+                        </div>
+
+                        {/* Bottom Center */}
+                        <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 text-center text-xs opacity-60">
+                            <div>Press 1-5 to change season</div>
+                            <div className="mt-1">Click bug nodes to catch them</div>
+                        </div>
+                    </div>
+
+                    {/* State Transition Strip */}
+                    <div
+                        className="absolute bottom-0 left-0 right-0 h-20 z-50 flex items-center justify-center gap-4 px-8"
+                        style={{
+                            background: 'rgba(0, 0, 0, 0.8)',
+                            backdropFilter: 'blur(20px)'
+                        }}
+                    >
+                        {Object.entries(seasons).map(([key, season], idx) => (
+                            <button
+                                key={key}
+                                onClick={() => setState(key)}
+                                className="relative px-6 py-3 rounded-lg font-mono font-bold text-sm transition-all duration-300 hover:scale-105"
+                                style={{
+                                    background: state === key ? `${season.accent}33` : 'rgba(255,255,255,0.05)',
+                                    border: `2px solid ${state === key ? season.accent : 'rgba(255,255,255,0.2)'}`,
+                                    color: state === key ? season.accent : '#ffffff88',
+                                    boxShadow: state === key ? `0 0 25px ${season.accent}` : 'none',
+                                    transform: state === key ? 'scale(1.1)' : 'scale(1)'
+                                }}
+                            >
+                                <div className="text-xs opacity-60 mb-1">{idx + 1}</div>
+                                {season.name}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Custom Cursor */}
+                    <div
+                        className="fixed w-5 h-5 rounded-full border-2 border-white pointer-events-none z-[100]"
+                        style={{
+                            left: mousePos.x,
+                            top: mousePos.y,
+                            transform: 'translate(-50%, -50%)',
+                            mixBlendMode: 'difference',
+                            transition: 'width 0.15s ease, height 0.15s ease'
+                        }}
+                    >
+                        <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1 h-1 bg-white rounded-full" />
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>

@@ -19,7 +19,7 @@ A modular system for creating, managing, and syncing Claude AI skill templates. 
 - `cloud/` - Sync registry (main_cloud.json stores metadata/hashes/timestamps)
 - `config/` - Configuration (watch_config.json)
 - `UI_Templates/` - WPF XAML templates
-- `skills/` - Active skill packages (canva-designer, design-system, document-designer, universal-coding-standards, architecture-patterns, dev-workflow, enterprise-secure-ai-engineering)
+- `skills/` - Active skill packages (canva-designer, design-system, document-designer, universal-coding-standards, architecture-patterns, dev-workflow, enterprise-secure-ai-engineering, desktop-ui-designer, pyqt6-ui-debugger, python-code-reviewer, vault-analysis, verified-build-gate)
 - `Prompts/` - Prompt templates
 - `security/` - Security audit logs
 
@@ -78,6 +78,7 @@ These rules apply to ALL code in this project and any project Marcus works on. S
 - **Brainstorm First**: Any feature request begins with research, not code. Research built-in solutions, generate multiple approaches, discuss trade-offs, design architecture, THEN implement.
 - **Configuration-Driven Design**: NEVER hardcode values that could change. Use config files, environment variables, constructor parameters, or data stores.
 - **Learning Through Understanding**: Explain WHY code is structured a particular way. Explain architectural reasoning behind every choice.
+- **Maximum Sophistication**: NEVER suggest minimal, simple, or "good enough" designs. Always research and implement the most advanced, feature-rich, and sophisticated approach available. Push technical boundaries and explore cutting-edge solutions.
 
 ### Critical Rules (NEVER Violate)
 
@@ -143,3 +144,4 @@ Active on all sessions. See `skills/enterprise-secure-ai-engineering/` for full 
 - Provide complete, compilable/runnable code, not pseudo-code snippets
 - When debugging, help systematically: clarify, find root cause, explain, suggest prevention
 - Document significant bugs in Problem Tracker format (symptom, cause, solution, prevention)
+- **NEVER suggest minimal or simplified designs** -- always research the most advanced, sophisticated, and feature-rich approach. Marcus wants cutting-edge, production-grade implementations with maximum capabilities

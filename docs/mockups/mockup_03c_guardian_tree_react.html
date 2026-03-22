@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OwlWatcher - Guardian Tree (React + AI Art + Spline 3D)</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide-react@0.344.0/dist/umd/lucide-react.min.js"></script>
+    <!-- Spline 3D Viewer Web Component -->
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { overflow: hidden; background: #000; }
+
+        @keyframes dash {
+            to { stroke-dashoffset: -1000; }
+        }
+        @keyframes sweep {
+            0% { transform: translateX(-50%) rotate(-45deg); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateX(-50%) rotate(45deg); opacity: 0; }
+        }
+        @keyframes float {
+            0% { transform: translateY(0px) translateX(0px); }
+            50% { transform: translateY(-15px) translateX(10px); }
+            100% { transform: translateY(0px) translateX(0px); }
+        }
+        @keyframes fall {
+            0% { transform: translateY(-10vh) translateX(0) rotate(0deg); }
+            100% { transform: translateY(110vh) translateX(50px) rotate(360deg); }
+        }
+        @keyframes swing {
+            0% { transform: rotate(-10deg); }
+            100% { transform: rotate(10deg); }
+        }
+        @keyframes hovering {
+            0% { transform: translateY(-5px); }
+            100% { transform: translateY(5px); }
+        }
+        @keyframes peck {
+            0%, 100% { transform: rotate(0deg) translateY(0); }
+            50% { transform: rotate(20deg) translateY(20px); }
+        }
+        @keyframes explode {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        @keyframes shoot {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-60px); }
+        }
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        @keyframes scanBeamSweep {
+            0%, 100% { transform: translateX(-50%) rotate(-40deg); }
+            50% { transform: translateX(-50%) rotate(40deg); }
+        }
+        @keyframes fogDrift {
+            0% { transform: translateX(-20%); }
+            100% { transform: translateX(20%); }
+        }
+        @keyframes fogDriftReverse {
+            0% { transform: translateX(15%); }
+            100% { transform: translateX(-25%); }
+        }
+        @keyframes dustFloat {
+            0% { transform: translate(0, 0) scale(1); opacity: 0; }
+            20% { opacity: 0.4; }
+            80% { opacity: 0.3; }
+            100% { transform: translate(30px, -40px) scale(0.5); opacity: 0; }
+        }
+        @keyframes volumetricSway {
+            0%, 100% { transform: rotate(-2deg) scaleX(0.95); }
+            50% { transform: rotate(2deg) scaleX(1.05); }
+        }
+        @keyframes breathe3d {
+            0%, 100% { transform: translateZ(0px) scale(1); }
+            50% { transform: translateZ(10px) scale(1.02); }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Destructure Lucide icons from global
+        const LucideIcons = window.lucideReact || {};
+        const FileText = LucideIcons.FileText || (() => <span>📄</span>);
+        const Code = LucideIcons.Code || (() => <span>🐍</span>);
+        const Settings = LucideIcons.Settings || (() => <span>⚙️</span>);
+        const Database = LucideIcons.Database || (() => <span>📊</span>);
+        const Shield = LucideIcons.Shield || (() => <span>🔒</span>);
+        const Archive = LucideIcons.Archive || (() => <span>📦</span>);
+        const PenTool = LucideIcons.PenTool || (() => <span>🎨</span>);
+        const Activity = LucideIcons.Activity || (() => <span>⚡</span>);
+        const Clipboard = LucideIcons.Clipboard || (() => <span>📝</span>);
+        const Wrench = LucideIcons.Wrench || (() => <span>🔧</span>);
+        const BookOpen = LucideIcons.BookOpen || (() => <span>📚</span>);
+        const Bug = LucideIcons.Bug || (() => <span>🐛</span>);
+
+        const OwlWatcher = () => {
+            const [state, setState] = useState('IDLE');
+            const [catching, setCatching] = useState(null);
+            const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+            const [interactionStep, setInteractionStep] = useState(0);
+
+            const seasons = {
+                IDLE: {
+                    name: 'Summer Night',
+                    accent: '#4FD1C5',
+                    eyeColor: '#4FD1C5',
+                    eyeGlow: '#4FD1C5',
+                    moon: '#FBBF24',
+                    bgOverlay: 'rgba(0,0,0,0)',
+                    vignetteColor: 'transparent'
+                },
+                SCANNING: {
+                    name: 'Autumn Scan',
+                    accent: '#FB923C',
+                    eyeColor: '#FFD700',
+                    eyeGlow: '#FBBF24',
+                    moon: '#f97316',
+                    bgOverlay: 'rgba(100,50,0,0.25)',
+                    vignetteColor: 'transparent'
+                },
+                ALERT: {
+                    name: 'Winter Storm',
+                    accent: '#EF4444',
+                    eyeColor: '#FF1A1A',
+                    eyeGlow: '#EF4444',
+                    moon: '#fee2e2',
+                    bgOverlay: 'rgba(80,0,0,0.35)',
+                    vignetteColor: 'rgba(239,68,68,0.25)'
+                },
+                SUCCESS: {
+                    name: 'Spring Bloom',
+                    accent: '#F59E0B',
+                    eyeColor: '#FFB800',
+                    eyeGlow: '#F59E0B',
+                    moon: '#fef3c7',
+                    bgOverlay: 'rgba(80,0,80,0.2)',
+                    vignetteColor: 'transparent'
+                },
+                SLEEPING: {
+                    name: 'Deep Winter',
+                    accent: '#93B4DC',
+                    eyeColor: '#5A7A9E',
+                    eyeGlow: '#4A6A8E',
+                    moon: '#94a3b8',
+                    bgOverlay: 'rgba(15,23,42,0.4)',
+                    vignetteColor: 'transparent'
+                }
+            };
+
+            const currentSeason = seasons[state];
+
+            /* Bug positions calibrated to the ChatGPT image layout
+               Each bug has organic shape data: bodyColor, wingColor, glowColor, and SVG shape type */
+            /* Bug positions with 3D depth (zDepth in px) — bugs closer to viewer appear larger
+               and shift more with mouse parallax, creating a layered 3D ecosystem */
+            const bugs = [
+                { id: 'docs', label: 'Documents', type: 'Moth', icon: <FileText size={12}/>, x: '15%', y: '28%', zDepth: 40,
+                  bodyColor: '#8B7355', wingColor: '#D4C5A9', glowColor: '#E8DCC8', shape: 'moth' },
+                { id: 'py', label: 'Python', type: 'Beetle', icon: <Code size={12}/>, x: '12%', y: '42%', zDepth: -20,
+                  bodyColor: '#2E7D32', wingColor: '#4CAF50', glowColor: '#66BB6A', shape: 'beetle' },
+                { id: 'cfg', label: 'Config', type: 'Firefly', icon: <Settings size={12}/>, x: '78%', y: '25%', zDepth: 60,
+                  bodyColor: '#1B1B1B', wingColor: '#333', glowColor: '#FFEB3B', shape: 'firefly' },
+                { id: 'data', label: 'Data', type: 'Dragonfly', icon: <Database size={12}/>, x: '22%', y: '55%', zDepth: 30,
+                  bodyColor: '#1565C0', wingColor: '#90CAF9', glowColor: '#42A5F5', shape: 'dragonfly' },
+                { id: 'sec', label: 'Security', type: 'Spider', icon: <Shield size={12}/>, x: '38%', y: '62%', zDepth: -30, hanging: true,
+                  bodyColor: '#1A1A1A', wingColor: '#333', glowColor: '#CE93D8', shape: 'spider' },
+                { id: 'pkg', label: 'Package', type: 'Caterpillar', icon: <Archive size={12}/>, x: '25%', y: '70%', zDepth: -10,
+                  bodyColor: '#558B2F', wingColor: '#8BC34A', glowColor: '#AED581', shape: 'caterpillar' },
+                { id: 'design', label: 'Design', type: 'Butterfly', icon: <PenTool size={12}/>, x: '85%', y: '18%', zDepth: 80, hover: true,
+                  bodyColor: '#1A1A1A', wingColor: '#EC407A', glowColor: '#F48FB1', shape: 'butterfly' },
+                { id: 'db', label: 'Database', type: 'Pill Bug', icon: <Database size={12}/>, x: '48%', y: '75%', zDepth: -40,
+                  bodyColor: '#455A64', wingColor: '#78909C', glowColor: '#90A4AE', shape: 'pillbug' },
+                { id: 'test', label: 'Test', type: 'Lightning Bug', icon: <Activity size={12}/>, x: '70%', y: '45%', zDepth: 50,
+                  bodyColor: '#1B1B1B', wingColor: '#333', glowColor: '#76FF03', shape: 'firefly' },
+                { id: 'log', label: 'Log', type: 'Ant', icon: <Clipboard size={12}/>, x: '30%', y: '35%', zDepth: 10,
+                  bodyColor: '#3E2723', wingColor: '#5D4037', glowColor: '#8D6E63', shape: 'ant' },
+                { id: 'tools', label: 'Tools', type: 'Carpenter Bee', icon: <Wrench size={12}/>, x: '60%', y: '32%', zDepth: 70, hover: true,
+                  bodyColor: '#1A1A1A', wingColor: '#FFC107', glowColor: '#FFD54F', shape: 'bee' },
+                { id: 'docs2', label: 'Docs', type: 'Bookworm', icon: <BookOpen size={12}/>, x: '55%', y: '20%', zDepth: 55, hover: true,
+                  bodyColor: '#4FD1C5', wingColor: '#80DEEA', glowColor: '#B2EBF2', shape: 'worm' },
+            ];
+
+            /* SVG insect shapes that render organic bodies */
+            const InsectBody = ({ bug, accent }) => {
+                const s = bug.shape;
+                const glow = bug.glowColor;
+                const body = bug.bodyColor;
+                const wing = bug.wingColor;
+
+                if (s === 'moth') return (
+                    <svg width="52" height="44" viewBox="0 0 52 44" className="drop-shadow-lg">
+                        <defs><filter id={`glow-${bug.id}`}><feGaussianBlur stdDeviation="2.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                        <ellipse cx="18" cy="18" rx="14" ry="10" fill={wing} opacity="0.5" transform="rotate(-20,18,18)" filter={`url(#glow-${bug.id})`}/>
+                        <ellipse cx="34" cy="18" rx="14" ry="10" fill={wing} opacity="0.5" transform="rotate(20,34,18)" filter={`url(#glow-${bug.id})`}/>
+                        <ellipse cx="26" cy="24" rx="4" ry="10" fill={body}/>
+                        <line x1="22" y1="14" x2="16" y2="6" stroke={body} strokeWidth="1" opacity="0.6"/>
+                        <line x1="30" y1="14" x2="36" y2="6" stroke={body} strokeWidth="1" opacity="0.6"/>
+                        <circle cx="16" cy="5" r="1.5" fill={glow} opacity="0.8"/>
+                        <circle cx="36" cy="5" r="1.5" fill={glow} opacity="0.8"/>
+                    </svg>
+                );
+                if (s === 'beetle') return (
+                    <svg width="40" height="48" viewBox="0 0 40 48" className="drop-shadow-lg">
+                        <defs><filter id={`glow-${bug.id}`}><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                        <ellipse cx="20" cy="28" rx="12" ry="16" fill={body} filter={`url(#glow-${bug.id})`}/>
+                        <line x1="20" y1="12" x2="20" y2="44" stroke={wing} strokeWidth="0.8" opacity="0.4"/>
+                        <ellipse cx="20" cy="12" rx="8" ry="6" fill={body} opacity="0.9"/>
+                        <circle cx="16" cy="10" r="2" fill={glow} opacity="0.9"/>
+                        <circle cx="24" cy="10" r="2" fill={glow} opacity="0.9"/>
+                        <line x1="8" y1="22" x2="2" y2="18" stroke={body} strokeWidth="1.2"/>
+                        <line x1="32" y1="22" x2="38" y2="18" stroke={body} strokeWidth="1.2"/>
+                        <line x1="7" y1="28" x2="1" y2="30" stroke={body} strokeWidth="1.2"/>
+                        <line x1="33" y1="28" x2="39" y2="30" stroke={body} strokeWidth="1.2"/>
+                    </svg>
+                );
+                if (s === 'firefly') return (
+                    <svg width="36" height="44" viewBox="0 0 36 44" className="drop-shadow-lg">
+                        <defs>
+                            <filter id={`glow-${bug.id}`}><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                            <radialGradient id={`light-${bug.id}`}><stop offset="0%" stopColor={glow} stopOpacity="1"/><stop offset="100%" stopColor={glow} stopOpacity="0"/></radialGradient>
+                        </defs>
+                        <ellipse cx="18" cy="18" rx="6" ry="8" fill={body}/>
+                        <ellipse cx="18" cy="32" rx="5" ry="7" fill={glow} opacity="0.9" filter={`url(#glow-${bug.id})`}/>
+                        <circle cx="18" cy="32" r="10" fill={`url(#light-${bug.id})`} opacity="0.5"/>
+                        <ellipse cx="12" cy="16" rx="6" ry="3" fill={wing} opacity="0.25" transform="rotate(-30,12,16)"/>
+                        <ellipse cx="24" cy="16" rx="6" ry="3" fill={wing} opacity="0.25" transform="rotate(30,24,16)"/>
+                    </svg>
+                );
+                if (s === 'dragonfly') return (
+                    <svg width="64" height="40" viewBox="0 0 64 40" className="drop-shadow-lg">
+                        <defs><filter id={`glow-${bug.id}`}><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                        <ellipse cx="16" cy="14" rx="12" ry="5" fill={wing} opacity="0.3" transform="rotate(-15,16,14)" filter={`url(#glow-${bug.id})`}/>
+                        <ellipse cx="48" cy="14" rx="12" ry="5" fill={wing} opacity="0.3" transform="rotate(15,48,14)" filter={`url(#glow-${bug.id})`}/>
+                        <ellipse cx="18" cy="24" rx="10" ry="4" fill={wing} opacity="0.25" transform="rotate(-10,18,24)"/>
+                        <ellipse cx="46" cy="24" rx="10" ry="4" fill={wing} opacity="0.25" transform="rotate(10,46,24)"/>
+                        <ellipse cx="32" cy="20" rx="4" ry="14" fill={body}/>
+                        <circle cx="32" cy="8" r="4" fill={body}/>
+                        <circle cx="30" cy="7" r="1.5" fill={glow} opacity="0.9"/>
+                        <circle cx="34" cy="7" r="1.5" fill={glow} opacity="0.9"/>
+                    </svg>
+                );
+                if (s === 'spider') return (
+                    <svg width="44" height="44" viewBox="0 0 44 44" className="drop-shadow-lg">
+                        <defs><filter id={`glow-${bug.id}`}><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                        <circle cx="22" cy="22" r="8" fill={body} filter={`url(#glow-${bug.id})`}/>
+                        <circle cx="22" cy="12" r="5" fill={body}/>
+                        {[[-35,0],[-25,0],[-15,0],[-5,0],[5,0],[15,0],[25,0],[35,0]].map((a,i) => (
+                            <line key={i} x1="22" y1="22" x2={22 + Math.cos((i*45-90)*Math.PI/180)*18} y2={22 + Math.sin((i*45-90)*Math.PI/180)*18} stroke={body} strokeWidth="1.5" opacity="0.7"/>
+                        ))}
+                        <circle cx="19" cy="10" r="1.5" fill={glow} opacity="0.8"/>
+                        <circle cx="25" cy="10" r="1.5" fill={glow} opacity="0.8"/>
+                    </svg>
+                );
+                if (s === 'caterpillar') return (
+                    <svg width="56" height="28" viewBox="0 0 56 28" className="drop-shadow-lg">
+                        <defs><filter id={`glow-${bug.id}`}><feGaussianBlur stdDeviation="1.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                        {[0,1,2,3,4,5].map(i => (
+                            <circle key={i} cx={8 + i*8} cy={16} r={i===0 ? 6 : 5} fill={i%2===0 ? body : wing} opacity={0.8} filter={i===0 ? `url(#glow-${bug.id})` : undefined}/>
+                        ))}
+                        <circle cx="6" cy="12" r="1.5" fill={glow} opacity="0.9"/>
+                        <circle cx="12" cy="12" r="1.5" fill={glow} opacity="0.9"/>
+                        <line x1="4" y1="10" x2="0" y2="4" stroke={body} strokeWidth="1"/>
+                        <line x1="10" y1="10" x2="14" y2="4" stroke={body} strokeWidth="1"/>
+                    </svg>
+                );
+                if (s === 'butterfly') return (
+                    <svg width="56" height="48" viewBox="0 0 56 48" className="drop-shadow-lg">
+                        <defs><filter id={`glow-${bug.id}`}><feGaussianBlur stdDeviation="2.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                        <ellipse cx="14" cy="16" rx="12" ry="10" fill={wing} opacity="0.55" filter={`url(#glow-${bug.id})`}/>
+                        <ellipse cx="42" cy="16" rx="12" ry="10" fill={wing} opacity="0.55" filter={`url(#glow-${bug.id})`}/>
+                        <ellipse cx="16" cy="30" rx="8" ry="10" fill={wing} opacity="0.4"/>
+                        <ellipse cx="40" cy="30" rx="8" ry="10" fill={wing} opacity="0.4"/>
+                        <ellipse cx="28" cy="24" rx="3" ry="14" fill={body}/>
+                        <circle cx="14" cy="16" r="3" fill={glow} opacity="0.3"/>
+                        <circle cx="42" cy="16" r="3" fill={glow} opacity="0.3"/>
+                        <line x1="26" y1="10" x2="20" y2="2" stroke={body} strokeWidth="0.8"/>
+                        <line x1="30" y1="10" x2="36" y2="2" stroke={body} strokeWidth="0.8"/>
+                        <circle cx="20" cy="2" r="1.2" fill={glow} opacity="0.7"/>
+                        <circle cx="36" cy="2" r="1.2" fill={glow} opacity="0.7"/>
+                    </svg>
+                );
+                if (s === 'pillbug') return (
+                    <svg width="40" height="32" viewBox="0 0 40 32" className="drop-shadow-lg">
+                        <defs><filter id={`glow-${bug.id}`}><feGaussianBlur stdDeviation="1.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                        <ellipse cx="20" cy="18" rx="14" ry="10" fill={body} filter={`url(#glow-${bug.id})`}/>
+                        {[0,1,2,3,4].map(i => (
+                            <path key={i} d={`M ${8+i*6} 10 Q ${8+i*6} 18 ${8+i*6} 26`} stroke={wing} strokeWidth="1.5" fill="none" opacity="0.4"/>
+                        ))}
+                        <circle cx="12" cy="12" r="1.5" fill={glow} opacity="0.7"/>
+                        <circle cx="20" cy="12" r="1.5" fill={glow} opacity="0.7"/>
+                    </svg>
+                );
+                if (s === 'ant') return (
+                    <svg width="44" height="32" viewBox="0 0 44 32" className="drop-shadow-lg">
+                        <defs><filter id={`glow-${bug.id}`}><feGaussianBlur stdDeviation="1.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                        <ellipse cx="10" cy="18" rx="6" ry="5" fill={body} filter={`url(#glow-${bug.id})`}/>
+                        <ellipse cx="22" cy="18" rx="5" ry="4" fill={body}/>
+                        <ellipse cx="34" cy="18" rx="7" ry="5" fill={body}/>
+                        <line x1="4" y1="14" x2="0" y2="8" stroke={body} strokeWidth="1"/>
+                        <line x1="10" y1="14" x2="14" y2="8" stroke={body} strokeWidth="1"/>
+                        <circle cx="0" cy="7" r="1" fill={glow} opacity="0.8"/>
+                        <circle cx="14" cy="7" r="1" fill={glow} opacity="0.8"/>
+                        {[0,1,2].map(i => (<React.Fragment key={i}>
+                            <line x1={16+i*6} y1="22" x2={12+i*6} y2="30" stroke={body} strokeWidth="1" opacity="0.6"/>
+                            <line x1={20+i*6} y1="22" x2={24+i*6} y2="30" stroke={body} strokeWidth="1" opacity="0.6"/>
+                        </React.Fragment>))}
+                    </svg>
+                );
+                if (s === 'bee') return (
+                    <svg width="44" height="44" viewBox="0 0 44 44" className="drop-shadow-lg">
+                        <defs><filter id={`glow-${bug.id}`}><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                        <ellipse cx="14" cy="16" rx="8" ry="4" fill="rgba(255,255,255,0.15)" transform="rotate(-30,14,16)"/>
+                        <ellipse cx="30" cy="16" rx="8" ry="4" fill="rgba(255,255,255,0.15)" transform="rotate(30,30,16)"/>
+                        <ellipse cx="22" cy="26" rx="8" ry="12" fill={body} filter={`url(#glow-${bug.id})`}/>
+                        {[0,1,2].map(i => (
+                            <rect key={i} x="14" y={20+i*5} width="16" height="2.5" fill={wing} rx="1" opacity="0.7"/>
+                        ))}
+                        <circle cx="22" cy="14" r="5" fill={body}/>
+                        <circle cx="19" cy="12" r="1.5" fill={glow} opacity="0.9"/>
+                        <circle cx="25" cy="12" r="1.5" fill={glow} opacity="0.9"/>
+                    </svg>
+                );
+                /* worm / bookworm */
+                return (
+                    <svg width="48" height="28" viewBox="0 0 48 28" className="drop-shadow-lg">
+                        <defs><filter id={`glow-${bug.id}`}><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                        <path d="M 4 16 Q 12 8 20 16 Q 28 24 36 16 Q 42 10 46 14" stroke={body} strokeWidth="6" fill="none" strokeLinecap="round" filter={`url(#glow-${bug.id})`}/>
+                        <circle cx="46" cy="14" r="4" fill={body}/>
+                        <circle cx="44" cy="12" r="1.2" fill={glow} opacity="0.9"/>
+                        <circle cx="48" cy="12" r="1.2" fill={glow} opacity="0.9"/>
+                    </svg>
+                );
+            };
+
+            const [parallax, setParallax] = useState({ x: 0, y: 0 });
+
+            /* Keyboard state switching (1-5) */
+            useEffect(() => {
+                const handleKey = (e) => {
+                    const stateMap = { '1': 'IDLE', '2': 'SCANNING', '3': 'ALERT', '4': 'SUCCESS', '5': 'SLEEPING' };
+                    if (stateMap[e.key]) setState(stateMap[e.key]);
+                };
+                window.addEventListener('keydown', handleKey);
+                return () => window.removeEventListener('keydown', handleKey);
+            }, []);
+
+            const handleMouseMove = (e) => {
+                setMousePos({ x: e.clientX, y: e.clientY });
+                /* Parallax offset: normalized -1 to 1 from center */
+                const px = (e.clientX / window.innerWidth - 0.5) * 2;
+                const py = (e.clientY / window.innerHeight - 0.5) * 2;
+                setParallax({ x: px, y: py });
+            };
+
+            const catchBug = (bug) => {
+                if (catching) return;
+                setCatching(bug);
+                setInteractionStep(1);
+                setTimeout(() => setInteractionStep(2), 400);
+                setTimeout(() => setInteractionStep(3), 800);
+                setTimeout(() => setInteractionStep(4), 1200);
+                setTimeout(() => setInteractionStep(5), 1800);
+                setTimeout(() => {
+                    setCatching(null);
+                    setInteractionStep(0);
+                }, 2400);
+            };
+
+            const getOwlTransform = () => {
+                const basePos = { left: '52%', top: '42%', rotate: '0deg', scale: '1', flip: '' };
+                if (!catching || interactionStep === 0 || interactionStep === 5) return basePos;
+                if (interactionStep === 1) return { ...basePos, rotate: '-10deg', scale: '1.05' };
+                const isLeft = parseInt(catching.x) < 50;
+                return {
+                    left: catching.x,
+                    top: catching.y,
+                    rotate: isLeft ? '-15deg' : '15deg',
+                    scale: '1.1',
+                    flip: isLeft ? 'scaleX(-1)' : 'scaleX(1)'
+                };
+            };
+
+            const owlPos = getOwlTransform();
+
+            return (
+                <div
+                    className="relative w-full h-screen overflow-hidden cursor-none select-none font-mono"
+                    onMouseMove={handleMouseMove}
+                    style={{ background: '#000' }}
+                >
+                    {/* LAYER 1: AI-Generated Background Image with Mouse Parallax */}
+                    <div
+                        className="absolute bg-cover bg-center bg-no-repeat z-0 transition-[filter] duration-1000"
+                        style={{
+                            /* Oversize slightly so parallax doesn't show edges */
+                            inset: '-20px',
+                            backgroundImage: `url('file:///C:/Users/daley/Downloads/a0ddd4a6-8f74-4e0b-a696-e4209cf44170.png')`,
+                            backgroundPosition: 'center top',
+                            backgroundSize: 'cover',
+                            transform: `translate(${parallax.x * -8}px, ${parallax.y * -5}px)`,
+                            transition: 'transform 0.15s ease-out, filter 1s ease',
+                            filter: state === 'SLEEPING' ? 'brightness(0.5) saturate(0.3) hue-rotate(200deg)' :
+                                   state === 'ALERT' ? 'brightness(0.7) saturate(1.3) hue-rotate(-20deg)' :
+                                   state === 'SCANNING' ? 'brightness(0.8) saturate(0.8) sepia(0.4) hue-rotate(-10deg)' :
+                                   state === 'SUCCESS' ? 'brightness(1.1) saturate(1.2) hue-rotate(280deg)' :
+                                   'brightness(1) saturate(1)'
+                        }}
+                    />
+
+                    {/* LAYER 2: State Color Overlay */}
+                    <div
+                        className="absolute inset-0 z-[1] transition-all duration-1000 pointer-events-none"
+                        style={{ backgroundColor: currentSeason.bgOverlay }}
+                    />
+
+                    {/* LAYER 2.5: SPLINE 3D SCENE — Full-screen atmospheric layer */}
+                    {/* This layer adds 3D particles, volumetric fog, fireflies, and depth to the scene */}
+                    {/* The Spline scene should have a TRANSPARENT background so the AI image shows through */}
+                    <div className="absolute inset-0 z-[4] pointer-events-none">
+                        {/*
+                            ===== SPLINE 3D INTEGRATION POINT: ATMOSPHERE =====
+                            Replace the commented line below with your Spline scene URL.
+                            Recommended scene contents:
+                            - 3D particle system (fireflies, dust motes)
+                            - Volumetric fog planes at ground level
+                            - Volumetric light rays from upper-right (moon direction)
+                            - Ambient floating spores/pollen
+                            Scene should have transparent/no background.
+
+                            <spline-viewer
+                                url="https://prod.spline.design/YOUR_ATMOSPHERE_SCENE_ID/scene.splinecode"
+                                style="width:100%;height:100%;position:absolute;inset:0;"
+                                loading="eager"
+                            ></spline-viewer>
+                        */}
+
+                        {/* CSS 3D Fallback: Volumetric light rays from moon */}
+                        <div className="absolute top-0 right-[15%] w-[400px] h-[70%] pointer-events-none opacity-[0.06] mix-blend-screen"
+                            style={{
+                                background: `linear-gradient(195deg, ${currentSeason.accent}44 0%, transparent 60%)`,
+                                animation: 'volumetricSway 12s ease-in-out infinite',
+                                transformOrigin: 'top right',
+                                transition: 'background 1s ease'
+                            }}
+                        />
+                        <div className="absolute top-[5%] right-[22%] w-[250px] h-[55%] pointer-events-none opacity-[0.04] mix-blend-screen"
+                            style={{
+                                background: `linear-gradient(200deg, ${currentSeason.accent}33 0%, transparent 50%)`,
+                                animation: 'volumetricSway 15s ease-in-out infinite 2s',
+                                transformOrigin: 'top right',
+                                transition: 'background 1s ease'
+                            }}
+                        />
+                        <div className="absolute top-[2%] right-[10%] w-[300px] h-[60%] pointer-events-none opacity-[0.035] mix-blend-screen"
+                            style={{
+                                background: `linear-gradient(188deg, #FBBF2422 0%, transparent 45%)`,
+                                animation: 'volumetricSway 18s ease-in-out infinite 4s',
+                                transformOrigin: 'top right'
+                            }}
+                        />
+
+                        {/* CSS 3D Fallback: Ground fog layers */}
+                        <div className="absolute bottom-[8%] left-0 w-[150%] h-[120px] pointer-events-none"
+                            style={{
+                                background: 'linear-gradient(to top, rgba(79,209,197,0.06) 0%, transparent 100%)',
+                                filter: 'blur(20px)',
+                                animation: 'fogDrift 20s ease-in-out infinite alternate',
+                                transition: 'background 1s ease'
+                            }}
+                        />
+                        <div className="absolute bottom-[5%] left-[-10%] w-[140%] h-[80px] pointer-events-none"
+                            style={{
+                                background: 'linear-gradient(to top, rgba(79,209,197,0.04) 0%, transparent 100%)',
+                                filter: 'blur(30px)',
+                                animation: 'fogDriftReverse 25s ease-in-out infinite alternate'
+                            }}
+                        />
+                        <div className="absolute bottom-[12%] left-[5%] w-[130%] h-[60px] pointer-events-none"
+                            style={{
+                                background: `linear-gradient(to top, ${currentSeason.accent}08 0%, transparent 100%)`,
+                                filter: 'blur(25px)',
+                                animation: 'fogDrift 30s ease-in-out infinite alternate 5s',
+                                transition: 'background 1s ease'
+                            }}
+                        />
+
+                        {/* CSS 3D Fallback: Ambient dust motes */}
+                        {[...Array(30)].map((_, i) => (
+                            <div
+                                key={`dust-${i}`}
+                                className="absolute rounded-full bg-white pointer-events-none"
+                                style={{
+                                    width: `${1 + Math.random() * 2}px`,
+                                    height: `${1 + Math.random() * 2}px`,
+                                    top: `${10 + Math.random() * 70}%`,
+                                    left: `${Math.random() * 100}%`,
+                                    opacity: 0,
+                                    animation: `dustFloat ${8 + Math.random() * 12}s ease-in-out infinite`,
+                                    animationDelay: `${Math.random() * 15}s`
+                                }}
+                            />
+                        ))}
+                    </div>
+
+                    {/* Alert Vignette */}
+                    {state === 'ALERT' && (
+                        <div
+                            className="absolute inset-0 z-[2] pointer-events-none"
+                            style={{
+                                background: 'radial-gradient(ellipse at center, transparent 40%, rgba(239,68,68,0.3) 100%)',
+                                animation: 'pulse 0.8s ease-in-out infinite alternate'
+                            }}
+                        />
+                    )}
+
+                    {/* Lightning Flash for Alert */}
+                    {state === 'ALERT' && (
+                        <AlertLightning />
+                    )}
+
+                    {/* Snow / Petals for states */}
+                    {(state === 'SLEEPING' || state === 'SUCCESS') && (
+                        <div className="absolute inset-0 pointer-events-none z-[3]">
+                            {[...Array(50)].map((_, i) => (
+                                <div
+                                    key={`particle-${i}`}
+                                    className="absolute rounded-full"
+                                    style={{
+                                        width: state === 'SUCCESS' ? `${6 + Math.random() * 8}px` : `${2 + Math.random() * 4}px`,
+                                        height: state === 'SUCCESS' ? `${4 + Math.random() * 6}px` : `${2 + Math.random() * 4}px`,
+                                        backgroundColor: state === 'SUCCESS' ? '#fbcfe8' : '#dbeafe',
+                                        borderRadius: state === 'SUCCESS' ? '50% 0 50% 0' : '50%',
+                                        top: '-5%',
+                                        left: `${Math.random() * 100}%`,
+                                        opacity: 0.7,
+                                        animation: `fall ${6 + Math.random() * 8}s linear infinite`,
+                                        animationDelay: `${Math.random() * 10}s`
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Scanning leaves */}
+                    {state === 'SCANNING' && (
+                        <div className="absolute inset-0 pointer-events-none z-[3]">
+                            {[...Array(25)].map((_, i) => (
+                                <div
+                                    key={`leaf-${i}`}
+                                    className="absolute text-lg"
+                                    style={{
+                                        top: '-5%',
+                                        left: `${Math.random() * 100}%`,
+                                        animation: `fall ${5 + Math.random() * 6}s linear infinite`,
+                                        animationDelay: `${Math.random() * 8}s`
+                                    }}
+                                >
+                                    {['🍂', '🍁', '🍃'][Math.floor(Math.random() * 3)]}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Firefly particles */}
+                    <div className="absolute inset-0 pointer-events-none z-[5]">
+                        {[...Array(20)].map((_, i) => (
+                            <div
+                                key={`firefly-${i}`}
+                                className="absolute rounded-full"
+                                style={{
+                                    width: '4px',
+                                    height: '4px',
+                                    backgroundColor: currentSeason.accent,
+                                    boxShadow: `0 0 12px 3px ${currentSeason.accent}88`,
+                                    top: `${10 + Math.random() * 60}%`,
+                                    left: `${5 + Math.random() * 90}%`,
+                                    opacity: state === 'SLEEPING' ? 0.2 : 0.8,
+                                    animation: `float ${4 + Math.random() * 6}s ease-in-out infinite alternate, pulse ${1 + Math.random() * 2}s infinite alternate`,
+                                    animationDelay: `${Math.random() * 5}s`
+                                }}
+                            />
+                        ))}
+                    </div>
+
+                    {/* LAYER 3: THE OWL (Interactive, moves to catch bugs) */}
+                    {/* Includes Spline 3D owl with CSS fallback */}
+                    <div
+                        className="absolute transition-all duration-700 ease-in-out z-[40] pointer-events-none"
+                        style={{
+                            left: owlPos.left,
+                            top: owlPos.top,
+                            transform: `translate(-50%, -50%) rotate(${owlPos.rotate}) scale(${owlPos.scale}) ${owlPos.flip || ''}`,
+                            transformOrigin: 'bottom center'
+                        }}
+                    >
+                        {/* Interaction Step Label */}
+                        {interactionStep > 0 && interactionStep < 6 && (
+                            <div className="absolute -top-20 left-1/2 -translate-x-1/2 whitespace-nowrap z-50">
+                                <div className="bg-black/80 text-white text-xs font-bold px-4 py-1.5 rounded border border-white/20 tracking-[0.2em] shadow-[0_0_15px_rgba(79,209,197,0.3)] backdrop-blur-md">
+                                    <span style={{ color: currentSeason.accent }} className="mr-2">[{interactionStep}]</span>
+                                    {['TARGET ACQUIRED', 'SWOOP & STRIKE', 'BUG CAPTURED', 'ENERGY BURST', 'RETURN TO PERCH'][interactionStep - 1]}
+                                </div>
+                            </div>
+                        )}
+
+                        {/*
+                            ===== SPLINE 3D INTEGRATION POINT: OWL MODEL =====
+                            Replace the CSS fallback owl below with a Spline 3D owl model.
+                            Recommended model specs:
+                            - Great horned owl, 15-25K triangles
+                            - PBR materials: dark brown feathers, teal bioluminescent edges
+                            - Animation states: idle_breathe, head_turn, swoop, peck, alert_bristle, sleep_tuck
+                            - Eye material should accept color parameter for seasonal changes
+                            - Transparent/no background
+
+                            To integrate: Wrap this in a div and add:
+                            <spline-viewer
+                                url="https://prod.spline.design/YOUR_OWL_SCENE_ID/scene.splinecode"
+                                style="width:300px;height:350px;"
+                                loading="eager"
+                            ></spline-viewer>
+
+                            Then hide the CSS fallback owl div below by adding className="hidden"
+                        */}
+
+                        {/* CSS Fallback Owl (shown when Spline not loaded) */}
+                        <div className="relative w-36 h-[200px]" style={{ animation: 'breathe3d 4s ease-in-out infinite' }}>
+                            {/* Body */}
+                            <div className="absolute bottom-0 w-full h-[160px] bg-gradient-to-b from-[#3a2818] to-[#1f140c] rounded-[70px_70px_40px_40px] shadow-[inset_-10px_0_20px_rgba(0,0,0,0.5),_0_20px_30px_rgba(0,0,0,0.8)] overflow-hidden border border-[#4a3624]/30">
+                                <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 5px, #1a1008 5px, #1a1008 10px)' }} />
+                                <div className="absolute top-10 left-1/2 -translate-x-1/2 w-24 h-28 bg-[#4a3624] rounded-full blur-[2px] opacity-80 mix-blend-screen" />
+                            </div>
+
+                            {/* Wings */}
+                            <div className="absolute top-12 -left-2 w-10 h-[110px] bg-[#2a1b10] rounded-[30px_10px_10px_40px] rotate-12 shadow-[5px_0_10px_rgba(0,0,0,0.5)] border-l border-white/10" />
+                            <div className="absolute top-12 -right-2 w-10 h-[110px] bg-[#2a1b10] rounded-[10px_30px_40px_10px] -rotate-12 shadow-[-5px_0_10px_rgba(0,0,0,0.5)] border-r border-white/10" />
+
+                            {/* Head */}
+                            <div className="absolute top-[-10px] left-1/2 -translate-x-1/2 w-[130px] h-[90px] bg-gradient-to-b from-[#4a3624] to-[#2a1b10] rounded-[60px_60px_40px_40px] shadow-[0_10px_20px_rgba(0,0,0,0.6)] z-10">
+                                {/* Horns */}
+                                <div className="absolute -top-6 left-2 w-10 h-14 bg-[#3a2818] -rotate-[30deg] rounded-[10px_100%_0_0] z-[-1]" />
+                                <div className="absolute -top-6 right-2 w-10 h-14 bg-[#3a2818] rotate-[30deg] rounded-[100%_10px_0_0] z-[-1]" />
+
+                                {/* Facial Disks */}
+                                <div className="absolute top-4 left-2 w-[58px] h-[58px] bg-[#5c432d] rounded-full shadow-[inset_0_0_10px_rgba(0,0,0,0.8)] border border-[#8a6b4e]/30" />
+                                <div className="absolute top-4 right-2 w-[58px] h-[58px] bg-[#5c432d] rounded-full shadow-[inset_0_0_10px_rgba(0,0,0,0.8)] border border-[#8a6b4e]/30" />
+
+                                {/* Eyes - distinct color per season with strong glow */}
+                                <div className="absolute top-8 left-[18px] w-7 h-7 bg-black rounded-full flex items-center justify-center">
+                                    {/* Outer glow ring */}
+                                    <div
+                                        className="absolute inset-[-3px] rounded-full transition-all duration-700"
+                                        style={{
+                                            boxShadow: `0 0 ${state === 'ALERT' ? '25px 8px' : state === 'SLEEPING' ? '4px 1px' : '18px 5px'} ${currentSeason.eyeGlow}`,
+                                            opacity: state === 'SLEEPING' ? 0.3 : 1
+                                        }}
+                                    />
+                                    {/* Iris */}
+                                    <div
+                                        className="w-5 rounded-full transition-all duration-700"
+                                        style={{
+                                            background: state === 'ALERT'
+                                                ? `radial-gradient(circle, #FF4444 30%, ${currentSeason.eyeColor} 70%, #8B0000)`
+                                                : state === 'SCANNING'
+                                                ? `radial-gradient(circle, #FFF8DC 20%, ${currentSeason.eyeColor} 60%, #B8860B)`
+                                                : state === 'SUCCESS'
+                                                ? `radial-gradient(circle, #FFFACD 20%, ${currentSeason.eyeColor} 60%, #CC8800)`
+                                                : state === 'SLEEPING'
+                                                ? `radial-gradient(circle, #7A9ABE 30%, ${currentSeason.eyeColor} 70%, #3A5A7E)`
+                                                : `radial-gradient(circle, #7FFFED 20%, ${currentSeason.eyeColor} 60%, #2A9D8F)`,
+                                            boxShadow: `0 0 12px 3px ${currentSeason.eyeGlow}, inset 0 0 6px rgba(255,255,255,0.3)`,
+                                            height: state === 'SLEEPING' ? '3px' : '18px'
+                                        }}
+                                    />
+                                    {/* Pupil */}
+                                    <div
+                                        className="absolute bg-black rounded-full transition-all duration-700"
+                                        style={{
+                                            width: state === 'ALERT' ? '3px' : '6px',
+                                            height: state === 'SLEEPING' ? '0px' : state === 'ALERT' ? '12px' : '10px'
+                                        }}
+                                    />
+                                    {/* Specular highlight */}
+                                    {state !== 'SLEEPING' && (
+                                        <div className="absolute top-[6px] left-[6px] w-[3px] h-[3px] bg-white rounded-full opacity-80" />
+                                    )}
+                                </div>
+                                <div className="absolute top-8 right-[18px] w-7 h-7 bg-black rounded-full flex items-center justify-center">
+                                    <div
+                                        className="absolute inset-[-3px] rounded-full transition-all duration-700"
+                                        style={{
+                                            boxShadow: `0 0 ${state === 'ALERT' ? '25px 8px' : state === 'SLEEPING' ? '4px 1px' : '18px 5px'} ${currentSeason.eyeGlow}`,
+                                            opacity: state === 'SLEEPING' ? 0.3 : 1
+                                        }}
+                                    />
+                                    <div
+                                        className="w-5 rounded-full transition-all duration-700"
+                                        style={{
+                                            background: state === 'ALERT'
+                                                ? `radial-gradient(circle, #FF4444 30%, ${currentSeason.eyeColor} 70%, #8B0000)`
+                                                : state === 'SCANNING'
+                                                ? `radial-gradient(circle, #FFF8DC 20%, ${currentSeason.eyeColor} 60%, #B8860B)`
+                                                : state === 'SUCCESS'
+                                                ? `radial-gradient(circle, #FFFACD 20%, ${currentSeason.eyeColor} 60%, #CC8800)`
+                                                : state === 'SLEEPING'
+                                                ? `radial-gradient(circle, #7A9ABE 30%, ${currentSeason.eyeColor} 70%, #3A5A7E)`
+                                                : `radial-gradient(circle, #7FFFED 20%, ${currentSeason.eyeColor} 60%, #2A9D8F)`,
+                                            boxShadow: `0 0 12px 3px ${currentSeason.eyeGlow}, inset 0 0 6px rgba(255,255,255,0.3)`,
+                                            height: state === 'SLEEPING' ? '3px' : '18px'
+                                        }}
+                                    />
+                                    <div
+                                        className="absolute bg-black rounded-full transition-all duration-700"
+                                        style={{
+                                            width: state === 'ALERT' ? '3px' : '6px',
+                                            height: state === 'SLEEPING' ? '0px' : state === 'ALERT' ? '12px' : '10px'
+                                        }}
+                                    />
+                                    {state !== 'SLEEPING' && (
+                                        <div className="absolute top-[6px] left-[6px] w-[3px] h-[3px] bg-white rounded-full opacity-80" />
+                                    )}
+                                </div>
+
+                                {/* Beak */}
+                                <div className="absolute top-[45px] left-1/2 -translate-x-1/2 w-6 h-8 bg-gradient-to-b from-[#1a1a1a] to-black rounded-[0_0_10px_10px]" style={{ clipPath: 'polygon(0 0, 100% 0, 50% 100%)' }} />
+                            </div>
+
+                            {/* Talons */}
+                            <div className="absolute -bottom-3 left-8 w-8 h-6 bg-[#1a1a1a] rounded-[10px_10px_20px_20px] shadow-lg border-b-2 border-white/20" />
+                            <div className="absolute -bottom-3 right-8 w-8 h-6 bg-[#1a1a1a] rounded-[10px_10px_20px_20px] shadow-lg border-b-2 border-white/20" />
+
+                            {/* Scanning Beam */}
+                            {state === 'SCANNING' && interactionStep === 0 && (
+                                <div
+                                    className="absolute top-20 left-1/2 -translate-x-1/2 w-[1200px] h-[600px] pointer-events-none origin-top mix-blend-screen z-50"
+                                    style={{
+                                        background: `linear-gradient(to bottom, ${currentSeason.accent}33 0%, transparent 100%)`,
+                                        clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
+                                        animation: 'scanBeamSweep 6s ease-in-out infinite'
+                                    }}
+                                />
+                            )}
+
+                            {/* Sleep Zs */}
+                            {state === 'SLEEPING' && (
+                                <div className="absolute -top-10 right-0 text-[#93B4DC] font-bold text-lg opacity-70" style={{ animation: 'float 3s ease-in-out infinite' }}>
+                                    Z
+                                    <span className="absolute -top-4 right-4 text-sm" style={{ animation: 'float 3s ease-in-out infinite 0.5s' }}>z</span>
+                                    <span className="absolute -top-8 right-8 text-xs" style={{ animation: 'float 3s ease-in-out infinite 1s' }}>z</span>
+                                </div>
+                            )}
+
+                            {/* Peck shake */}
+                            {interactionStep === 3 && (
+                                <div className="absolute inset-0" style={{ animation: 'peck 0.3s ease-in-out 3' }} />
+                            )}
+
+                            {/* Energy Burst */}
+                            {interactionStep === 4 && (
+                                <div className="absolute top-1/2 left-1/2 w-0 h-0">
+                                    <div
+                                        className="absolute -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full animate-ping opacity-50 mix-blend-screen"
+                                        style={{ backgroundColor: currentSeason.accent }}
+                                    />
+                                    {[...Array(16)].map((_, i) => (
+                                        <div
+                                            key={i}
+                                            className="absolute w-1.5 h-1.5 rounded-full"
+                                            style={{
+                                                backgroundColor: i % 2 === 0 ? '#fff' : currentSeason.accent,
+                                                transform: `rotate(${i * 22.5}deg) translateY(-40px)`,
+                                                boxShadow: `0 0 10px ${currentSeason.accent}`,
+                                                animation: 'explode 0.8s ease-out forwards'
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* LAYER 4: BUGS (Organic glowing insects blended into scene) */}
+                    {/* CSS 3D perspective adds depth — bugs at different z-positions feel layered */}
+                    <div className="absolute inset-0 z-[30]" style={{ perspective: '1200px', perspectiveOrigin: '50% 40%' }}>
+                        {bugs.map((bug) => {
+                            const isCaught = catching?.id === bug.id;
+                            const isDissolving = isCaught && interactionStep >= 4;
+
+                            return (
+                                <div
+                                    key={bug.id}
+                                    onClick={() => catchBug(bug)}
+                                    className="absolute group cursor-pointer"
+                                    style={{
+                                        left: bug.x,
+                                        top: bug.y,
+                                        opacity: isDissolving ? 0 : (state === 'SLEEPING' ? 0.25 : 1),
+                                        /* 3D depth: translateZ places bugs at different planes,
+                                           parallax shifts them based on mouse + their depth */
+                                        transform: isDissolving
+                                            ? `translateZ(${bug.zDepth}px) scale(0) rotate(180deg)`
+                                            : `translateZ(${bug.zDepth}px) translate(${parallax.x * (bug.zDepth * 0.15)}px, ${parallax.y * (bug.zDepth * 0.08)}px) scale(1) rotate(0deg)`,
+                                        transition: 'opacity 0.5s, transform 0.3s ease-out',
+                                        transformOrigin: bug.hanging ? 'top center' : 'center',
+                                        transformStyle: 'preserve-3d',
+                                        animation: bug.hanging ? 'swing 4s ease-in-out infinite alternate' :
+                                                   bug.hover ? 'hovering 3s ease-in-out infinite alternate' :
+                                                   `float ${6 + Math.random()*4}s ease-in-out infinite alternate`
+                                    }}
+                                >
+                                    {/* Spider silk thread */}
+                                    {bug.hanging && (
+                                        <div className="absolute bottom-full left-1/2 w-[1px] h-24 -translate-x-1/2"
+                                            style={{
+                                                background: 'linear-gradient(to bottom, transparent, rgba(255,255,255,0.15), rgba(255,255,255,0.05))'
+                                            }}
+                                        />
+                                    )}
+
+                                    {/* Ambient glow - blends insect into the scene lighting */}
+                                    <div
+                                        className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-700 group-hover:scale-150"
+                                        style={{
+                                            width: '50px',
+                                            height: '50px',
+                                            background: `radial-gradient(circle, ${bug.glowColor}44 0%, ${bug.glowColor}11 50%, transparent 70%)`,
+                                            filter: 'blur(8px)',
+                                            opacity: state === 'SLEEPING' ? 0.15 : 0.6
+                                        }}
+                                    />
+
+                                    {/* Organic SVG insect body */}
+                                    <div className="relative transition-transform duration-300 group-hover:scale-125 group-hover:brightness-150"
+                                        style={{
+                                            filter: `drop-shadow(0 0 6px ${bug.glowColor}88) drop-shadow(0 0 12px ${bug.glowColor}33)`,
+                                            transform: 'translate(-50%, -50%)'
+                                        }}
+                                    >
+                                        <InsectBody bug={bug} accent={currentSeason.accent} />
+
+                                        {/* Tiny file icon centered on the insect body */}
+                                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                                            style={{ color: bug.glowColor, opacity: 0.7, filter: `drop-shadow(0 0 3px ${bug.glowColor})` }}>
+                                            {bug.icon}
+                                        </div>
+                                    </div>
+
+                                    {/* Trail particles behind the bug */}
+                                    <div className="absolute top-1/2 left-1/2 pointer-events-none">
+                                        {[0,1,2].map(i => (
+                                            <div key={i} className="absolute rounded-full"
+                                                style={{
+                                                    width: `${3-i}px`,
+                                                    height: `${3-i}px`,
+                                                    backgroundColor: bug.glowColor,
+                                                    left: `${-8 - i*6}px`,
+                                                    top: `${(i-1)*3}px`,
+                                                    opacity: 0.3 - i*0.1,
+                                                    filter: `blur(${1+i}px)`
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
+
+                                    {/* Hover label with organic connector line */}
+                                    <div className="absolute left-[60%] top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-400 pointer-events-none">
+                                        <div className="flex items-center">
+                                            <div className="w-12 h-[1px] origin-left" style={{ background: `linear-gradient(to right, ${bug.glowColor}66, ${bug.glowColor}22)` }} />
+                                            <div className="ml-1 w-1.5 h-1.5 rounded-full" style={{ backgroundColor: bug.glowColor, boxShadow: `0 0 4px ${bug.glowColor}` }} />
+                                            <div className="ml-2 text-[10px] text-white/90 font-bold whitespace-nowrap tracking-widest uppercase"
+                                                style={{ textShadow: `0 1px 6px rgba(0,0,0,0.95), 0 0 10px ${bug.glowColor}33` }}>
+                                                {bug.label}
+                                                <div className="text-[8px] font-normal tracking-wider" style={{ color: bug.glowColor, opacity: 0.7 }}>{bug.type}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* LAYER 5: HUD OVERLAY */}
+                    <div className="absolute inset-0 pointer-events-none z-[50] p-8 flex flex-col justify-between">
+                        {/* Top Row */}
+                        <div className="flex justify-between items-start w-full">
+                            <div className="text-white/40 text-[11px] tracking-[0.2em] uppercase leading-relaxed" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>
+                                <div>Files: <span className="text-white/80">1,287</span></div>
+                                <div>Scanned: <span style={{ color: currentSeason.accent }}>100%</span></div>
+                            </div>
+
+                            <div className="flex flex-col items-center">
+                                <div className="h-[1px] w-32 bg-gradient-to-r from-transparent via-white/30 to-transparent mb-2" />
+                                <div className="text-[10px] font-black text-white/90 tracking-[0.4em] uppercase" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>
+                                    <span className="text-white/50 mr-2">SYS.</span>{state}
+                                </div>
+                                <div className="text-[9px] text-white/40 tracking-widest mt-1 uppercase">{currentSeason.name}</div>
+                                <div className="h-[1px] w-16 bg-gradient-to-r from-transparent via-white/30 to-transparent mt-2" />
+                            </div>
+
+                            <div className="text-white/40 text-[11px] tracking-[0.2em] uppercase text-right leading-relaxed" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>
+                                <div>Sync: <span className="text-white/80">Active</span></div>
+                                <div>Uplink: <span style={{ color: currentSeason.accent }}>Stable</span></div>
+                            </div>
+                        </div>
+
+                        {/* Bottom Row */}
+                        <div className="flex justify-between items-end w-full pb-20">
+                            <div className="text-white/40 text-[11px] tracking-[0.2em] uppercase" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>
+                                Threats: <span className={state === 'ALERT' ? 'text-[#EF4444]' : 'text-white/80'}>
+                                    {state === 'ALERT' ? '1 DETECTED' : '0'}
+                                </span>
+                            </div>
+
+                            <div className="text-white/20 text-[10px] tracking-[0.3em] uppercase" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>
+                                [1-5] Seasons | [Click] Catch | [Move] Explore 3D
+                            </div>
+
+                            <div className="text-white/40 text-[11px] tracking-[0.2em] uppercase text-right" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>
+                                Mode: <span className="text-white/80">Monitoring</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* LAYER 6: STATE TRANSITION STRIP */}
+                    <div className="absolute bottom-0 left-0 right-0 h-20 bg-black/80 backdrop-blur-xl border-t border-white/10 flex items-center justify-center gap-4 px-8 z-[50]">
+                        {Object.keys(seasons).map((s) => (
+                            <button
+                                key={s}
+                                onClick={() => setState(s)}
+                                className={`relative w-40 h-12 rounded overflow-hidden border transition-all duration-300 cursor-pointer
+                                    ${state === s ? 'border-white/80 scale-105 shadow-[0_0_15px_rgba(255,255,255,0.2)]' : 'border-white/10 hover:border-white/40'}
+                                `}
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-b from-gray-900 to-gray-800 opacity-90" />
+                                <div className="absolute inset-0 flex items-center justify-center z-10 text-[9px] font-bold text-white/80 tracking-widest uppercase hover:text-white transition-colors pointer-events-none">
+                                    {seasons[s].name}
+                                </div>
+                                {state === s && (
+                                    <div className="absolute bottom-0 left-0 h-[2px] w-full" style={{ backgroundColor: seasons[s].accent }} />
+                                )}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Custom Cursor */}
+                    <div
+                        className="fixed pointer-events-none z-[1000] mix-blend-difference"
+                        style={{ left: mousePos.x, top: mousePos.y, transform: 'translate(-50%, -50%)' }}
+                    >
+                        <div className="w-5 h-5 border border-white/60 rounded-full flex items-center justify-center">
+                            <div className="w-[3px] h-[3px] bg-white rounded-full" />
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Lightning component for Alert state
+        const AlertLightning = () => {
+            const [flash, setFlash] = useState(false);
+
+            useEffect(() => {
+                const interval = setInterval(() => {
+                    setFlash(true);
+                    setTimeout(() => setFlash(false), 80);
+                    setTimeout(() => setFlash(true), 150);
+                    setTimeout(() => setFlash(false), 200);
+                }, 3000 + Math.random() * 2000);
+                return () => clearInterval(interval);
+            }, []);
+
+            return flash ? (
+                <div className="absolute inset-0 bg-white/40 pointer-events-none z-[2]" />
+            ) : null;
+        };
+
+        ReactDOM.render(<OwlWatcher />, document.getElementById('root'));
+    </script>
+</body>
+</html>
