@@ -95,6 +95,47 @@ Reusable task templates for game development including Unreal Engine, Unity, and
 
 ---
 
+## Blueprint Organization Cleanup (9-Tip Review)
+
+> Apply after building or before code review. See `skills/ue5-blueprint-organization/` for full details.
+
+### DRY — No Repeated Logic (Tip 1)
+- [ ] All repeated node patterns extracted to Functions
+- [ ] Cross-Blueprint shared logic uses Blueprint Function Libraries
+- [ ] Custom Events used for fire-and-forget / latent operations
+- [ ] Functions used where return values are needed
+
+### Comments & Readability (Tips 2-3)
+- [ ] Every complex section wrapped in a comment box (select nodes > press C)
+- [ ] Individual tricky nodes have right-click comments where needed
+- [ ] Comment boxes color-coded by system (blue=movement, red=combat, green=UI)
+- [ ] Reroute nodes used where wires would cross over nodes (double-click wire)
+
+### Node Efficiency (Tip 4)
+- [ ] Select nodes used instead of Branch/Switch where applicable
+- [ ] Validated Gets used instead of IsValid + Get chains (right-click > Convert to Validated Get)
+- [ ] Bool-to-Branch conversion used where possible (UE 5.7+)
+
+### Modular Architecture (Tips 5-6)
+- [ ] Logic split into ActorComponents, not monolithic Blueprints
+- [ ] Each component handles exactly one system (inventory, health, combat, etc.)
+- [ ] Player/Character BP only contains character-specific logic
+- [ ] Complex one-off sequences collapsed into subgraphs (select > right-click > Collapse)
+
+### Variable Organization (Tip 7)
+- [ ] All variables assigned to categories (Config, State, References, Combat, Movement, UI)
+- [ ] Variable names are descriptive (not Var1, TempBool, MyFloat)
+- [ ] Boolean variables prefixed with "b" (bIsAlive, bCanFire)
+
+### Layout & Formatting (Tips 8-9)
+- [ ] Nodes aligned using alignment tools (right-click > Alignment)
+- [ ] Graph reads left-to-right (execution flow direction)
+- [ ] Related nodes grouped visually
+- [ ] No "spaghetti" wire tangles remaining
+- [ ] (Optional) Blueprint Assist plugin used for auto-formatting (Fab marketplace)
+
+---
+
 ## Character / AI Agent
 
 ### Core Setup
