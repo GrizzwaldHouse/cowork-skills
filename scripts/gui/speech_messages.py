@@ -73,6 +73,30 @@ _MESSAGES: dict[str, list[str]] = {
         "Integrity verified!",
         "Clean sweep -- well done.",
     ],
+    "learning": [
+        "Studying session patterns...",
+        "Extracting knowledge...",
+        "Learning from this session.",
+        "Processing session artifacts...",
+    ],
+    "validating": [
+        "Checking skill quality...",
+        "Running validation gates...",
+        "Verifying architecture rules...",
+        "Scoring this skill...",
+    ],
+    "syncing": [
+        "Pushing to GitHub...",
+        "Syncing approved skills...",
+        "Updating the OpenModel...",
+        "Almost done syncing...",
+    ],
+    "refactoring": [
+        "Refactoring this skill for better quality...",
+        "Running the improvement loop now.",
+        "Analyzing dimensions and optimizing...",
+        "Applying targeted refinements.",
+    ],
 }
 
 # Rare messages (5% chance) -- keyed by state
@@ -102,6 +126,18 @@ _RARE_MESSAGES: dict[str, list[str]] = {
     ],
     "proud": [
         "Another day, another clean audit. I'm basically a superhero.",
+    ],
+    "learning": [
+        "I'm basically going to school right now.",
+    ],
+    "validating": [
+        "Trust, but verify. Especially skills.",
+    ],
+    "syncing": [
+        "git push --wisdom",
+    ],
+    "refactoring": [
+        "If at first you don't succeed... refactor, refactor again.",
     ],
 }
 

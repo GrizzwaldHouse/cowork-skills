@@ -37,6 +37,11 @@ class OwlState(str, Enum):
     ALERT = "alert"
     ALARM = "alarm"
     PROUD = "proud"
+    LEARNING = "learning"
+    EXTRACTING = "extracting"
+    VALIDATING = "validating"
+    SYNCING = "syncing"
+    REFACTORING = "refactoring"
 
 
 # ---------------------------------------------------------------------------
@@ -49,11 +54,17 @@ _TRANSITIONS: dict[OwlState, set[OwlState]] = {
     OwlState.SCANNING: {
         OwlState.CURIOUS, OwlState.ALERT, OwlState.ALARM,
         OwlState.PROUD, OwlState.IDLE, OwlState.SLEEPING,
+        OwlState.LEARNING,
     },
     OwlState.CURIOUS: {OwlState.SCANNING, OwlState.ALERT, OwlState.ALARM},
     OwlState.ALERT: {OwlState.SCANNING, OwlState.ALARM, OwlState.PROUD, OwlState.IDLE},
     OwlState.ALARM: {OwlState.ALERT, OwlState.SCANNING},
     OwlState.PROUD: {OwlState.SCANNING, OwlState.ALERT, OwlState.ALARM},
+    OwlState.LEARNING: {OwlState.EXTRACTING, OwlState.SCANNING, OwlState.ALERT},
+    OwlState.EXTRACTING: {OwlState.VALIDATING, OwlState.SCANNING, OwlState.ALERT},
+    OwlState.VALIDATING: {OwlState.SYNCING, OwlState.SCANNING, OwlState.ALERT, OwlState.REFACTORING},
+    OwlState.SYNCING: {OwlState.PROUD, OwlState.SCANNING, OwlState.ALERT},
+    OwlState.REFACTORING: {OwlState.VALIDATING, OwlState.SCANNING, OwlState.IDLE},
 }
 
 # Auto-return transitions: state -> (target, delay_ms)
@@ -62,6 +73,11 @@ _AUTO_TRANSITIONS: dict[OwlState, tuple[OwlState, int]] = {
     OwlState.CURIOUS: (OwlState.SCANNING, 5000),
     OwlState.PROUD: (OwlState.SCANNING, 4000),
     OwlState.ALARM: (OwlState.ALERT, 10000),
+    OwlState.LEARNING: (OwlState.EXTRACTING, 15000),
+    OwlState.EXTRACTING: (OwlState.VALIDATING, 30000),
+    OwlState.VALIDATING: (OwlState.SCANNING, 15000),
+    OwlState.SYNCING: (OwlState.SCANNING, 20000),
+    OwlState.REFACTORING: (OwlState.SCANNING, 60000),
 }
 
 
@@ -201,3 +217,58 @@ class OwlStateMachine(QObject):
             self._transition(OwlState.SLEEPING)
         elif self._state == OwlState.SCANNING:
             self._transition(OwlState.IDLE)
+
+    # ------------------------------------------------------------------
+    # Intelligence pipeline commands
+    # ------------------------------------------------------------------
+
+    def command_session_detected(self) -> None:
+        """Session activity detected -- begin learning."""
+        if self._state == OwlState.SCANNING:
+            self._transition(OwlState.LEARNING)
+
+    def command_extraction_started(self) -> None:
+        """Extraction started -- transition to extracting state."""
+        if self._state == OwlState.LEARNING:
+            self._transition(OwlState.EXTRACTING)
+
+    def command_skills_extracted(self) -> None:
+        """Skills extracted -- begin validation."""
+        if self._state == OwlState.EXTRACTING:
+            self._transition(OwlState.VALIDATING)
+        elif self._state == OwlState.LEARNING:
+            # Allow direct LEARNING -> EXTRACTING -> VALIDATING shortcut
+            if self._transition(OwlState.EXTRACTING):
+                self._transition(OwlState.VALIDATING)
+
+    def command_skills_approved(self) -> None:
+        """Skills approved -- begin syncing."""
+        if self._state == OwlState.VALIDATING:
+            self._transition(OwlState.SYNCING)
+
+    def command_sync_complete(self) -> None:
+        """Sync complete -- show pride."""
+        if self._state == OwlState.SYNCING:
+            self._transition(OwlState.PROUD)
+
+    def command_validation_failed(self) -> None:
+        """Validation failed -- alert."""
+        if self._state in (OwlState.LEARNING, OwlState.VALIDATING, OwlState.SYNCING):
+            self._transitions.setdefault(self._state, set()).add(OwlState.ALERT)
+            self._transition(OwlState.ALERT)
+
+    # ------------------------------------------------------------------
+    # Refactoring commands
+    # ------------------------------------------------------------------
+
+    def command_refactor_started(self) -> bool:
+        """Skill improvement loop initiated."""
+        return self._transition(OwlState.REFACTORING)
+
+    def command_refactor_complete(self) -> bool:
+        """Skill improvement succeeded."""
+        return self._transition(OwlState.VALIDATING)
+
+    def command_refactor_failed(self) -> bool:
+        """Skill improvement failed."""
+        return self._transition(OwlState.SCANNING)

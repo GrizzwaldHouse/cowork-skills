@@ -168,6 +168,136 @@ def cmd_rollback(timestamp: str) -> int:
     return 0
 
 
+def cmd_eval(skill_name: str) -> int:
+    """Run eval assertions against a skill and show results."""
+    from skill_eval_runner import EvalRunner, print_eval_summary
+
+    logger.info("Running eval for skill: %s", skill_name)
+
+    try:
+        runner = EvalRunner(skill_name)
+        report = runner.run()
+        print_eval_summary(report)
+        return 0 if report["summary"]["pass_rate"] >= 1.0 else 1
+    except FileNotFoundError as exc:
+        print(f"\nError: {exc}")
+        return 1
+    except Exception as exc:
+        logger.exception("Eval failed for '%s'", skill_name)
+        print(f"\nEval failed: {exc}")
+        return 1
+
+
+def cmd_self_improve(
+    skill_name: str,
+    max_iterations: int,
+    target_score: float,
+    resume: bool = False,
+    self_heal: bool = False,
+) -> int:
+    """Start the autonomous self-improvement loop for a skill."""
+    logger.info(
+        "Starting self-improvement for '%s' (max=%d, target=%.2f, resume=%s, heal=%s)",
+        skill_name,
+        max_iterations,
+        target_score,
+        resume,
+        self_heal,
+    )
+
+    try:
+        # Detect interrupted loop if --resume was specified
+        continuation = None
+        if resume:
+            from diff_continuation import DiffContinuationEngine
+
+            engine = DiffContinuationEngine(skill_name)
+            continuation = engine.detect_interrupted_loop()
+            if continuation:
+                print(f"Resuming from iteration {continuation.resume_iteration} "
+                      f"(score: {continuation.last_score:.2%}, "
+                      f"state: {continuation.skill_state})")
+            else:
+                print("No interrupted loop detected. Starting fresh.")
+
+        # Use self-healing wrapper if --self-heal was specified
+        if self_heal:
+            from self_healing_loop import SelfHealingLoop
+
+            loop = SelfHealingLoop(
+                skill_name=skill_name,
+                max_iterations=max_iterations,
+                target_score=target_score,
+            )
+            summary = loop.run(continuation=continuation)
+        else:
+            from skill_improver import SkillImprover
+
+            improver = SkillImprover(
+                skill_name=skill_name,
+                max_iterations=max_iterations,
+                target_score=target_score,
+            )
+            summary = improver.run_loop(continuation=continuation)
+
+        return 0 if summary.get("target_reached", False) else 1
+    except FileNotFoundError as exc:
+        print(f"\nError: {exc}")
+        return 1
+    except Exception as exc:
+        logger.exception("Self-improvement failed for '%s'", skill_name)
+        print(f"\nSelf-improvement failed: {exc}")
+        return 1
+
+
+def cmd_intelligence() -> int:
+    """Start the GUI with intelligence pipeline enabled."""
+    from gui.app import OwlWatcherApp, _parse_args, _check_single_instance
+    from PyQt6.QtWidgets import QApplication
+    import sys as _sys
+
+    _app_temp = QApplication.instance() or QApplication(_sys.argv)
+    shared_mem = _check_single_instance()
+    if shared_mem is None:
+        from PyQt6.QtWidgets import QMessageBox
+        QMessageBox.warning(None, "OwlWatcher", "Another instance is already running.")
+        return 1
+
+    # Create args with intelligence flag
+    args = _parse_args(["--visible"])
+    args.intelligence = True
+
+    owl_app = OwlWatcherApp(args)
+    owl_app._shared_mem = shared_mem
+    return owl_app.run()
+
+
+def cmd_agents() -> int:
+    """Start the multi-agent system in headless mode."""
+    from agent_runtime import AgentRuntime
+
+    logger.info("Starting multi-agent system...")
+
+    runtime = AgentRuntime()
+    runtime.bootstrap()
+    started = runtime.start()
+
+    print(runtime.get_status_summary())
+    print(f"\nAgents running: {', '.join(started)}")
+    print("Press Ctrl+C to stop.\n")
+
+    try:
+        import time
+        while runtime.is_running:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("\nShutting down agents...")
+        runtime.stop()
+        print("All agents stopped.")
+
+    return 0
+
+
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
@@ -186,6 +316,9 @@ def main() -> None:
             "  python main.py --github                # GitHub dry-run\n"
             "  python main.py --github --confirm      # GitHub push\n"
             "  python main.py --rollback 20260217T120000Z  # Restore backup\n"
+            "  python main.py --eval canva-designer   # Run eval assertions\n"
+            "  python main.py --self-improve canva-designer  # Self-improve loop\n"
+            "  python main.py --self-improve canva-designer --max-iterations 10\n"
         ),
     )
 
@@ -215,6 +348,26 @@ def main() -> None:
         metavar="TIMESTAMP",
         help="Restore files from a backup (e.g. 20260217T120000Z)",
     )
+    group.add_argument(
+        "--eval",
+        metavar="SKILL_NAME",
+        help="Run eval assertions against a skill and show results",
+    )
+    group.add_argument(
+        "--self-improve",
+        metavar="SKILL_NAME",
+        help="Start autonomous self-improvement loop for a skill",
+    )
+    group.add_argument(
+        "--intelligence",
+        action="store_true",
+        help="Start OwlWatcher with intelligence pipeline enabled",
+    )
+    group.add_argument(
+        "--agents",
+        action="store_true",
+        help="Start the multi-agent system (headless, no GUI)",
+    )
 
     parser.add_argument(
         "--confirm",
@@ -230,6 +383,28 @@ def main() -> None:
         "--tag",
         metavar="TAG",
         help="Create a git tag after push (used with --github --confirm)",
+    )
+    parser.add_argument(
+        "--max-iterations",
+        type=int,
+        default=50,
+        help="Max improvement iterations (used with --self-improve, default: 50)",
+    )
+    parser.add_argument(
+        "--target-score",
+        type=float,
+        default=1.0,
+        help="Target pass rate to stop at (used with --self-improve, default: 1.0)",
+    )
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="Resume interrupted self-improvement loop (used with --self-improve)",
+    )
+    parser.add_argument(
+        "--self-heal",
+        action="store_true",
+        help="Enable self-healing retry wrapper (used with --self-improve)",
     )
     parser.add_argument(
         "--verbose", "-v",
@@ -259,8 +434,22 @@ def main() -> None:
             skip_pull=args.skip_pull,
             tag=args.tag,
         ))
+    elif args.eval:
+        sys.exit(cmd_eval(args.eval))
+    elif args.self_improve:
+        sys.exit(cmd_self_improve(
+            skill_name=args.self_improve,
+            max_iterations=args.max_iterations,
+            target_score=args.target_score,
+            resume=args.resume,
+            self_heal=args.self_heal,
+        ))
     elif args.rollback:
         sys.exit(cmd_rollback(args.rollback))
+    elif args.intelligence:
+        sys.exit(cmd_intelligence())
+    elif args.agents:
+        sys.exit(cmd_agents())
 
 
 if __name__ == "__main__":

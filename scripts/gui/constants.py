@@ -152,6 +152,10 @@ STATE_SVG_MAP: dict[str, str] = {
     "alert": "owl_alert.svg",
     "alarm": "owl_alarm.svg",
     "proud": "owl_proud.svg",
+    "learning": "owl_curious.svg",
+    "validating": "owl_scanning.svg",
+    "syncing": "owl_proud.svg",
+    "refactoring": "owl_scanning.svg",
 }
 
 STATE_LABELS: dict[str, str] = {
@@ -163,6 +167,10 @@ STATE_LABELS: dict[str, str] = {
     "alert": "Changes detected",
     "alarm": "Security alert!",
     "proud": "All clear!",
+    "learning": "Learning patterns...",
+    "validating": "Validating skills...",
+    "syncing": "Syncing to GitHub...",
+    "refactoring": "Refactoring",
 }
 
 # ---------------------------------------------------------------------------
@@ -199,3 +207,20 @@ THREAT_WARNING_MULTIPLIER = 5      # Weight multiplier for warnings
 # ---------------------------------------------------------------------------
 QSETTINGS_ORG = "ClaudeSkills"
 QSETTINGS_APP = "OwlWatcher"
+
+# ---------------------------------------------------------------------------
+# Intelligence pipeline colors
+# ---------------------------------------------------------------------------
+INTEL_LEARNING_COLOR = "#7B68EE"    # Medium slate blue
+INTEL_VALIDATING_COLOR = "#20B2AA"  # Light sea green
+INTEL_SYNCING_COLOR = "#DAA520"     # Goldenrod
+INTEL_APPROVED_COLOR = "#32CD32"    # Lime green
+INTEL_REJECTED_COLOR = "#DC143C"    # Crimson
+INTEL_PENDING_COLOR = "#FF8C00"     # Dark orange
+INTEL_REFACTORING_COLOR = "#9B59B6"  # Purple
+
+# Intelligence thresholds
+INTEL_AUTO_APPROVE_THRESHOLD = 0.7
+INTEL_MIN_CONFIDENCE = 0.3
+INTEL_DEDUP_THRESHOLD = 0.85
+INTEL_MAX_SKILLS_PER_SESSION = 5

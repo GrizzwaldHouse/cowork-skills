@@ -321,10 +321,11 @@ class TestOwlStateMachine:
     """Test owl_state_machine.py state transitions."""
 
     def test_all_states_exist(self):
-        """Test all 8 owl states are defined in OwlState enum."""
+        """Test all 11 owl states are defined in OwlState enum."""
         expected_states = {
             "SLEEPING", "WAKING", "IDLE", "SCANNING",
             "CURIOUS", "ALERT", "ALARM", "PROUD",
+            "LEARNING", "VALIDATING", "SYNCING",
         }
 
         actual_states = {s.name for s in OwlState}
@@ -545,10 +546,11 @@ class TestConstants:
         assert len(constants.QSETTINGS_APP) > 0
 
     def test_state_svg_map_complete(self):
-        """Test STATE_SVG_MAP contains all 8 owl states."""
+        """Test STATE_SVG_MAP contains all 11 owl states."""
         expected_states = {
             "sleeping", "waking", "idle", "scanning",
             "curious", "alert", "alarm", "proud",
+            "learning", "validating", "syncing",
         }
 
         assert set(constants.STATE_SVG_MAP.keys()) == expected_states
@@ -577,3 +579,94 @@ class TestConstants:
 
         for attr in bubble_attrs:
             assert hasattr(constants, attr)
+
+
+# ---------------------------------------------------------------------------
+# Multi-agent pipeline integration tests
+# ---------------------------------------------------------------------------
+
+class TestAgentPipelineIntegration:
+    """Integration: full pipeline FileChangeEvent -> disposition routing."""
+
+    def test_file_event_to_extraction(self):
+        """EventBus routes FileChangeEvent to registered handlers."""
+        from scripts.agent_event_bus import EventBus
+        from scripts.agent_events import FileChangeEvent
+
+        bus = EventBus()
+        received = []
+        bus.subscribe(FileChangeEvent, received.append)
+        bus.publish(FileChangeEvent(
+            file_path="C:/ClaudeSkills/skills/test/SKILL.md",
+            event_type="modified",
+            project="test-project",
+        ))
+        assert len(received) == 1
+        assert received[0].project == "test-project"
+
+    def test_quality_scoring_disposition_routing(self):
+        """QualityScoringEngine routes to correct dispositions."""
+        from scripts.quality_scoring import QualityScoringEngine
+
+        engine = QualityScoringEngine()
+
+        # High-quality skill should be approved
+        good_skill = {
+            "skill_id": "test-good",
+            "name": "Universal Pattern",
+            "intent": "Apply universal coding patterns across any project",
+            "execution_logic": "Load config, parse input, apply transformation rules, validate output. " * 5,
+            "context": "Framework-agnostic, reusable, portable, cross-project",
+            "input_pattern": "source: Path, config: dict[str, Any], options: dict",
+            "constraints": ["Must be idempotent", "Must handle edge cases"],
+            "expected_output": "Transformed source following configured patterns",
+            "failure_modes": ["Invalid input format", "Config not found"],
+        }
+        report = engine.score(good_skill, {
+            "architecture_score": 0.95,
+            "security_score": 0.95,
+            "quality_score": 0.90,
+        })
+        assert report.disposition == "approved"
+
+        # Poor skill should be rejected
+        bad_skill = {
+            "skill_id": "test-bad",
+            "name": "x",
+            "intent": "y",
+            "execution_logic": "z",
+        }
+        report = engine.score(bad_skill, {
+            "architecture_score": 0.1,
+            "security_score": 0.1,
+            "quality_score": 0.1,
+        })
+        assert report.disposition == "rejected"
+
+    def test_event_types_frozen(self):
+        """All event dataclasses are immutable."""
+        from scripts.agent_events import (
+            FileChangeEvent, SkillExtractedEvent, SkillValidatedEvent,
+        )
+
+        event = FileChangeEvent(file_path="/test.py")
+        with pytest.raises(AttributeError):
+            event.file_path = "/other.py"
+
+    def test_agent_runtime_bootstrap(self):
+        """AgentRuntime can bootstrap all agents."""
+        from scripts.agent_runtime import AgentRuntime
+        from scripts.agent_protocol import AgentStatus
+
+        runtime = AgentRuntime()
+        runtime.bootstrap()
+
+        infos = runtime.get_status()
+        assert len(infos) == 4
+        assert all(i.status == AgentStatus.CONFIGURED for i in infos)
+
+        agent_names = {i.name for i in infos}
+        assert "extractor-agent" in agent_names
+        assert "validator-agent" in agent_names
+        assert "refactor-agent" in agent_names
+        assert "sync-agent" in agent_names

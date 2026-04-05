@@ -1,0 +1,86 @@
+{
+    "quality_scoring": {
+        "weights": {
+            "architecture": 0.20,
+            "security": 0.25,
+            "quality": 0.15,
+            "reusability": 0.25,
+            "completeness": 0.15
+        },
+        "dispositions": {
+            "approved": 0.80,
+            "needs_refactor": 0.50,
+            "needs_review": 0.40,
+            "rejected": 0.0
+        },
+        "reusability": {
+            "deduction_per_indicator": 0.15,
+            "bonus_per_indicator": 0.05,
+            "max_bonus": 0.15,
+            "project_specific_indicators": [
+                "this repo only",
+                "only for this project",
+                "specific to this codebase",
+                "hardcoded for",
+                "works only with"
+            ],
+            "hardcoded_path_patterns": [
+                "C:\\\\Users\\\\[^\\\\]+\\\\(?!.claude)",
+                "/home/[^/]+/(?!.claude)",
+                "/Users/[^/]+/(?!.claude)"
+            ],
+            "allowed_path_prefixes": [
+                "C:/ClaudeSkills",
+                "C:\\ClaudeSkills",
+                "~/.claude"
+            ],
+            "reusable_indicators": [
+                "universal",
+                "any project",
+                "cross-project",
+                "framework-agnostic",
+                "language-agnostic",
+                "reusable",
+                "portable",
+                "configurable"
+            ]
+        },
+        "completeness": {
+            "required_sections": {
+                "intent": {"min_chars": 20, "weight": 0.20},
+                "execution_logic": {"min_chars": 100, "weight": 0.30},
+                "constraints": {"min_items": 1, "weight": 0.20},
+                "expected_output": {"min_chars": 20, "weight": 0.15},
+                "failure_modes": {"min_items": 1, "weight": 0.15}
+            }
+        }
+    },
+    "improvement": {
+        "cooldown_seconds": 300,
+        "max_consecutive_failures": 3,
+        "max_iterations_per_run": 10,
+        "target_score": 0.80,
+        "regression_tolerance": 0.0
+    },
+    "agents": {
+        "extractor": {
+            "name": "extractor-agent",
+            "type": "extractor"
+        },
+        "validator": {
+            "name": "validator-agent",
+            "type": "validator"
+        },
+        "refactor": {
+            "name": "refactor-agent",
+            "type": "refactor"
+        },
+        "sync": {
+            "name": "sync-agent",
+            "type": "sync"
+        }
+    },
+    "event_bus": {
+        "audit_log_capacity": 1000
+    }
+}

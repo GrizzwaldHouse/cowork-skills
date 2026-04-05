@@ -1,0 +1,61 @@
+{
+    "skill_id": "multi-agent-pipeline",
+    "name": "Multi-Agent Pipeline Framework",
+    "version": "1.0.0",
+    "author": "Marcus Daley",
+    "created": "2026-04-05",
+    "category": "architecture",
+    "tags": [
+        "multi-agent",
+        "event-driven",
+        "quality-scoring",
+        "self-improvement",
+        "orchestration",
+        "pipeline",
+        "observer-pattern",
+        "immutable-events",
+        "typed-communication",
+        "parallel-execution"
+    ],
+    "security_classification": "internal",
+    "reuse_frequency": "high",
+    "confidence_score": 0.95,
+    "dependencies": [
+        "PyQt6"
+    ],
+    "files": [
+        "scripts/agent_events.py",
+        "scripts/agent_protocol.py",
+        "scripts/agent_base.py",
+        "scripts/agent_event_bus.py",
+        "scripts/agent_registry.py",
+        "scripts/quality_scoring.py",
+        "scripts/improvement_tracker.py",
+        "scripts/agent_runtime.py",
+        "scripts/agents/__init__.py",
+        "scripts/agents/extractor_agent.py",
+        "scripts/agents/validator_agent.py",
+        "scripts/agents/refactor_agent.py",
+        "scripts/agents/sync_agent.py",
+        "config/agent_config.json"
+    ],
+    "test_files": [
+        "tests/test_agent_event_bus.py",
+        "tests/test_quality_scoring.py",
+        "tests/test_improvement_tracker.py",
+        "tests/test_agent_lifecycle.py"
+    ],
+    "description": "Production-grade, event-driven multi-agent execution framework that enforces strict quality gates, parallel execution, and multi-layer validation. Eliminates low-quality outputs through mandatory cross-review, supervisor validation, and automated self-improvement loops.",
+    "keywords": [
+        "agent-protocol",
+        "event-bus",
+        "quality-gates",
+        "self-healing",
+        "regression-prevention",
+        "cooldown-enforcement",
+        "typed-events",
+        "lifecycle-management",
+        "thread-safe",
+        "fail-safe"
+    ]
+}
