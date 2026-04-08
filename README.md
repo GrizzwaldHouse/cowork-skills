@@ -127,6 +127,30 @@ Pre-built task checklists for common workflows:
 
 **Task templates** are reference checklists. Copy the relevant section into your project or reference them when planning work.
 
+## Multi-Agent System
+
+The `scripts/` directory contains a Python-based multi-agent runtime that coordinates specialized agents (extractor, validator, refactor, sync, pruner) over a shared typed event bus. Agents communicate via `EventBus.publish` with handler-level exception isolation so one bad handler can't stall the pipeline.
+
+Security-sensitive components are covered by unit tests in `tests/`:
+
+| Component | File | Tests | Purpose |
+|---|---|---|---|
+| EventBus | `scripts/agent_event_bus.py` | `tests/test_agent_event_bus.py` | Typed pub/sub with RLock + snapshot dispatch |
+| SkillIsolator | `scripts/skill_isolator.py` | `tests/test_skill_isolator.py` (93 tests) | Per-agent skill manifest writer with strict path-traversal validation (CWE-22/41/66) |
+| Extractor agent | `scripts/agents/extractor_agent.py` | `tests/test_extractor_agent.py` | Skill extraction pipeline |
+| Validator agent | `scripts/agents/validator_agent.py` | `tests/test_validator_agent.py` | Skill validation against security rules |
+| Sandbox manager | `scripts/testing/sandbox_manager.py` | `tests/test_sandbox_manager.py` | Process isolation for untrusted code |
+
+Run the security-critical SkillIsolator tests directly:
+```bash
+py -3 tests/test_skill_isolator.py   # 93 assertions, path-traversal + TOCTOU hardening
+```
+
+Run the pytest-based tests:
+```bash
+py -3 -m pytest tests/test_agent_event_bus.py tests/test_sandbox_manager.py
+```
+
 ## Structure
 
 ```
@@ -142,6 +166,13 @@ cowork-skills/
     desktop-ui-designer/                # PyQt6/PySide6 desktop app patterns
     pyqt6-ui-debugger/                  # PyQt6 layout & widget debugging
     python-code-reviewer/               # Python standards compliance review
+  scripts/
+    agent_event_bus.py                  # Typed pub/sub for inter-agent communication
+    agent_events.py                     # Event dataclasses
+    agent_runtime.py                    # Agent orchestration
+    skill_isolator.py                   # Per-agent skill manifests (path-traversal hardened)
+    agents/                             # Extractor, validator, refactor, sync, pruner agents
+  tests/                                # Unit and security tests (pytest + standalone scripts)
   tasks/
     app-development/      # Feature dev, bug fix, UI upgrade, API, deploy
     ai-workflows/         # Design gen, doc creation, prompt eng, safety
