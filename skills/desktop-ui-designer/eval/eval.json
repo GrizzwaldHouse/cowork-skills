@@ -1,0 +1,166 @@
+{
+  "skill_name": "desktop-ui-designer",
+  "version": "1.0.0",
+  "test_cases": [
+    {
+      "id": 1,
+      "prompt": "Create a main window for a file manager application with a sidebar, toolbar, and file list view. It should support dark and light themes.",
+      "expected_output": "PyQt6 main window implementation following MVC pattern with signals/slots",
+      "assertions": [
+        {
+          "id": "signals_slots_used",
+          "check": "Output uses pyqtSignal declarations and .connect() for inter-component communication instead of polling or QTimer-based checks",
+          "category": "structure"
+        },
+        {
+          "id": "property_for_state",
+          "check": "Output uses @property decorators for read-only state access rather than directly exposing public mutable attributes",
+          "category": "compliance"
+        },
+        {
+          "id": "layout_managers_used",
+          "check": "Output uses QVBoxLayout, QHBoxLayout, or QGridLayout for widget positioning instead of absolute positioning (setGeometry)",
+          "category": "structure"
+        },
+        {
+          "id": "super_init_called",
+          "check": "Output calls super().__init__() in custom widget or window constructors",
+          "category": "compliance"
+        },
+        {
+          "id": "type_hints_on_public",
+          "check": "Output includes return type annotations (-> None, -> str, -> int, etc.) on public methods",
+          "category": "quality"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Create a settings dialog with fields for username, password, server URL, and connection timeout. Include validation and an apply button.",
+      "expected_output": "Modal dialog implementation with validation and signal-based result communication",
+      "assertions": [
+        {
+          "id": "modal_dialog",
+          "check": "Output creates a QDialog subclass with setModal(True) or uses exec() for modal behavior",
+          "category": "structure"
+        },
+        {
+          "id": "validation_present",
+          "check": "Output includes input validation logic (checking empty fields, URL format, or timeout range) before accepting settings",
+          "category": "content"
+        },
+        {
+          "id": "signal_for_result",
+          "check": "Output uses a pyqtSignal to communicate changed settings to the parent rather than direct parent method calls",
+          "category": "compliance"
+        },
+        {
+          "id": "no_magic_numbers",
+          "check": "Output defines named constants (class-level or module-level) for default values like timeout ranges, minimum lengths, or port numbers instead of inline magic numbers",
+          "category": "compliance"
+        },
+        {
+          "id": "private_attributes",
+          "check": "Output uses underscore-prefixed private attributes (self._username, self._timeout) rather than bare public attributes (self.username, self.timeout)",
+          "category": "compliance"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Create a custom circular progress widget that shows download progress with smooth animation and color transitions.",
+      "expected_output": "Custom QWidget with QPropertyAnimation and paintEvent override",
+      "assertions": [
+        {
+          "id": "paint_event_override",
+          "check": "Output overrides paintEvent() to perform custom rendering with QPainter",
+          "category": "structure"
+        },
+        {
+          "id": "animation_used",
+          "check": "Output uses QPropertyAnimation or QEasingCurve for smooth value transitions rather than instant value changes",
+          "category": "structure"
+        },
+        {
+          "id": "value_changed_signal",
+          "check": "Output declares a pyqtSignal (e.g., value_changed or progress_changed) that emits when the progress value changes",
+          "category": "compliance"
+        },
+        {
+          "id": "controlled_mutation",
+          "check": "Output provides a public method (e.g., set_value, set_progress) for changing the value rather than allowing direct attribute assignment",
+          "category": "compliance"
+        },
+        {
+          "id": "size_hint_or_minimum",
+          "check": "Output sets a sizeHint(), minimumSize(), or setMinimumSize() to ensure the widget renders at a reasonable default size",
+          "category": "quality"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Create a system tray application that monitors clipboard changes and shows notifications when new URLs are copied.",
+      "expected_output": "QSystemTrayIcon-based application with clipboard monitoring and notifications",
+      "assertions": [
+        {
+          "id": "system_tray_icon",
+          "check": "Output creates or uses QSystemTrayIcon for the tray icon",
+          "category": "structure"
+        },
+        {
+          "id": "context_menu",
+          "check": "Output creates a QMenu with context menu actions for the tray icon (at minimum a quit/exit action)",
+          "category": "content"
+        },
+        {
+          "id": "clipboard_signal",
+          "check": "Output connects to QApplication.clipboard().dataChanged signal rather than polling the clipboard with a timer",
+          "category": "compliance"
+        },
+        {
+          "id": "notification_method",
+          "check": "Output uses showMessage() on the QSystemTrayIcon for displaying notifications to the user",
+          "category": "structure"
+        },
+        {
+          "id": "availability_check",
+          "check": "Output checks QSystemTrayIcon.isSystemTrayAvailable() before attempting to create the tray icon",
+          "category": "quality"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Create a themed button component with hover animation, configurable colors, and click ripple effect for a design tool application.",
+      "expected_output": "Custom QPushButton subclass with animation and theming support",
+      "assertions": [
+        {
+          "id": "enter_leave_events",
+          "check": "Output overrides enterEvent and leaveEvent (or installEventFilter) to trigger hover animations",
+          "category": "structure"
+        },
+        {
+          "id": "color_constants",
+          "check": "Output defines color values as class-level constants or configurable constructor parameters rather than inline hex strings in methods",
+          "category": "compliance"
+        },
+        {
+          "id": "animation_system",
+          "check": "Output uses QPropertyAnimation for color or size transitions rather than instant style changes",
+          "category": "structure"
+        },
+        {
+          "id": "stylesheet_or_paint",
+          "check": "Output uses either setStyleSheet() with dynamic values or overrides paintEvent() for custom rendering",
+          "category": "content"
+        },
+        {
+          "id": "file_header",
+          "check": "Output includes a file header comment with developer name, date, and purpose",
+          "category": "compliance"
+        }
+      ]
+    }
+  ]
+}

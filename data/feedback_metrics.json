@@ -1,0 +1,18 @@
+{
+  "global": {
+    "total_cycles": 10,
+    "total_extracted": 0,
+    "total_validated": 0,
+    "total_approved": 0,
+    "total_rejected": 0,
+    "total_refactored": 0,
+    "total_synced": 1,
+    "refactor_failures": 0,
+    "avg_quality_score": 0.0,
+    "rejection_rate": 0.0,
+    "auto_refactor_success_rate": 0.0,
+    "rolling_scores": []
+  },
+  "skills": {},
+  "last_updated": "2026-04-05T21:23:56.149234+00:00"
+}

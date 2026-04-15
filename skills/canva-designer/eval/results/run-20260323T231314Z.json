@@ -1,0 +1,422 @@
+{
+  "skill_name": "canva-designer",
+  "timestamp": "20260323T231314Z",
+  "eval_version": "1.0.0",
+  "summary": {
+    "total_assertions": 25,
+    "total_passed": 0,
+    "pass_rate": 0.0,
+    "total_test_cases": 5,
+    "category_breakdown": {
+      "compliance": {
+        "passed": 0,
+        "total": 3,
+        "rate": 0.0
+      },
+      "content": {
+        "passed": 0,
+        "total": 5,
+        "rate": 0.0
+      },
+      "quality": {
+        "passed": 0,
+        "total": 6,
+        "rate": 0.0
+      },
+      "structure": {
+        "passed": 0,
+        "total": 11,
+        "rate": 0.0
+      }
+    }
+  },
+  "failed_assertions": [
+    {
+      "case_id": 1,
+      "assertion_id": "style_direction",
+      "check": "Output includes an explicit style direction (e.g., 'minimalist', 'bold', 'modern', 'elegant', 'premium')",
+      "category": "structure",
+      "evidence": "Test case execution failed"
+    },
+    {
+      "case_id": 1,
+      "assertion_id": "color_specified",
+      "check": "Output includes at least one specific hex color code or named color palette",
+      "category": "structure",
+      "evidence": "Test case execution failed"
+    },
+    {
+      "case_id": 1,
+      "assertion_id": "audience_mentioned",
+      "check": "Output specifies a target audience (e.g., 'tech executives', 'CTOs', 'engineering leaders')",
+      "category": "content",
+      "evidence": "Test case execution failed"
+    },
+    {
+      "case_id": 1,
+      "assertion_id": "no_vague_query",
+      "check": "Output does NOT contain vague phrases like 'make it nice', 'create a good design', or 'make it look professional' without further specifics",
+      "category": "quality",
+      "evidence": "Test case execution failed"
+    },
+    {
+      "case_id": 1,
+      "assertion_id": "whitespace_mentioned",
+      "check": "Output mentions whitespace, spacing, clean layout, or breathing room in the design",
+      "category": "structure",
+      "evidence": "Test case execution failed"
+    },
+    {
+      "case_id": 2,
+      "assertion_id": "outline_review_first",
+      "check": "Output recommends or uses request-outline-review before generate-design-structured, or explicitly mentions reviewing the outline first",
+      "category": "structure",
+      "evidence": "Test case execution failed"
+    },
+    {
+      "case_id": 2,
+      "assertion_id": "audience_specified",
+      "check": "Output specifies the audience role and knowledge level (e.g., 'board members', 'C-suite', 'executives familiar with SaaS metrics')",
+      "category": "content",
+      "evidence": "Test case execution failed"
+    },
+    {
+      "case_id": 2,
+      "assertion_id": "one_idea_per_slide",
+      "check": "Output follows the one-idea-per-slide principle or explicitly states each slide should have a single key message",
+      "category": "structure",
+      "evidence": "Test case execution failed"
+    },
+    {
+      "case_id": 2,
+      "assertion_id": "slide_length_specified",
+      "check": "Output specifies or recommends a length category ('short', 'balanced', 'long') or mentions a specific slide count range",
+      "category": "structure",
+      "evidence": "Test case execution failed"
+    },
+    {
+      "case_id": 2,
+      "assertion_id": "topic_specific",
+      "check": "The topic description is specific (references Q4, revenue, SaaS, board) rather than generic like 'quarterly update'",
+      "category": "quality",
+      "evidence": "Test case execution failed"
+    },
+    {
+      "case_id": 3,
+      "assertion_id": "multiple_candidates",
+      "check": "Output suggests generating multiple candidates or variations (e.g., 'generate 4 candidates', 'create several options')",
+      "category": "structure",
+      "evidence": "Test case execution failed"
+    },
+    {
+      "case_id": 3,
+      "assertion_id": "scalability_mentioned",
+      "check": "Output mentions scalability, works at different sizes, favicon compatibility, or readability at small sizes",
+      "category": "quality",
+      "evidence": "Test case execution failed"
+    },
+    {
+      "case_id": 3,
+      "assertion_id": "color_direction",
+      "check": "Output includes specific color guidance with hex codes or a described palette mood (not just 'use nice colors')",
+      "category": "structure",
+      "evidence": "Test case execution failed"
+    },
+    {
+      "case_id": 3,
+      "assertion_id": "style_clear",
+      "check": "Output includes a clear style direction appropriate for fintech (e.g., 'modern', 'trustworthy', 'clean', 'professional')",
+      "category": "content",
+      "evidence": "Test case execution failed"
+    },
+    {
+      "case_id": 3,
+      "assertion_id": "design_type_logo",
+      "check": "Output correctly identifies the design_type as 'logo' or uses the appropriate Canva tool for logo generation",
+      "category": "compliance",
+      "evidence": "Test case execution failed"
+    },
+    {
+      "case_id": 4,
+      "assertion_id": "text_hierarchy",
+      "check": "Output specifies text hierarchy with different sizes or emphasis levels (headline, subtitle, details)",
+      "category": "structure",
+      "evidence": "Test case execution failed"
+    },
+    {
+      "case_id": 4,
+      "assertion_id": "layout_intent",
+      "check": "Output describes specific layout intent (e.g., 'hero image at top', 'centered headline', 'details at bottom') rather than just 'a poster'",
+      "category": "structure",
+      "evidence": "Test case execution failed"
+    },
+    {
+      "case_id": 4,
+      "assertion_id": "event_details_included",
+      "check": "Output includes the event name ('CodeJam 2026') and dates (March 15-16) in the design plan",
+      "category": "content",
+      "evidence": "Test case execution failed"
+    },
+    {
+      "case_id": 4,
+      "assertion_id": "no_placeholder_text",
+      "check": "Output does NOT include or suggest placeholder text like 'Lorem ipsum', 'Your text here', or 'Event Name Here'",
+      "category": "quality",
+      "evidence": "Test case execution failed"
+    },
+    {
+      "case_id": 4,
+      "assertion_id": "dimensions_or_format",
+      "check": "Output specifies physical dimensions, poster format, or intended display context (print size, digital display)",
+      "category": "compliance",
+      "evidence": "Test case execution failed"
+    },
+    {
+      "case_id": 5,
+      "assertion_id": "platform_specific",
+      "check": "Output specifies Instagram-specific dimensions (1080x1080, 1080x1350) or mentions platform constraints",
+      "category": "compliance",
+      "evidence": "Test case execution failed"
+    },
+    {
+      "case_id": 5,
+      "assertion_id": "cohesive_visual",
+      "check": "Output ensures visual cohesion across slides (consistent colors, fonts, or template across all 5 slides)",
+      "category": "quality",
+      "evidence": "Test case execution failed"
+    },
+    {
+      "case_id": 5,
+      "assertion_id": "color_max_three",
+      "check": "Output limits the color palette to 3 primary colors plus neutrals, or describes a cohesive limited palette",
+      "category": "structure",
+      "evidence": "Test case execution failed"
+    },
+    {
+      "case_id": 5,
+      "assertion_id": "content_per_slide",
+      "check": "Output describes specific content for each slide or tip rather than treating all 5 as identical",
+      "category": "content",
+      "evidence": "Test case execution failed"
+    },
+    {
+      "case_id": 5,
+      "assertion_id": "readability_considered",
+      "check": "Output mentions text readability, contrast, font size for mobile viewing, or avoiding text overlapping images",
+      "category": "quality",
+      "evidence": "Test case execution failed"
+    }
+  ],
+  "test_cases": [
+    {
+      "case_id": 1,
+      "prompt": "Create a LinkedIn post announcement for a new AI product launch targeting tech executives",
+      "output": "[ERROR: subprocess failed or timed out]",
+      "assertion_results": [
+        {
+          "assertion_id": "style_direction",
+          "check": "Output includes an explicit style direction (e.g., 'minimalist', 'bold', 'modern', 'elegant', 'premium')",
+          "category": "structure",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        },
+        {
+          "assertion_id": "color_specified",
+          "check": "Output includes at least one specific hex color code or named color palette",
+          "category": "structure",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        },
+        {
+          "assertion_id": "audience_mentioned",
+          "check": "Output specifies a target audience (e.g., 'tech executives', 'CTOs', 'engineering leaders')",
+          "category": "content",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        },
+        {
+          "assertion_id": "no_vague_query",
+          "check": "Output does NOT contain vague phrases like 'make it nice', 'create a good design', or 'make it look professional' without further specifics",
+          "category": "quality",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        },
+        {
+          "assertion_id": "whitespace_mentioned",
+          "check": "Output mentions whitespace, spacing, clean layout, or breathing room in the design",
+          "category": "structure",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        }
+      ]
+    },
+    {
+      "case_id": 2,
+      "prompt": "Generate a 10-slide presentation deck for a Q4 board meeting about SaaS revenue growth",
+      "output": "[ERROR: subprocess failed or timed out]",
+      "assertion_results": [
+        {
+          "assertion_id": "outline_review_first",
+          "check": "Output recommends or uses request-outline-review before generate-design-structured, or explicitly mentions reviewing the outline first",
+          "category": "structure",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        },
+        {
+          "assertion_id": "audience_specified",
+          "check": "Output specifies the audience role and knowledge level (e.g., 'board members', 'C-suite', 'executives familiar with SaaS metrics')",
+          "category": "content",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        },
+        {
+          "assertion_id": "one_idea_per_slide",
+          "check": "Output follows the one-idea-per-slide principle or explicitly states each slide should have a single key message",
+          "category": "structure",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        },
+        {
+          "assertion_id": "slide_length_specified",
+          "check": "Output specifies or recommends a length category ('short', 'balanced', 'long') or mentions a specific slide count range",
+          "category": "structure",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        },
+        {
+          "assertion_id": "topic_specific",
+          "check": "The topic description is specific (references Q4, revenue, SaaS, board) rather than generic like 'quarterly update'",
+          "category": "quality",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        }
+      ]
+    },
+    {
+      "case_id": 3,
+      "prompt": "Design a logo for a fintech startup called 'NovaPay' that handles digital payments",
+      "output": "[ERROR: subprocess failed or timed out]",
+      "assertion_results": [
+        {
+          "assertion_id": "multiple_candidates",
+          "check": "Output suggests generating multiple candidates or variations (e.g., 'generate 4 candidates', 'create several options')",
+          "category": "structure",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        },
+        {
+          "assertion_id": "scalability_mentioned",
+          "check": "Output mentions scalability, works at different sizes, favicon compatibility, or readability at small sizes",
+          "category": "quality",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        },
+        {
+          "assertion_id": "color_direction",
+          "check": "Output includes specific color guidance with hex codes or a described palette mood (not just 'use nice colors')",
+          "category": "structure",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        },
+        {
+          "assertion_id": "style_clear",
+          "check": "Output includes a clear style direction appropriate for fintech (e.g., 'modern', 'trustworthy', 'clean', 'professional')",
+          "category": "content",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        },
+        {
+          "assertion_id": "design_type_logo",
+          "check": "Output correctly identifies the design_type as 'logo' or uses the appropriate Canva tool for logo generation",
+          "category": "compliance",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        }
+      ]
+    },
+    {
+      "case_id": 4,
+      "prompt": "Create a poster for a university hackathon event called 'CodeJam 2026' happening March 15-16",
+      "output": "[ERROR: subprocess failed or timed out]",
+      "assertion_results": [
+        {
+          "assertion_id": "text_hierarchy",
+          "check": "Output specifies text hierarchy with different sizes or emphasis levels (headline, subtitle, details)",
+          "category": "structure",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        },
+        {
+          "assertion_id": "layout_intent",
+          "check": "Output describes specific layout intent (e.g., 'hero image at top', 'centered headline', 'details at bottom') rather than just 'a poster'",
+          "category": "structure",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        },
+        {
+          "assertion_id": "event_details_included",
+          "check": "Output includes the event name ('CodeJam 2026') and dates (March 15-16) in the design plan",
+          "category": "content",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        },
+        {
+          "assertion_id": "no_placeholder_text",
+          "check": "Output does NOT include or suggest placeholder text like 'Lorem ipsum', 'Your text here', or 'Event Name Here'",
+          "category": "quality",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        },
+        {
+          "assertion_id": "dimensions_or_format",
+          "check": "Output specifies physical dimensions, poster format, or intended display context (print size, digital display)",
+          "category": "compliance",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        }
+      ]
+    },
+    {
+      "case_id": 5,
+      "prompt": "Create an Instagram carousel (5 slides) about '5 Tips for Remote Work Productivity' for a lifestyle brand",
+      "output": "[ERROR: subprocess failed or timed out]",
+      "assertion_results": [
+        {
+          "assertion_id": "platform_specific",
+          "check": "Output specifies Instagram-specific dimensions (1080x1080, 1080x1350) or mentions platform constraints",
+          "category": "compliance",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        },
+        {
+          "assertion_id": "cohesive_visual",
+          "check": "Output ensures visual cohesion across slides (consistent colors, fonts, or template across all 5 slides)",
+          "category": "quality",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        },
+        {
+          "assertion_id": "color_max_three",
+          "check": "Output limits the color palette to 3 primary colors plus neutrals, or describes a cohesive limited palette",
+          "category": "structure",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        },
+        {
+          "assertion_id": "content_per_slide",
+          "check": "Output describes specific content for each slide or tip rather than treating all 5 as identical",
+          "category": "content",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        },
+        {
+          "assertion_id": "readability_considered",
+          "check": "Output mentions text readability, contrast, font size for mobile viewing, or avoiding text overlapping images",
+          "category": "quality",
+          "passed": false,
+          "evidence": "Test case execution failed"
+        }
+      ]
+    }
+  ]
+}

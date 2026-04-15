@@ -298,6 +298,139 @@ def cmd_agents() -> int:
     return 0
 
 
+def cmd_prune(
+    load_bundle: str | None = None,
+    unload_bundle: str | None = None,
+    show_status: bool = False,
+    reset: bool = False,
+) -> int:
+    """Run a pruning operation against the skill registry."""
+    import json as _json
+    import shutil as _shutil
+    from pathlib import Path as _Path
+
+    pruner_config_path = BASE_DIR / "config" / "pruner_config.json"
+    if not pruner_config_path.exists():
+        print(f"Error: pruner config not found at {pruner_config_path}")
+        return 1
+
+    try:
+        pcfg = _json.loads(pruner_config_path.read_text(encoding="utf-8"))
+    except _json.JSONDecodeError as exc:
+        print(f"Error: invalid pruner config: {exc}")
+        return 1
+
+    active_dir = _Path(pcfg["active_skills_dir"])
+    source_dir = _Path(pcfg["source_skills_dir"])
+    temp_dir = _Path(pcfg["temp_cache_dir"])
+    registry_path = _Path(pcfg["registry_path"])
+    max_active = int(pcfg.get("max_active_skills", 15))
+
+    # --status: print registry summary
+    if show_status:
+        registry: dict = {}
+        if registry_path.exists():
+            try:
+                registry = _json.loads(registry_path.read_text(encoding="utf-8"))
+            except _json.JSONDecodeError:
+                pass
+        active = sorted(p.name for p in active_dir.iterdir()) if active_dir.exists() else []
+        cached = sorted(p.name for p in temp_dir.iterdir()) if temp_dir.exists() else []
+        source = sorted(p.name for p in source_dir.iterdir()) if source_dir.exists() else []
+
+        print("Skill Registry Status")
+        print("=" * 40)
+        print(f"  Max active: {max_active}")
+        print(f"  Active:     {len(active)} / {max_active}")
+        print(f"  Cached:     {len(cached)}")
+        print(f"  Source:     {len(source)}")
+        print(f"  Cataloged:  {len(registry.get('skills', {}))}")
+        print(f"  Last updated: {registry.get('last_updated', '(never)')}")
+        print()
+        print("Active skills:")
+        for name in active:
+            print(f"  - {name}")
+        return 0
+
+    # --reset: restore everything from source
+    if reset:
+        if not source_dir.exists():
+            print(f"Error: source dir missing: {source_dir}")
+            return 1
+        active_dir.mkdir(parents=True, exist_ok=True)
+        restored = 0
+        for entry in source_dir.iterdir():
+            target = active_dir / entry.name
+            if target.exists():
+                continue
+            try:
+                if entry.is_dir():
+                    _shutil.copytree(str(entry), str(target))
+                else:
+                    _shutil.copy2(str(entry), str(target))
+                restored += 1
+            except OSError as exc:
+                logger.warning("Failed to restore %s: %s", entry.name, exc)
+        print(f"Reset complete: restored {restored} skills from source")
+        return 0
+
+    # --load BUNDLE / --unload BUNDLE / default cycle: use the runtime
+    from agent_runtime import AgentRuntime
+    from scripts.agent_events import (
+        SkillLoadRequestEvent,
+        SkillUnloadRequestEvent,
+        TaskCompleteEvent,
+    )
+
+    runtime = AgentRuntime()
+    runtime.bootstrap()
+    runtime.start()
+
+    try:
+        if load_bundle:
+            runtime.inject_event(SkillLoadRequestEvent(
+                bundle_name=load_bundle,
+                reason="manual",
+            ))
+            print(f"Load request issued for bundle: {load_bundle}")
+        elif unload_bundle:
+            # Resolve bundle to skill names
+            bundles_path = _Path(pcfg["bundles_path"])
+            bundles_data: dict = {}
+            if bundles_path.exists():
+                try:
+                    bundles_data = _json.loads(bundles_path.read_text(encoding="utf-8"))
+                except _json.JSONDecodeError:
+                    pass
+            bundle = bundles_data.get("bundles", {}).get(unload_bundle, {})
+            skills = tuple(bundle.get("skills", []))
+            if not skills:
+                print(f"Error: bundle '{unload_bundle}' has no skills")
+                runtime.stop()
+                return 1
+            runtime.inject_event(SkillUnloadRequestEvent(
+                skill_names=skills,
+                reason="manual",
+            ))
+            print(f"Unload request issued for bundle: {unload_bundle} ({len(skills)} skills)")
+        else:
+            # Default: full pruning cycle — emit a TaskCompleteEvent with no skills_used
+            runtime.inject_event(TaskCompleteEvent(
+                task_name="manual-prune-cycle",
+                skills_used=(),
+                duration_seconds=0.0,
+            ))
+            print("Pruning cycle issued — unused skills will be moved to cache")
+
+        # Give handlers a moment to run
+        import time as _time
+        _time.sleep(0.5)
+    finally:
+        runtime.stop()
+
+    return 0
+
+
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
@@ -367,6 +500,32 @@ def main() -> None:
         "--agents",
         action="store_true",
         help="Start the multi-agent system (headless, no GUI)",
+    )
+    group.add_argument(
+        "--prune",
+        action="store_true",
+        help="Run pruning operations (use with --load/--unload/--status/--reset)",
+    )
+
+    parser.add_argument(
+        "--load",
+        metavar="BUNDLE",
+        help="Bundle name to load (used with --prune)",
+    )
+    parser.add_argument(
+        "--unload",
+        metavar="BUNDLE",
+        help="Bundle name to unload (used with --prune)",
+    )
+    parser.add_argument(
+        "--status",
+        action="store_true",
+        help="Show registry status (used with --prune)",
+    )
+    parser.add_argument(
+        "--reset",
+        action="store_true",
+        help="Restore all skills from source (used with --prune)",
     )
 
     parser.add_argument(
@@ -450,6 +609,13 @@ def main() -> None:
         sys.exit(cmd_intelligence())
     elif args.agents:
         sys.exit(cmd_agents())
+    elif args.prune:
+        sys.exit(cmd_prune(
+            load_bundle=args.load,
+            unload_bundle=args.unload,
+            show_status=args.status,
+            reset=args.reset,
+        ))
 
 
 if __name__ == "__main__":

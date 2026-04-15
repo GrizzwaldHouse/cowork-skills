@@ -1,0 +1,166 @@
+{
+  "skill_name": "python-code-reviewer",
+  "version": "1.0.0",
+  "test_cases": [
+    {
+      "id": 1,
+      "prompt": "Review this Python code for standards compliance:\n\nclass UserManager:\n    def __init__(self):\n        self.users = []\n        self.active_count = 0\n\n    def add_user(self, name, email):\n        self.users.append({'name': name, 'email': email})\n        self.active_count += 1\n\n    def get_users(self):\n        return self.users",
+      "expected_output": "Violation report identifying unrestricted mutable public state and missing type hints",
+      "assertions": [
+        {
+          "id": "public_state_violation",
+          "check": "Output identifies self.users and/or self.active_count as unrestricted mutable public state that should use underscore prefix and @property",
+          "category": "content"
+        },
+        {
+          "id": "severity_assigned",
+          "check": "Output assigns a severity level (CRITICAL, HIGH, MEDIUM, or LOW) to at least one identified violation",
+          "category": "structure"
+        },
+        {
+          "id": "fix_recommendation",
+          "check": "Output provides a specific fix recommendation (e.g., rename to _users, add @property decorator) rather than just stating the problem",
+          "category": "quality"
+        },
+        {
+          "id": "line_numbers_referenced",
+          "check": "Output references specific line numbers or attribute names when describing violations",
+          "category": "structure"
+        },
+        {
+          "id": "type_hints_flagged",
+          "check": "Output flags the missing type hints on method parameters (name, email) and return types as a violation",
+          "category": "content"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Review this Python code for standards compliance:\n\nclass DataPoller:\n    def __init__(self):\n        self.running = True\n\n    def start(self):\n        while self.running:\n            data = self.source.check_updates()\n            if data:\n                self.process(data)\n            import time\n            time.sleep(0.5)",
+      "expected_output": "Violation report identifying polling pattern and communication anti-pattern",
+      "assertions": [
+        {
+          "id": "polling_identified",
+          "check": "Output identifies the while loop with time.sleep() as a polling pattern that violates event-driven communication rules",
+          "category": "content"
+        },
+        {
+          "id": "polling_severity_critical",
+          "check": "Output rates the polling violation as CRITICAL severity",
+          "category": "compliance"
+        },
+        {
+          "id": "observer_suggested",
+          "check": "Output suggests replacing polling with an event-driven pattern such as callbacks, observer pattern, signals/slots, or async events",
+          "category": "quality"
+        },
+        {
+          "id": "public_state_flagged",
+          "check": "Output flags self.running as unrestricted mutable public state",
+          "category": "content"
+        },
+        {
+          "id": "rationale_explained",
+          "check": "Output explains WHY polling is problematic (e.g., CPU waste, latency, tight coupling, violates Observer pattern requirement)",
+          "category": "quality"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Review this Python code for standards compliance:\n\nclass Config:\n    def load(self, path):\n        try:\n            with open(path) as f:\n                data = json.load(f)\n                self.timeout = data.get('timeout', 30)\n                self.url = data.get('url', 'http://localhost:8080')\n                self.retries = 3\n        except:\n            pass",
+      "expected_output": "Violation report identifying bare except, magic numbers, and swallowed errors",
+      "assertions": [
+        {
+          "id": "bare_except_found",
+          "check": "Output identifies the bare 'except:' clause as a violation requiring specific exception types",
+          "category": "content"
+        },
+        {
+          "id": "swallowed_error_found",
+          "check": "Output identifies the 'pass' in the except block as swallowing errors silently",
+          "category": "content"
+        },
+        {
+          "id": "magic_numbers_found",
+          "check": "Output identifies at least one of 30, 'http://localhost:8080', or 3 as magic numbers/strings that should be named constants",
+          "category": "content"
+        },
+        {
+          "id": "severity_critical_for_except",
+          "check": "Output assigns CRITICAL severity to the bare except and/or swallowed error violation",
+          "category": "compliance"
+        },
+        {
+          "id": "specific_fix_for_except",
+          "check": "Output suggests catching specific exceptions (e.g., FileNotFoundError, json.JSONDecodeError, PermissionError) instead of bare except",
+          "category": "quality"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Review this Python code for standards compliance:\n\ndef calculate_discount(items, user_type):\n    total = 0\n    for item in items:\n        total += item['price']\n    if user_type == 'premium':\n        return total * 0.8\n    elif user_type == 'basic':\n        return total * 0.95\n    return total",
+      "expected_output": "Violation report identifying missing type hints, magic numbers, and magic strings",
+      "assertions": [
+        {
+          "id": "missing_types_flagged",
+          "check": "Output flags missing type hints on parameters (items, user_type) and the return type",
+          "category": "content"
+        },
+        {
+          "id": "magic_numbers_flagged",
+          "check": "Output identifies 0.8 and/or 0.95 as magic numbers that should be named constants (e.g., PREMIUM_DISCOUNT_RATE)",
+          "category": "content"
+        },
+        {
+          "id": "magic_strings_flagged",
+          "check": "Output identifies 'premium' and 'basic' as magic strings that should be an Enum or Literal type",
+          "category": "content"
+        },
+        {
+          "id": "line_reference_present",
+          "check": "Output references specific lines, variable names, or code snippets when describing each violation",
+          "category": "structure"
+        },
+        {
+          "id": "fix_shows_code",
+          "check": "Output provides at least one concrete code example showing how to fix a violation (not just a description of the fix)",
+          "category": "quality"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Review this Python code for security vulnerabilities:\n\nimport sqlite3\n\ndef search_users(query):\n    conn = sqlite3.connect('users.db')\n    cursor = conn.cursor()\n    cursor.execute(f\"SELECT * FROM users WHERE name LIKE '%{query}%'\")\n    results = cursor.fetchall()\n    conn.close()\n    return results",
+      "expected_output": "Security violation report identifying SQL injection and other issues",
+      "assertions": [
+        {
+          "id": "sql_injection_found",
+          "check": "Output identifies the f-string SQL query as a SQL injection vulnerability",
+          "category": "content"
+        },
+        {
+          "id": "sql_injection_critical",
+          "check": "Output rates the SQL injection vulnerability as CRITICAL severity",
+          "category": "compliance"
+        },
+        {
+          "id": "parameterized_fix",
+          "check": "Output suggests using parameterized queries (cursor.execute with ? placeholders or named parameters) as the fix",
+          "category": "quality"
+        },
+        {
+          "id": "input_validation_flagged",
+          "check": "Output flags the missing input validation on the 'query' parameter at the function boundary",
+          "category": "content"
+        },
+        {
+          "id": "missing_types_noted",
+          "check": "Output notes missing type hints on the function signature (query parameter and return type)",
+          "category": "content"
+        }
+      ]
+    }
+  ]
+}

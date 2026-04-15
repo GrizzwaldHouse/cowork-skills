@@ -1,0 +1,40 @@
+{
+  "watched_projects": [
+    "D:\\Agent-Alexander",
+    "D:\\BrightForge",
+    "C:\\Users\\daley\\Projects\\Bob-AICompanion"
+  ],
+  "session_detection": {
+    "idle_timeout_seconds": 300,
+    "min_activity_events": 3,
+    "claude_indicators": [
+      ".claude/plans/*.md",
+      "CLAUDE.md",
+      "MEMORY.md",
+      ".git/COMMIT_EDITMSG"
+    ]
+  },
+  "extraction": {
+    "min_confidence": 0.3,
+    "auto_approve_threshold": 0.7,
+    "max_skills_per_session": 5,
+    "dedup_similarity_threshold": 0.85
+  },
+  "safety": {
+    "core_skills": [
+      "universal-coding-standards",
+      "architecture-patterns",
+      "enterprise-secure-ai-engineering"
+    ],
+    "blocked_patterns": [
+      "os.system", "subprocess", "eval(", "exec(",
+      "__import__", "rm -rf", "format c:"
+    ]
+  },
+  "sync": {
+    "auto_push": true,
+    "push_interval_minutes": 30,
+    "remote": "origin",
+    "branch": "main"
+  }
+}

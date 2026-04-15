@@ -1,0 +1,156 @@
+{
+    "schema_version": "1.0",
+    "bundles": {
+        "core": {
+            "description": "Always-loaded essential skills",
+            "skills": [
+                "orchestrate",
+                "agent-study-guide",
+                "file-organizer",
+                "domain-name-brainstormer"
+            ],
+            "trigger_tags": [],
+            "always_loaded": true
+        },
+        "portfolio-dev": {
+            "description": "Portfolio and frontend development skills",
+            "skills": [
+                "web-artifacts-builder.md",
+                "spline-3d",
+                "webapp-testing",
+                "tailored-resume-generator",
+                "changelog-generator",
+                "image-enhancer",
+                "theme-factory",
+                "content-research-writer"
+            ],
+            "trigger_tags": ["portfolio", "frontend", "web"],
+            "always_loaded": false
+        },
+        "ue5-gamedev": {
+            "description": "Unreal Engine 5 and game development skills",
+            "skills": [
+                "ue5-blueprint-organization",
+                "ue5-plugin-review",
+                "ue5-plugin-scaffold",
+                "ue5-asset-pipeline",
+                "fbx-ue5-integration.md"
+            ],
+            "trigger_tags": ["unreal", "ue5", "game", "blueprint"],
+            "always_loaded": false
+        },
+        "content-marketing": {
+            "description": "Content creation and marketing automation skills",
+            "skills": [
+                "twitter-algorithm-optimizer",
+                "competitive-ads-extractor",
+                "lead-research-assistant",
+                "brand-guidelines",
+                "linkedin-automation"
+            ],
+            "trigger_tags": ["marketing", "leads", "social"],
+            "always_loaded": false
+        },
+        "design-creative": {
+            "description": "Design and creative tools",
+            "skills": [
+                "canva-designer",
+                "canva-automation",
+                "canvas-design",
+                "design-system",
+                "document-designer",
+                "algorithmic-art",
+                "slack-gif-creator"
+            ],
+            "trigger_tags": ["design", "canva", "visual"],
+            "always_loaded": false
+        },
+        "automation-saas": {
+            "description": "SaaS integration and automation skills",
+            "skills": [
+                "slack-automation",
+                "discord-automation",
+                "gmail-automation",
+                "google-calendar-automation",
+                "googledocs-automation",
+                "googledrive-automation",
+                "googlesheets-automation",
+                "jira-automation",
+                "asana-automation",
+                "notion-automation",
+                "todoist-automation",
+                "trello-automation",
+                "twitter-automation",
+                "reddit-automation",
+                "figma-automation",
+                "zoom-automation"
+            ],
+            "trigger_tags": ["automation", "integrate"],
+            "always_loaded": false
+        },
+        "ai-ml": {
+            "description": "AI/ML model integration skills",
+            "skills": [
+                "openai-automation",
+                "replicate-automation",
+                "elevenlabs-automation",
+                "mcp-builder"
+            ],
+            "trigger_tags": ["ai", "ml", "model", "llm"],
+            "always_loaded": false
+        },
+        "python-desktop": {
+            "description": "Python desktop application development",
+            "skills": [
+                "desktop-ui-designer",
+                "pyqt6-ui-debugger",
+                "python-code-reviewer"
+            ],
+            "trigger_tags": ["python", "pyqt", "desktop"],
+            "always_loaded": false
+        },
+        "devops-standards": {
+            "description": "Development standards and DevOps practices",
+            "skills": [
+                "universal-coding-standards",
+                "architecture-patterns",
+                "dev-workflow",
+                "enterprise-secure-ai-engineering",
+                "verified-build-gate",
+                "connect"
+            ],
+            "trigger_tags": ["standards", "devops", "review"],
+            "always_loaded": false
+        },
+        "business": {
+            "description": "Business operations and management skills",
+            "skills": [
+                "meeting-insights-analyzer",
+                "internal-comms",
+                "invoice-organizer"
+            ],
+            "trigger_tags": ["business", "meetings", "invoices"],
+            "always_loaded": false
+        },
+        "media": {
+            "description": "Video and media automation skills",
+            "skills": [
+                "video-downloader",
+                "youtube-automation"
+            ],
+            "trigger_tags": ["video", "youtube", "media"],
+            "always_loaded": false
+        }
+    },
+    "standalone_skills": [
+        "doc-coauthoring.md",
+        "skill-creator.md",
+        "Conversation_Consolidation_and_Strategic_Validation_Document.md",
+        "figma-ai-spec.md",
+        "frontend-design.md",
+        "spline-integration.md",
+        "artifacts-builder",
+        "github-automation",
+        "outlook-calendar-automation"
+    ]
+}

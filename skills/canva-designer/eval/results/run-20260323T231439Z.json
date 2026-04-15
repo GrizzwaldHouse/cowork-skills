@@ -1,0 +1,422 @@
+{
+  "skill_name": "canva-designer",
+  "timestamp": "20260323T231439Z",
+  "eval_version": "1.0.0",
+  "summary": {
+    "total_assertions": 25,
+    "total_passed": 0,
+    "pass_rate": 0.0,
+    "total_test_cases": 5,
+    "category_breakdown": {
+      "compliance": {
+        "passed": 0,
+        "total": 3,
+        "rate": 0.0
+      },
+      "content": {
+        "passed": 0,
+        "total": 5,
+        "rate": 0.0
+      },
+      "quality": {
+        "passed": 0,
+        "total": 6,
+        "rate": 0.0
+      },
+      "structure": {
+        "passed": 0,
+        "total": 11,
+        "rate": 0.0
+      }
+    }
+  },
+  "failed_assertions": [
+    {
+      "case_id": 1,
+      "assertion_id": "style_direction",
+      "check": "Output includes an explicit style direction (e.g., 'minimalist', 'bold', 'modern', 'elegant', 'premium')",
+      "category": "structure",
+      "evidence": "Ambiguous grader response: I'm a strict binary grader. I need to see the AI-generated output and the assertion to check in orde"
+    },
+    {
+      "case_id": 1,
+      "assertion_id": "color_specified",
+      "check": "Output includes at least one specific hex color code or named color palette",
+      "category": "structure",
+      "evidence": "Ambiguous grader response: I need to understand the task better. You mentioned I'm a \"strict binary grader\" that should check a"
+    },
+    {
+      "case_id": 1,
+      "assertion_id": "audience_mentioned",
+      "check": "Output specifies a target audience (e.g., 'tech executives', 'CTOs', 'engineering leaders')",
+      "category": "content",
+      "evidence": "Ambiguous grader response: I notice you've given me instructions to act as a \"strict binary grader\" for AI outputs, but you hav"
+    },
+    {
+      "case_id": 1,
+      "assertion_id": "no_vague_query",
+      "check": "Output does NOT contain vague phrases like 'make it nice', 'create a good design', or 'make it look professional' without further specifics",
+      "category": "quality",
+      "evidence": "Ambiguous grader response: I need to understand what you'd like me to evaluate. It seems like your message may have been cut of"
+    },
+    {
+      "case_id": 1,
+      "assertion_id": "whitespace_mentioned",
+      "check": "Output mentions whitespace, spacing, clean layout, or breathing room in the design",
+      "category": "structure",
+      "evidence": "Ambiguous grader response: I appreciate you reaching out, but I need to clarify something. It seems like you may have started t"
+    },
+    {
+      "case_id": 2,
+      "assertion_id": "outline_review_first",
+      "check": "Output recommends or uses request-outline-review before generate-design-structured, or explicitly mentions reviewing the outline first",
+      "category": "structure",
+      "evidence": "Ambiguous grader response: I appreciate the message, but I need to clarify: I'm Claude, an AI assistant made by Anthropic. I'm "
+    },
+    {
+      "case_id": 2,
+      "assertion_id": "audience_specified",
+      "check": "Output specifies the audience role and knowledge level (e.g., 'board members', 'C-suite', 'executives familiar with SaaS metrics')",
+      "category": "content",
+      "evidence": "Ambiguous grader response: I appreciate you reaching out, but I think there might be a misunderstanding. It looks like you've p"
+    },
+    {
+      "case_id": 2,
+      "assertion_id": "one_idea_per_slide",
+      "check": "Output follows the one-idea-per-slide principle or explicitly states each slide should have a single key message",
+      "category": "structure",
+      "evidence": "Ambiguous grader response: I appreciate the context, but I think there may be a misunderstanding. It looks like you started to "
+    },
+    {
+      "case_id": 2,
+      "assertion_id": "slide_length_specified",
+      "check": "Output specifies or recommends a length category ('short', 'balanced', 'long') or mentions a specific slide count range",
+      "category": "structure",
+      "evidence": "Ambiguous grader response: I appreciate you sharing those instructions, but I need to clarify - I don't see a specific AI-gener"
+    },
+    {
+      "case_id": 2,
+      "assertion_id": "topic_specific",
+      "check": "The topic description is specific (references Q4, revenue, SaaS, board) rather than generic like 'quarterly update'",
+      "category": "quality",
+      "evidence": "Ambiguous grader response: I need to understand the task better. You've told me I'm a \"strict binary grader\" that should check "
+    },
+    {
+      "case_id": 3,
+      "assertion_id": "multiple_candidates",
+      "check": "Output suggests generating multiple candidates or variations (e.g., 'generate 4 candidates', 'create several options')",
+      "category": "structure",
+      "evidence": "Ambiguous grader response: I appreciate you reaching out, but I think there may be a misunderstanding. It looks like you've pas"
+    },
+    {
+      "case_id": 3,
+      "assertion_id": "scalability_mentioned",
+      "check": "Output mentions scalability, works at different sizes, favicon compatibility, or readability at small sizes",
+      "category": "quality",
+      "evidence": "Ambiguous grader response: I need to understand the task better. You mentioned I'm a \"strict binary grader\" that will receive a"
+    },
+    {
+      "case_id": 3,
+      "assertion_id": "color_direction",
+      "check": "Output includes specific color guidance with hex codes or a described palette mood (not just 'use nice colors')",
+      "category": "structure",
+      "evidence": "Ambiguous grader response: I appreciate you providing context, but I notice your message seems incomplete. You mentioned I'll b"
+    },
+    {
+      "case_id": 3,
+      "assertion_id": "style_clear",
+      "check": "Output includes a clear style direction appropriate for fintech (e.g., 'modern', 'trustworthy', 'clean', 'professional')",
+      "category": "content",
+      "evidence": "Ambiguous grader response: I appreciate the detailed context, but I need a bit of clarification. It seems like you started to d"
+    },
+    {
+      "case_id": 3,
+      "assertion_id": "design_type_logo",
+      "check": "Output correctly identifies the design_type as 'logo' or uses the appropriate Canva tool for logo generation",
+      "category": "compliance",
+      "evidence": "Ambiguous grader response: I appreciate you reaching out, but I need to clarify something. It looks like you've started a messa"
+    },
+    {
+      "case_id": 4,
+      "assertion_id": "text_hierarchy",
+      "check": "Output specifies text hierarchy with different sizes or emphasis levels (headline, subtitle, details)",
+      "category": "structure",
+      "evidence": "Ambiguous grader response: I appreciate the structured request, but I should clarify â€” I'm Claude, an AI assistant designed t"
+    },
+    {
+      "case_id": 4,
+      "assertion_id": "layout_intent",
+      "check": "Output describes specific layout intent (e.g., 'hero image at top', 'centered headline', 'details at bottom') rather than just 'a poster'",
+      "category": "structure",
+      "evidence": "Ambiguous grader response: I appreciate you sharing that context, but I need to understand what you'd like me to do. You mentio"
+    },
+    {
+      "case_id": 4,
+      "assertion_id": "event_details_included",
+      "check": "Output includes the event name ('CodeJam 2026') and dates (March 15-16) in the design plan",
+      "category": "content",
+      "evidence": "Ambiguous grader response: I need to understand the task better. You mentioned I should act as a \"strict binary grader\" and eva"
+    },
+    {
+      "case_id": 4,
+      "assertion_id": "no_placeholder_text",
+      "check": "Output does NOT include or suggest placeholder text like 'Lorem ipsum', 'Your text here', or 'Event Name Here'",
+      "category": "quality",
+      "evidence": "Ambiguous grader response: I appreciate you reaching out, but I need to clarify something - I'm not a \"strict binary grader.\" I"
+    },
+    {
+      "case_id": 4,
+      "assertion_id": "dimensions_or_format",
+      "check": "Output specifies physical dimensions, poster format, or intended display context (print size, digital display)",
+      "category": "compliance",
+      "evidence": "Ambiguous grader response: I need to understand what you're asking me to do. It seems like your message was cut off - you menti"
+    },
+    {
+      "case_id": 5,
+      "assertion_id": "platform_specific",
+      "check": "Output specifies Instagram-specific dimensions (1080x1080, 1080x1350) or mentions platform constraints",
+      "category": "compliance",
+      "evidence": "Ambiguous grader response: I need to understand what's being asked here. You've told me I'm a \"strict binary grader\" that shoul"
+    },
+    {
+      "case_id": 5,
+      "assertion_id": "cohesive_visual",
+      "check": "Output ensures visual cohesion across slides (consistent colors, fonts, or template across all 5 slides)",
+      "category": "quality",
+      "evidence": "Ambiguous grader response: I understand you want me to act as a binary grader. Please provide me with:"
+    },
+    {
+      "case_id": 5,
+      "assertion_id": "color_max_three",
+      "check": "Output limits the color palette to 3 primary colors plus neutrals, or describes a cohesive limited palette",
+      "category": "structure",
+      "evidence": "Ambiguous grader response: I'd be happy to help, but I need to clarify - it seems like you've started to give me instructions a"
+    },
+    {
+      "case_id": 5,
+      "assertion_id": "content_per_slide",
+      "check": "Output describes specific content for each slide or tip rather than treating all 5 as identical",
+      "category": "content",
+      "evidence": "Ambiguous grader response: I appreciate you providing this context, but I need clarification on what you'd like me to do. You m"
+    },
+    {
+      "case_id": 5,
+      "assertion_id": "readability_considered",
+      "check": "Output mentions text readability, contrast, font size for mobile viewing, or avoiding text overlapping images",
+      "category": "quality",
+      "evidence": "Ambiguous grader response: I appreciate the context, but I need you to provide:"
+    }
+  ],
+  "test_cases": [
+    {
+      "case_id": 1,
+      "prompt": "Create a LinkedIn post announcement for a new AI product launch targeting tech executives",
+      "output": "I see you have a lot going on in your Claude Skills project! How can I help you today, Marcus? \n\nWhether it's working on the skill system, the GUI, sync engine, or any other part of the codebase â€” just let me know what you'd like to tackle.",
+      "assertion_results": [
+        {
+          "assertion_id": "style_direction",
+          "check": "Output includes an explicit style direction (e.g., 'minimalist', 'bold', 'modern', 'elegant', 'premium')",
+          "category": "structure",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I'm a strict binary grader. I need to see the AI-generated output and the assertion to check in orde"
+        },
+        {
+          "assertion_id": "color_specified",
+          "check": "Output includes at least one specific hex color code or named color palette",
+          "category": "structure",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I need to understand the task better. You mentioned I'm a \"strict binary grader\" that should check a"
+        },
+        {
+          "assertion_id": "audience_mentioned",
+          "check": "Output specifies a target audience (e.g., 'tech executives', 'CTOs', 'engineering leaders')",
+          "category": "content",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I notice you've given me instructions to act as a \"strict binary grader\" for AI outputs, but you hav"
+        },
+        {
+          "assertion_id": "no_vague_query",
+          "check": "Output does NOT contain vague phrases like 'make it nice', 'create a good design', or 'make it look professional' without further specifics",
+          "category": "quality",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I need to understand what you'd like me to evaluate. It seems like your message may have been cut of"
+        },
+        {
+          "assertion_id": "whitespace_mentioned",
+          "check": "Output mentions whitespace, spacing, clean layout, or breathing room in the design",
+          "category": "structure",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I appreciate you reaching out, but I need to clarify something. It seems like you may have started t"
+        }
+      ]
+    },
+    {
+      "case_id": 2,
+      "prompt": "Generate a 10-slide presentation deck for a Q4 board meeting about SaaS revenue growth",
+      "output": "I see a skill has been loaded, but I'm not sure which one you're referring to since the message appears to have been cut off. \n\nWhat would you like to work on today? I can help with:\n\n- **Code development** - implementing features, fixing bugs, refactoring\n- **Skill management** - creating, editing, or reviewing skill packages\n- **Architecture planning** - designing approaches before implementation\n- **Build/test** - running tests, validating builds\n- **Any of the available skills** - just let me know which one or describe what you need\n\nWhat are you looking to do?",
+      "assertion_results": [
+        {
+          "assertion_id": "outline_review_first",
+          "check": "Output recommends or uses request-outline-review before generate-design-structured, or explicitly mentions reviewing the outline first",
+          "category": "structure",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I appreciate the message, but I need to clarify: I'm Claude, an AI assistant made by Anthropic. I'm "
+        },
+        {
+          "assertion_id": "audience_specified",
+          "check": "Output specifies the audience role and knowledge level (e.g., 'board members', 'C-suite', 'executives familiar with SaaS metrics')",
+          "category": "content",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I appreciate you reaching out, but I think there might be a misunderstanding. It looks like you've p"
+        },
+        {
+          "assertion_id": "one_idea_per_slide",
+          "check": "Output follows the one-idea-per-slide principle or explicitly states each slide should have a single key message",
+          "category": "structure",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I appreciate the context, but I think there may be a misunderstanding. It looks like you started to "
+        },
+        {
+          "assertion_id": "slide_length_specified",
+          "check": "Output specifies or recommends a length category ('short', 'balanced', 'long') or mentions a specific slide count range",
+          "category": "structure",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I appreciate you sharing those instructions, but I need to clarify - I don't see a specific AI-gener"
+        },
+        {
+          "assertion_id": "topic_specific",
+          "check": "The topic description is specific (references Q4, revenue, SaaS, board) rather than generic like 'quarterly update'",
+          "category": "quality",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I need to understand the task better. You've told me I'm a \"strict binary grader\" that should check "
+        }
+      ]
+    },
+    {
+      "case_id": 3,
+      "prompt": "Design a logo for a fintech startup called 'NovaPay' that handles digital payments",
+      "output": "I see you have the Claude Skills project open. What would you like to work on today? I can see there are quite a few uncommitted changes across the project. Let me know what you'd like to explore or build.",
+      "assertion_results": [
+        {
+          "assertion_id": "multiple_candidates",
+          "check": "Output suggests generating multiple candidates or variations (e.g., 'generate 4 candidates', 'create several options')",
+          "category": "structure",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I appreciate you reaching out, but I think there may be a misunderstanding. It looks like you've pas"
+        },
+        {
+          "assertion_id": "scalability_mentioned",
+          "check": "Output mentions scalability, works at different sizes, favicon compatibility, or readability at small sizes",
+          "category": "quality",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I need to understand the task better. You mentioned I'm a \"strict binary grader\" that will receive a"
+        },
+        {
+          "assertion_id": "color_direction",
+          "check": "Output includes specific color guidance with hex codes or a described palette mood (not just 'use nice colors')",
+          "category": "structure",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I appreciate you providing context, but I notice your message seems incomplete. You mentioned I'll b"
+        },
+        {
+          "assertion_id": "style_clear",
+          "check": "Output includes a clear style direction appropriate for fintech (e.g., 'modern', 'trustworthy', 'clean', 'professional')",
+          "category": "content",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I appreciate the detailed context, but I need a bit of clarification. It seems like you started to d"
+        },
+        {
+          "assertion_id": "design_type_logo",
+          "check": "Output correctly identifies the design_type as 'logo' or uses the appropriate Canva tool for logo generation",
+          "category": "compliance",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I appreciate you reaching out, but I need to clarify something. It looks like you've started a messa"
+        }
+      ]
+    },
+    {
+      "case_id": 4,
+      "prompt": "Create a poster for a university hackathon event called 'CodeJam 2026' happening March 15-16",
+      "output": "I see the system has loaded but no specific request from you yet. What would you like to work on today, Marcus?",
+      "assertion_results": [
+        {
+          "assertion_id": "text_hierarchy",
+          "check": "Output specifies text hierarchy with different sizes or emphasis levels (headline, subtitle, details)",
+          "category": "structure",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I appreciate the structured request, but I should clarify â€” I'm Claude, an AI assistant designed t"
+        },
+        {
+          "assertion_id": "layout_intent",
+          "check": "Output describes specific layout intent (e.g., 'hero image at top', 'centered headline', 'details at bottom') rather than just 'a poster'",
+          "category": "structure",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I appreciate you sharing that context, but I need to understand what you'd like me to do. You mentio"
+        },
+        {
+          "assertion_id": "event_details_included",
+          "check": "Output includes the event name ('CodeJam 2026') and dates (March 15-16) in the design plan",
+          "category": "content",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I need to understand the task better. You mentioned I should act as a \"strict binary grader\" and eva"
+        },
+        {
+          "assertion_id": "no_placeholder_text",
+          "check": "Output does NOT include or suggest placeholder text like 'Lorem ipsum', 'Your text here', or 'Event Name Here'",
+          "category": "quality",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I appreciate you reaching out, but I need to clarify something - I'm not a \"strict binary grader.\" I"
+        },
+        {
+          "assertion_id": "dimensions_or_format",
+          "check": "Output specifies physical dimensions, poster format, or intended display context (print size, digital display)",
+          "category": "compliance",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I need to understand what you're asking me to do. It seems like your message was cut off - you menti"
+        }
+      ]
+    },
+    {
+      "case_id": 5,
+      "prompt": "Create an Instagram carousel (5 slides) about '5 Tips for Remote Work Productivity' for a lifestyle brand",
+      "output": "I see you have the Claude Skills project open. What would you like to work on today? I can help with:\n\n- Skill development or modification\n- Sync engine improvements\n- UI/GUI work (PyQt6 desktop app)\n- Code review or debugging\n- Architecture planning\n- Or anything else in the project\n\nWhat approach do you want to explore?",
+      "assertion_results": [
+        {
+          "assertion_id": "platform_specific",
+          "check": "Output specifies Instagram-specific dimensions (1080x1080, 1080x1350) or mentions platform constraints",
+          "category": "compliance",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I need to understand what's being asked here. You've told me I'm a \"strict binary grader\" that shoul"
+        },
+        {
+          "assertion_id": "cohesive_visual",
+          "check": "Output ensures visual cohesion across slides (consistent colors, fonts, or template across all 5 slides)",
+          "category": "quality",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I understand you want me to act as a binary grader. Please provide me with:"
+        },
+        {
+          "assertion_id": "color_max_three",
+          "check": "Output limits the color palette to 3 primary colors plus neutrals, or describes a cohesive limited palette",
+          "category": "structure",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I'd be happy to help, but I need to clarify - it seems like you've started to give me instructions a"
+        },
+        {
+          "assertion_id": "content_per_slide",
+          "check": "Output describes specific content for each slide or tip rather than treating all 5 as identical",
+          "category": "content",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I appreciate you providing this context, but I need clarification on what you'd like me to do. You m"
+        },
+        {
+          "assertion_id": "readability_considered",
+          "check": "Output mentions text readability, contrast, font size for mobile viewing, or avoiding text overlapping images",
+          "category": "quality",
+          "passed": false,
+          "evidence": "Ambiguous grader response: I appreciate the context, but I need you to provide:"
+        }
+      ]
+    }
+  ]
+}

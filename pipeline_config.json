@@ -1,0 +1,26 @@
+{
+  "claude_model": "claude-sonnet-4-20250514",
+  "openai_model": "gpt-4o",
+  "supervisor_model": "claude-sonnet-4-20250514",
+  "max_retries": 3,
+  "retry_delay_seconds": 2.0,
+  "passing_score": 70,
+  "auto_approve_score": 90,
+  "worker_timeout": 300,
+  "auditor_timeout": 120,
+  "supervisor_timeout": 120,
+  "project_root": ".",
+  "primary_language": "auto",
+  "architecture_constraints": [
+    "event_driven_only",
+    "no_polling",
+    "dependency_injection",
+    "separation_of_concerns",
+    "repository_pattern",
+    "config_driven",
+    "no_public_mutable_state",
+    "comment_driven_development",
+    "single_line_comments_only",
+    "file_headers_required"
+  ]
+}

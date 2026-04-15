@@ -1,0 +1,23 @@
+{
+  "reviewers": [
+    {
+      "user_id": "marcus",
+      "name": "Marcus Daley",
+      "role": "admin",
+      "created_at": "2026-03-23T00:00:00Z",
+      "last_active": "2026-03-23T00:00:00Z"
+    }
+  ],
+  "approval_rules": {
+    "auto_approve_enabled": true,
+    "auto_approve_min_confidence": 0.7,
+    "auto_approve_min_security": 0.9,
+    "require_admin_for_core_skills": true,
+    "max_pending_queue_size": 50
+  },
+  "notifications": {
+    "notify_on_new_skill": true,
+    "notify_on_rejection": true,
+    "notify_on_safety_violation": true
+  }
+}

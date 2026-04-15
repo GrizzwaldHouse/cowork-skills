@@ -1,0 +1,166 @@
+{
+  "skill_name": "pyqt6-ui-debugger",
+  "version": "1.0.0",
+  "test_cases": [
+    {
+      "id": 1,
+      "prompt": "Debug this PyQt6 issue: My custom QWidget is being clipped at the bottom. The parent container is a QScrollArea but the widget content extends beyond the visible area and no scrollbar appears.\n\nclass ContentWidget(QWidget):\n    def __init__(self, parent=None):\n        super().__init__(parent)\n        layout = QVBoxLayout(self)\n        for i in range(50):\n            layout.addWidget(QLabel(f'Item {i}'))\n\nscroll = QScrollArea()\nscroll.setWidget(ContentWidget())\nscroll.setFixedSize(300, 200)",
+      "expected_output": "Diagnostic walkthrough with root cause and fix for QScrollArea clipping",
+      "assertions": [
+        {
+          "id": "diagnostic_approach",
+          "check": "Output describes a systematic diagnostic approach starting with symptom categorization (layout, visibility, sizing, or styling)",
+          "category": "structure"
+        },
+        {
+          "id": "root_cause_identified",
+          "check": "Output identifies the root cause as missing setWidgetResizable(True) on the QScrollArea or an equivalent sizing issue",
+          "category": "content"
+        },
+        {
+          "id": "fix_code_provided",
+          "check": "Output provides specific Python code showing how to fix the issue (e.g., scroll.setWidgetResizable(True))",
+          "category": "quality"
+        },
+        {
+          "id": "prevention_strategy",
+          "check": "Output includes a prevention strategy or best practice to avoid this issue in the future",
+          "category": "quality"
+        },
+        {
+          "id": "qt_class_referenced",
+          "check": "Output references specific Qt classes or methods (QScrollArea, setWidgetResizable, QSizePolicy, or sizeHint) in the diagnosis",
+          "category": "content"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Debug this PyQt6 issue: My QPushButton's clicked signal handler is not being called when I click the button.\n\nclass MyWindow(QMainWindow):\n    def __init__(self):\n        super().__init__()\n        btn = QPushButton('Click Me', self)\n        btn.clicked.connect(self.on_click())\n\n    def on_click(self):\n        print('Button clicked!')",
+      "expected_output": "Diagnosis identifying the parentheses calling bug in signal connection",
+      "assertions": [
+        {
+          "id": "connection_bug_found",
+          "check": "Output identifies that self.on_click() is being CALLED (with parentheses) instead of passed as a reference (without parentheses)",
+          "category": "content"
+        },
+        {
+          "id": "correct_syntax_shown",
+          "check": "Output shows the corrected syntax: btn.clicked.connect(self.on_click) without parentheses",
+          "category": "quality"
+        },
+        {
+          "id": "explanation_provided",
+          "check": "Output explains WHY the parentheses cause the issue (the function is executed immediately and its return value None is connected instead)",
+          "category": "quality"
+        },
+        {
+          "id": "signal_slot_category",
+          "check": "Output categorizes this as a signal/slot connection issue",
+          "category": "structure"
+        },
+        {
+          "id": "prevention_included",
+          "check": "Output includes advice on preventing this mistake (e.g., never use () when connecting unless wrapping in lambda)",
+          "category": "quality"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Debug this PyQt6 issue: My QVBoxLayout has three widgets but they are all bunched up at the top of the window. The bottom 60% of the window is empty space.\n\nclass Panel(QWidget):\n    def __init__(self):\n        super().__init__()\n        layout = QVBoxLayout(self)\n        layout.addWidget(QLabel('Title'))\n        layout.addWidget(QLineEdit())\n        layout.addWidget(QPushButton('Submit'))",
+      "expected_output": "Layout diagnosis addressing stretch and size policy",
+      "assertions": [
+        {
+          "id": "layout_issue_categorized",
+          "check": "Output categorizes this as a layout issue related to stretch factors or size policies",
+          "category": "structure"
+        },
+        {
+          "id": "stretch_or_policy_fix",
+          "check": "Output suggests adding addStretch() at the end or adjusting QSizePolicy to Expanding, or setting alignment on the layout",
+          "category": "content"
+        },
+        {
+          "id": "working_code_shown",
+          "check": "Output provides corrected Python code with the fix applied",
+          "category": "quality"
+        },
+        {
+          "id": "size_policy_explained",
+          "check": "Output explains the relationship between QSizePolicy and how Qt distributes extra space in a layout",
+          "category": "quality"
+        },
+        {
+          "id": "specific_qt_method",
+          "check": "Output references specific Qt methods like addStretch(), setSizePolicy(), setAlignment(), or setContentsMargins()",
+          "category": "content"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Debug this PyQt6 issue: My custom styled widget shows the correct dark background in isolation but when placed inside a QTabWidget, the background reverts to the system default.\n\nclass DarkPanel(QWidget):\n    def __init__(self):\n        super().__init__()\n        self.setStyleSheet('background-color: #1E1E1E; color: white;')\n\ntabs = QTabWidget()\ntabs.addTab(DarkPanel(), 'Dark Tab')",
+      "expected_output": "Stylesheet specificity and inheritance diagnosis",
+      "assertions": [
+        {
+          "id": "style_conflict_identified",
+          "check": "Output identifies the issue as a stylesheet specificity or inheritance conflict between the widget and QTabWidget",
+          "category": "content"
+        },
+        {
+          "id": "specificity_explained",
+          "check": "Output explains stylesheet specificity rules in Qt (parent styles can override child styles, or more specific selectors win)",
+          "category": "quality"
+        },
+        {
+          "id": "fix_provided",
+          "check": "Output provides a fix such as using a more specific CSS selector (e.g., 'DarkPanel { background-color: ... }') or setting setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)",
+          "category": "quality"
+        },
+        {
+          "id": "root_cause_clear",
+          "check": "Output clearly states the root cause (not just the fix) explaining why the background reverts",
+          "category": "content"
+        },
+        {
+          "id": "qt_styling_reference",
+          "check": "Output references Qt-specific styling concepts (stylesheet inheritance, QPalette, setAutoFillBackground, or WA_StyledBackground)",
+          "category": "content"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Debug this PyQt6 issue: I have overlapping widgets — a floating toolbar appears behind the main content area instead of on top of it. Both are children of the same parent QWidget.\n\nclass MainView(QWidget):\n    def __init__(self):\n        super().__init__()\n        self.content = QTextEdit(self)\n        self.toolbar = QWidget(self)\n        self.toolbar.setFixedSize(200, 40)\n        self.toolbar.move(50, 50)",
+      "expected_output": "Z-order diagnosis with raise_() or stackUnder() solution",
+      "assertions": [
+        {
+          "id": "z_order_identified",
+          "check": "Output identifies this as a z-order (stacking order) issue where sibling widgets overlap",
+          "category": "content"
+        },
+        {
+          "id": "raise_method_suggested",
+          "check": "Output suggests using raise_() on the toolbar widget to bring it to the front, or stackUnder() to control stacking",
+          "category": "quality"
+        },
+        {
+          "id": "creation_order_explained",
+          "check": "Output explains that Qt's default z-order follows widget creation order (later widgets are on top) or painting order",
+          "category": "quality"
+        },
+        {
+          "id": "alternative_approach",
+          "check": "Output suggests an alternative approach such as using layout managers instead of absolute positioning, or using QStackedLayout",
+          "category": "content"
+        },
+        {
+          "id": "fix_code_shown",
+          "check": "Output provides corrected Python code demonstrating the fix",
+          "category": "quality"
+        }
+      ]
+    }
+  ]
+}

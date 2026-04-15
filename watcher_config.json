@@ -1,0 +1,21 @@
+{
+  "project_root": ".",
+  "silence_threshold_seconds": 120,
+  "min_session_modifications": 3,
+  "recovery_cooldown_seconds": 300,
+  "watch_extensions": [
+    ".cpp", ".h", ".hpp", ".cc",
+    ".cs",
+    ".py",
+    ".ts", ".tsx", ".js", ".jsx",
+    ".rs", ".java", ".go"
+  ],
+  "ignore_dirs": [
+    "node_modules", ".git", "__pycache__", "Binaries", "Intermediate",
+    "Saved", "DerivedDataCache", ".vs", "dist", "build", "target",
+    ".next", "coverage", "venv", ".venv"
+  ],
+  "recovery_command": "python detect_interruption.py --project-root {project_root} --format json --output recovery_report.json",
+  "notification_webhook": "",
+  "session_log_file": "session_history.jsonl"
+}

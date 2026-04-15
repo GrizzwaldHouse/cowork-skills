@@ -1,0 +1,19 @@
+{
+    "max_active_skills": 15,
+    "core_bundle": "core",
+    "temp_cache_dir": "C:/ClaudeSkills/skills_temp",
+    "active_skills_dir": "C:/Users/daley/.claude/skills",
+    "source_skills_dir": "C:/ClaudeSkills/skills",
+    "registry_path": "C:/ClaudeSkills/config/skill_registry.json",
+    "bundles_path": "C:/ClaudeSkills/config/skill_bundles.json",
+    "usage_log_path": "C:/Users/daley/.claude/skill_usage.md",
+    "handoff_path": "C:/Users/daley/.claude/HANDOFF.md",
+    "archive_after_days": 30,
+    "predictive_preload_threshold": 0.6,
+    "predictive_co_occurrence_min": 3,
+    "eviction_policy": "lru",
+    "fail_fast_on_missing": true,
+    "github_fallback": true,
+    "github_repo": "GrizzwaldHouse/cowork-skills",
+    "github_branch": "main"
+}

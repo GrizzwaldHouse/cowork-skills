@@ -1,0 +1,166 @@
+{
+  "skill_name": "canva-designer",
+  "version": "1.0.0",
+  "test_cases": [
+    {
+      "id": 1,
+      "prompt": "Create a LinkedIn post announcement for a new AI product launch targeting tech executives",
+      "expected_output": "A Canva design query following brand structure rules",
+      "assertions": [
+        {
+          "id": "style_direction",
+          "check": "Output includes an explicit style direction (e.g., 'minimalist', 'bold', 'modern', 'elegant', 'premium')",
+          "category": "structure"
+        },
+        {
+          "id": "color_specified",
+          "check": "Output includes at least one specific hex color code or named color palette",
+          "category": "structure"
+        },
+        {
+          "id": "audience_mentioned",
+          "check": "Output specifies a target audience (e.g., 'tech executives', 'CTOs', 'engineering leaders')",
+          "category": "content"
+        },
+        {
+          "id": "no_vague_query",
+          "check": "Output does NOT contain vague phrases like 'make it nice', 'create a good design', or 'make it look professional' without further specifics",
+          "category": "quality"
+        },
+        {
+          "id": "whitespace_mentioned",
+          "check": "Output mentions whitespace, spacing, clean layout, or breathing room in the design",
+          "category": "structure"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Generate a 10-slide presentation deck for a Q4 board meeting about SaaS revenue growth",
+      "expected_output": "Structured presentation plan with outline review before generation",
+      "assertions": [
+        {
+          "id": "outline_review_first",
+          "check": "Output recommends or uses request-outline-review before generate-design-structured, or explicitly mentions reviewing the outline first",
+          "category": "structure"
+        },
+        {
+          "id": "audience_specified",
+          "check": "Output specifies the audience role and knowledge level (e.g., 'board members', 'C-suite', 'executives familiar with SaaS metrics')",
+          "category": "content"
+        },
+        {
+          "id": "one_idea_per_slide",
+          "check": "Output follows the one-idea-per-slide principle or explicitly states each slide should have a single key message",
+          "category": "structure"
+        },
+        {
+          "id": "slide_length_specified",
+          "check": "Output specifies or recommends a length category ('short', 'balanced', 'long') or mentions a specific slide count range",
+          "category": "structure"
+        },
+        {
+          "id": "topic_specific",
+          "check": "The topic description is specific (references Q4, revenue, SaaS, board) rather than generic like 'quarterly update'",
+          "category": "quality"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Design a logo for a fintech startup called 'NovaPay' that handles digital payments",
+      "expected_output": "Logo design query with scalability and candidate generation",
+      "assertions": [
+        {
+          "id": "multiple_candidates",
+          "check": "Output suggests generating multiple candidates or variations (e.g., 'generate 4 candidates', 'create several options')",
+          "category": "structure"
+        },
+        {
+          "id": "scalability_mentioned",
+          "check": "Output mentions scalability, works at different sizes, favicon compatibility, or readability at small sizes",
+          "category": "quality"
+        },
+        {
+          "id": "color_direction",
+          "check": "Output includes specific color guidance with hex codes or a described palette mood (not just 'use nice colors')",
+          "category": "structure"
+        },
+        {
+          "id": "style_clear",
+          "check": "Output includes a clear style direction appropriate for fintech (e.g., 'modern', 'trustworthy', 'clean', 'professional')",
+          "category": "content"
+        },
+        {
+          "id": "design_type_logo",
+          "check": "Output correctly identifies the design_type as 'logo' or uses the appropriate Canva tool for logo generation",
+          "category": "compliance"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Create a poster for a university hackathon event called 'CodeJam 2026' happening March 15-16",
+      "expected_output": "Event poster with proper dimensions and visual hierarchy",
+      "assertions": [
+        {
+          "id": "text_hierarchy",
+          "check": "Output specifies text hierarchy with different sizes or emphasis levels (headline, subtitle, details)",
+          "category": "structure"
+        },
+        {
+          "id": "layout_intent",
+          "check": "Output describes specific layout intent (e.g., 'hero image at top', 'centered headline', 'details at bottom') rather than just 'a poster'",
+          "category": "structure"
+        },
+        {
+          "id": "event_details_included",
+          "check": "Output includes the event name ('CodeJam 2026') and dates (March 15-16) in the design plan",
+          "category": "content"
+        },
+        {
+          "id": "no_placeholder_text",
+          "check": "Output does NOT include or suggest placeholder text like 'Lorem ipsum', 'Your text here', or 'Event Name Here'",
+          "category": "quality"
+        },
+        {
+          "id": "dimensions_or_format",
+          "check": "Output specifies physical dimensions, poster format, or intended display context (print size, digital display)",
+          "category": "compliance"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Create an Instagram carousel (5 slides) about '5 Tips for Remote Work Productivity' for a lifestyle brand",
+      "expected_output": "Social media carousel with platform-specific dimensions and cohesive design",
+      "assertions": [
+        {
+          "id": "platform_specific",
+          "check": "Output specifies Instagram-specific dimensions (1080x1080, 1080x1350) or mentions platform constraints",
+          "category": "compliance"
+        },
+        {
+          "id": "cohesive_visual",
+          "check": "Output ensures visual cohesion across slides (consistent colors, fonts, or template across all 5 slides)",
+          "category": "quality"
+        },
+        {
+          "id": "color_max_three",
+          "check": "Output limits the color palette to 3 primary colors plus neutrals, or describes a cohesive limited palette",
+          "category": "structure"
+        },
+        {
+          "id": "content_per_slide",
+          "check": "Output describes specific content for each slide or tip rather than treating all 5 as identical",
+          "category": "content"
+        },
+        {
+          "id": "readability_considered",
+          "check": "Output mentions text readability, contrast, font size for mobile viewing, or avoiding text overlapping images",
+          "category": "quality"
+        }
+      ]
+    }
+  ]
+}

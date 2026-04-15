@@ -75,6 +75,7 @@ class AgentRuntime:
         from scripts.agents.validator_agent import ValidatorAgent
         from scripts.agents.refactor_agent import RefactorAgent
         from scripts.agents.sync_agent import SyncAgent
+        from scripts.agents.pruner_agent import PrunerAgent
 
         # Create agents — each receives the shared EventBus
         agents = [
@@ -82,6 +83,7 @@ class AgentRuntime:
             ValidatorAgent(self._event_bus),
             RefactorAgent(self._event_bus),
             SyncAgent(self._event_bus),
+            PrunerAgent(self._event_bus),
         ]
 
         # Register and configure each agent

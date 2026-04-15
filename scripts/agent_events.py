@@ -104,3 +104,48 @@ class AgentStatusChangedEvent(AgentEvent):
     previous_status: str = ""
     new_status: str = ""
     detail: str = ""
+
+
+# ---------------------------------------------------------------------------
+# Skill Lifecycle Events (PrunerAgent)
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class TaskStartEvent(AgentEvent):
+    """A task is starting and may need specific skills loaded."""
+    task_name: str = ""
+    required_skills: tuple[str, ...] = ()
+    optional_skills: tuple[str, ...] = ()
+    project: str = ""
+
+
+@dataclass(frozen=True)
+class TaskCompleteEvent(AgentEvent):
+    """A task has completed; report which skills were actually used."""
+    task_name: str = ""
+    skills_used: tuple[str, ...] = ()
+    duration_seconds: float = 0.0
+
+
+@dataclass(frozen=True)
+class SkillLoadRequestEvent(AgentEvent):
+    """Request to load one or more skills (or a bundle) into the active set."""
+    skill_names: tuple[str, ...] = ()
+    bundle_name: str = ""
+    reason: str = ""  # task | predictive | manual
+
+
+@dataclass(frozen=True)
+class SkillUnloadRequestEvent(AgentEvent):
+    """Request to unload one or more skills from the active set."""
+    skill_names: tuple[str, ...] = ()
+    reason: str = ""  # pruning | manual | limit
+
+
+@dataclass(frozen=True)
+class SkillRegistryUpdatedEvent(AgentEvent):
+    """The skill registry was updated (load/unload/archive completed)."""
+    action: str = ""  # load | unload | archive
+    skills: tuple[str, ...] = ()
+    active_count: int = 0

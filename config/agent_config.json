@@ -78,6 +78,10 @@
         "sync": {
             "name": "sync-agent",
             "type": "sync"
+        },
+        "pruner": {
+            "name": "pruner-agent",
+            "type": "pruner"
         }
     },
     "event_bus": {

@@ -1,0 +1,19 @@
+{
+  "total_cycles": 1,
+  "last_updated": "2026-04-05T21:23:56.149550+00:00",
+  "cycles": [
+    {
+      "cycle_id": "a7743ee4",
+      "started_at": "2026-04-05T21:23:56.149083+00:00",
+      "completed_at": "2026-04-05T21:23:56.149103+00:00",
+      "skills_extracted": 0,
+      "skills_validated": 0,
+      "skills_approved": 0,
+      "skills_refactored": 0,
+      "skills_rejected": 0,
+      "skills_synced": 0,
+      "refactor_failures": 0,
+      "events_processed": 0
+    }
+  ]
+}

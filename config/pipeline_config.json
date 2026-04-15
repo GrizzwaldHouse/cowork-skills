@@ -1,0 +1,26 @@
+{
+  "auto_extract": true,
+  "auto_refactor": true,
+  "auto_sync": false,
+  "min_quality_score": 0.7,
+  "min_reusability_score": 0.85,
+  "max_refactor_iterations": 10,
+  "feedback_enabled": true,
+  "scoring": {
+    "reusability_weight": 0.35,
+    "architecture_weight": 0.25,
+    "security_weight": 0.25,
+    "completeness_weight": 0.15
+  },
+  "thresholds": {
+    "approved": 0.85,
+    "needs_refactor": 0.5,
+    "rejected": 0.5
+  },
+  "feedback": {
+    "metrics_path": "data/feedback_metrics.json",
+    "trend_window": 10,
+    "rejection_rate_alert": 0.40,
+    "auto_adjust_thresholds": false
+  }
+}
