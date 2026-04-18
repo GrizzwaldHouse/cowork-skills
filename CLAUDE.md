@@ -145,3 +145,89 @@ Active on all sessions. See `skills/enterprise-secure-ai-engineering/` for full 
 - When debugging, help systematically: clarify, find root cause, explain, suggest prevention
 - Document significant bugs in Problem Tracker format (symptom, cause, solution, prevention)
 - **NEVER suggest minimal or simplified designs** -- always research the most advanced, sophisticated, and feature-rich approach. Marcus wants cutting-edge, production-grade implementations with maximum capabilities
+
+---
+
+# DeepCommand Skills System
+
+## Core Principles
+- Event-driven only
+- No polling
+- Config-driven architecture
+- No hardcoded values
+- Production-ready outputs only
+- Continuous validation
+
+---
+
+## Agent Roles
+
+### Planner
+- Defines milestones
+- Breaks into parallel tasks
+- Prioritizes playable demo progress
+
+### Implementer
+- Writes Unreal C++ systems
+- Ensures Blueprint compatibility
+- Uses Components + Subsystems
+
+### Validator
+- Compiles project
+- Fixes errors and warnings
+- Verifies runtime stability
+
+### Refactorer
+- Improves architecture
+- Removes technical debt
+- Enforces coding standards
+
+### Supervisor (Ollama Agent)
+- Validates Unreal API usage
+- Detects deprecated functions
+- Suggests modern alternatives
+- Blocks invalid implementations
+
+---
+
+## Execution Flow
+
+Planner → Implementer → Validator → Refactorer → Supervisor → Loop
+
+---
+
+## Task Types
+
+- SYSTEM_TASK
+- FIX_TASK
+- DOC_TASK
+- INTEGRATION_TASK
+
+---
+
+## Output Contract
+
+Each task MUST include:
+- What was done
+- Why it was done
+- Files changed
+- Unreal Editor steps
+- Validation result
+
+---
+
+## Unreal Rules
+
+- C++ first, Blueprint exposed
+- Use Actor Components for behavior
+- Use Subsystems for global systems
+- Interfaces for communication
+- No tight coupling
+
+---
+
+## Parallel Execution Rules
+
+- No overlapping file edits
+- Scoped ownership per agent
+- Merge only after validation
