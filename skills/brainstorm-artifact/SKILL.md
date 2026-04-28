@@ -1,6 +1,7 @@
 ---
 name: brainstorm-artifact
 description: Generate a structured, full-scope brainstorming artifact before writing any code or producing any deliverable on a new project, feature, or system. Use this skill whenever Marcus says "brainstorm", "let's plan out", "before we start", "scope this", "what should this do", or kicks off any new project, feature, milestone, or architectural decision. Also use when Marcus references a project name without prior scope (e.g. "let's start AgentForge", "begin SentinelMail Phase 2"). The artifact captures intent, constraints, and decisions as multi-question grouped checklists with mutually exclusive AND multi-select options, so Claude understands the FULL scope of what Marcus wants added before doing any work. Always present the artifact for review and confirmation before writing code.
+user-invocable: true
 ---
 
 # Brainstorm Artifact
