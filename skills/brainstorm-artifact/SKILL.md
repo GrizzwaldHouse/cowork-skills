@@ -72,7 +72,7 @@ Each option includes the trade-off in the same line. Format: "Option label: One 
 
 Options are concrete and mutually informative. Avoid generic options like "Use a database" or "Add tests". Prefer specific options like "Postgres with row-level security: Strong constraint enforcement, slower iteration during prototyping" versus "MongoDB Atlas free tier: Faster iteration, weaker schema guarantees, fits Phase 1 of Bob and Sentinel".
 
-If an option references a tool, library, or service Marcus has used before, mention it. The agent should pull from userMemories (Bob, SentinelMail, AgentForge, MCP Command Panel, Quidditch AI, IslandEscape, etc.) to make options feel anchored to his actual stack.
+If an option references a tool, library, or service Marcus has used before, mention it. The agent should pull from `userMemories` (Bob, SentinelMail, AgentForge, MCP Command Panel, Quidditch AI, IslandEscape, etc.) to make options feel anchored to his actual stack.
 
 ## Output Anatomy Example
 

@@ -35,6 +35,7 @@ These skills load automatically when Claude detects a relevant task. No invocati
 | `architecture-patterns` | Observer, composition, interface-driven, data-driven, repository, separation of concerns |
 | `dev-workflow` | Brainstorm-first methodology, session management, build/tooling, version control, debugging |
 | `enterprise-secure-ai-engineering` | OWASP, NIST SSDF, SLSA, SOC2 guardrails for runtime safety and AI code governance |
+| `brainstorm-artifact` | Pre-work scope-locking artifact: grouped checklist sections, trade-off options, decision pre-checking, blocks code generation until Marcus confirms |
 
 #### Design & Documents
 | Skill | Purpose |
