@@ -6,6 +6,12 @@ __pycache__/
 # Runtime data
 logs/
 backups/
+agentic-os/logs/*.log
+agentic-os/locks/*.lock
+
+# Autonomous workflow runtime state
+skills/ai-agents/autonomous-workflow/state/*.json
+skills/ai-agents/autonomous-workflow/state/*.txt
 
 # OS files
 Thumbs.db
