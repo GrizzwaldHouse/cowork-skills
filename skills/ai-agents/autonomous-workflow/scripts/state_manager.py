@@ -10,11 +10,12 @@ from typing import Optional
 
 PHASE_ORDER = ["brainstorm", "planning", "execution", "verification"]
 STATE_FILE = "workflow_state.json"
+INCOMPLETE_STATUSES = {"not_started", "in_progress", "failed", "incomplete"}
 
 
 @dataclass
 class PhaseStatus:
-    status: str  # not_started | in_progress | complete | failed
+    status: str  # not_started | in_progress | incomplete | complete | failed
     completed_at: Optional[str] = None
     failed_at: Optional[str] = None
     failure_reason: Optional[str] = None
@@ -24,9 +25,15 @@ class PhaseStatus:
 class WorkflowState:
     workflow_id: str
     task: str
-    phases: dict  # phase_name -> PhaseStatus
+    phases: dict  # phase_name -> PhaseStatus  (coerced in __post_init__)
     created_at: str = field(default_factory=lambda: _now())
     updated_at: str = field(default_factory=lambda: _now())
+
+    def __post_init__(self):
+        self.phases = {
+            k: PhaseStatus(**v) if isinstance(v, dict) else v
+            for k, v in self.phases.items()
+        }
 
     @classmethod
     def new(cls, task: str) -> "WorkflowState":
@@ -75,9 +82,9 @@ def detect_resume_point(state_dir: Path, from_flag: Optional[str]) -> str:
     if state_file.exists():
         state = load_state(state_dir)
         for phase in PHASE_ORDER:
-            if state.phases[phase].status in ("not_started", "in_progress", "failed", "incomplete"):
+            if state.phases[phase].status in INCOMPLETE_STATUSES:
                 return phase
-        return "brainstorm"
+        return "complete"  # all phases done — workflow is finished
 
     if (state_dir / "phases.json").exists():
         return "execution"

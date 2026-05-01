@@ -115,3 +115,25 @@ def test_mark_phase_failed(tmp_state_dir):
     updated = mark_phase_failed("brainstorm", reason="spec unclear", state_dir=tmp_state_dir)
     assert updated.phases["brainstorm"].status == "failed"
     assert updated.phases["brainstorm"].failure_reason == "spec unclear"
+
+
+def test_detect_resume_point_all_complete_returns_complete(tmp_state_dir):
+    """All phases complete — should return 'complete', not restart brainstorm."""
+    state = WorkflowState(
+        workflow_id="abc-123",
+        task="test task",
+        phases={p: PhaseStatus(status="complete") for p in ["brainstorm", "planning", "execution", "verification"]},
+    )
+    save_state(state, state_dir=tmp_state_dir)
+    result = detect_resume_point(state_dir=tmp_state_dir, from_flag=None)
+    assert result == "complete"
+
+
+def test_workflow_state_coerces_dict_phases():
+    """WorkflowState.__post_init__ should coerce plain dict phases to PhaseStatus."""
+    state = WorkflowState(
+        workflow_id="abc-123",
+        task="test",
+        phases={"brainstorm": {"status": "not_started", "completed_at": None, "failed_at": None, "failure_reason": None}},
+    )
+    assert isinstance(state.phases["brainstorm"], PhaseStatus)
