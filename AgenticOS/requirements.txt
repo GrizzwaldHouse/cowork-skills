@@ -1,0 +1,46 @@
+# requirements.txt
+# Developer: Marcus Daley
+# Date: 2026-04-29
+# Purpose: Pinned dependency set for the AgenticOS state bus. Versions are
+#          pinned to known-good lower bounds; run `pip install -U` to upgrade
+#          and re-test before committing a bump.
+
+# FastAPI: ASGI web framework hosting the WebSocket and REST endpoints.
+fastapi>=0.110.0,<1.0.0
+
+# Uvicorn: production ASGI server. The [standard] extra pulls in
+# httptools, uvloop (POSIX), watchfiles, and websockets.
+uvicorn[standard]>=0.29.0,<1.0.0
+
+# Pydantic v2: cross-process model validation.
+pydantic>=2.6.0,<3.0.0
+
+# Watchdog: filesystem event source for the agents.json watcher.
+watchdog>=4.0.0,<6.0.0
+
+# Websockets: explicit pin so the WebSocket layer matches the version
+# uvicorn[standard] would otherwise resolve transitively.
+websockets>=12.0,<14.0
+
+# Pytest: test runner.
+pytest>=8.0.0,<9.0.0
+
+# Pytest-asyncio: marker support for async test coroutines.
+pytest-asyncio>=0.23.0,<1.0.0
+
+# Httpx: ASGI-aware HTTP client used by FastAPI's TestClient and by
+# direct asyncio integration tests.
+httpx>=0.27.0,<1.0.0
+
+# Psutil: cross-platform process and system inspection. Used by
+# session_discovery.py to count claude.exe / claude sub-agent processes
+# associated with each Cowork session directory.
+psutil>=5.9.0,<8.0.0
+
+# Aiosqlite: async SQLite interface for the project registry. WAL mode
+# lets concurrent REST readers operate without blocking the watcher writer.
+aiosqlite>=0.20.0,<1.0.0
+
+# MCP: Model Context Protocol Python SDK. Exposes AgenticOS tools to
+# Claude Desktop so Marcus can approve agents from his iPhone via MCP tools.
+mcp>=1.0.0,<2.0.0

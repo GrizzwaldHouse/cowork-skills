@@ -1,0 +1,149 @@
+{
+  "version": 1,
+  "project_name": "AgenticOS Universal Hub",
+  "project_path": "C:/ClaudeSkills",
+  "written_by": "claude-code",
+  "written_at": "2026-05-01T00:15:59.764552+00:00",
+  "plan_summary": "AgenticOS Universal Hub — 8 phases wiring all of Marcus's projects into one monitor with iPhone access via MCP and Tailscale, Ollama handoff for continuous work, and skill auto-loading.",
+  "completed_tasks": [
+    {
+      "task": "Phase 0: config.py — BIND_HOST=0.0.0.0, TAILSCALE_AUTH_TOKEN, REGISTRY_DB_PATH, OLLAMA constants",
+      "status": "completed"
+    },
+    {
+      "task": "Phase 1: project_registry.py — SQLite-backed async project registry with WAL mode",
+      "status": "completed"
+    },
+    {
+      "task": "Phase 1: project_watcher.py — watchdog daemon auto-registering new CLAUDE.md files + psutil process scanner",
+      "status": "completed"
+    },
+    {
+      "task": "Phase 2: skill_loader.py — auto-copies skill packages into new projects",
+      "status": "completed"
+    },
+    {
+      "task": "Phase 3: mcp_server.py — Claude Desktop MCP stdio server with 5 tools",
+      "status": "completed"
+    },
+    {
+      "task": "Phase 3: mcp_config.json — drop-in Claude Desktop config",
+      "status": "completed"
+    },
+    {
+      "task": "Phase 4: ws_relay.py — authenticated Tailscale WebSocket relay on port 7843",
+      "status": "completed"
+    },
+    {
+      "task": "Phase 5: ProjectSwitcher.tsx — left sidebar project navigator",
+      "status": "completed"
+    },
+    {
+      "task": "Phase 5: PhaseCard.tsx — ADHD-friendly current-task banner",
+      "status": "completed"
+    },
+    {
+      "task": "Phase 5: SkillBadge.tsx + SkillBadgeList — active skill chips",
+      "status": "completed"
+    },
+    {
+      "task": "Phase 5: MobileApproval.tsx — iPhone-optimised approval buttons",
+      "status": "completed"
+    },
+    {
+      "task": "Phase 5: useAgentState.ts — added useFilteredAgents hook for project filtering",
+      "status": "completed"
+    },
+    {
+      "task": "Phase 7: skills/agentic-hub/SKILL.md — reusable skill package",
+      "status": "completed"
+    },
+    {
+      "task": "Phase 8: docs/agentic-hub-ui-prompt.json — Lovable/Replit UI mockup prompt",
+      "status": "completed"
+    },
+    {
+      "task": "Handoff feature: handoff_writer.py — writes/reads handoff manifest",
+      "status": "completed"
+    },
+    {
+      "task": "Handoff feature: handoff_runner.py — Ollama runner that continues pending tasks",
+      "status": "completed"
+    },
+    {
+      "task": "AIArchGuide.tsx — saved AI Architecture Field Guide with DOMAIN_COLORS export",
+      "status": "completed"
+    },
+    {
+      "task": "docs/AIArchGuide-plan.md — plan file linking arch models to AgenticOS domain theming",
+      "status": "completed"
+    },
+    {
+      "task": "agentic_server.py — added /projects/* and /handoff/* REST routes + watcher lifecycle",
+      "status": "completed"
+    },
+    {
+      "task": "requirements.txt — added aiosqlite and mcp dependencies",
+      "status": "completed"
+    }
+  ],
+  "pending_tasks": [
+    {
+      "task": "Phase 6: D:/Agent-Alexander/server/routes/bridge.ts — add cross-app bridge endpoint",
+      "status": "pending"
+    },
+    {
+      "task": "Wire ProjectSwitcher + PhaseCard into App.tsx with selectedProject state",
+      "status": "pending"
+    },
+    {
+      "task": "Wire DOMAIN_COLORS from AIArchGuide.tsx into AgentCard.tsx domain accent colors",
+      "status": "pending"
+    },
+    {
+      "task": "Add /guide route to React router for AIArchGuide component",
+      "status": "pending"
+    },
+    {
+      "task": "Install Tailscale on PC + iPhone (Phase 0 manual step)",
+      "status": "pending"
+    },
+    {
+      "task": "Copy mcp_config.json to %APPDATA%/Claude/claude_desktop_config.json",
+      "status": "pending"
+    },
+    {
+      "task": "Set TAILSCALE_AUTH_TOKEN and OLLAMA_HANDOFF_MODEL in .env",
+      "status": "pending"
+    },
+    {
+      "task": "Run verification: start AgenticOS, create test CLAUDE.md, verify GET /projects returns it",
+      "status": "pending"
+    }
+  ],
+  "current_task": null,
+  "context_notes": "Claude Code implemented all backend phases (1-5, 7-8) and the handoff system in this session. The Agent-Alexander bridge (Phase 6) requires access to D:/Agent-Alexander which is a separate project. All Python files passed AST syntax checks. The worktree is at .worktrees/agentic-hub on branch feature/agentic-hub.",
+  "files_modified": [
+    "AgenticOS/config.py",
+    "AgenticOS/agentic_server.py",
+    "AgenticOS/requirements.txt",
+    "AgenticOS/project_registry.py (NEW)",
+    "AgenticOS/project_watcher.py (NEW)",
+    "AgenticOS/skill_loader.py (NEW)",
+    "AgenticOS/mcp_server.py (NEW)",
+    "AgenticOS/mcp_config.json (NEW)",
+    "AgenticOS/ws_relay.py (NEW)",
+    "AgenticOS/handoff_writer.py (NEW)",
+    "AgenticOS/handoff_runner.py (NEW)",
+    "AgenticOS/frontend/src/components/ProjectSwitcher.tsx (NEW)",
+    "AgenticOS/frontend/src/components/PhaseCard.tsx (NEW)",
+    "AgenticOS/frontend/src/components/SkillBadge.tsx (NEW)",
+    "AgenticOS/frontend/src/components/MobileApproval.tsx (NEW)",
+    "AgenticOS/frontend/src/components/AIArchGuide.tsx (NEW)",
+    "AgenticOS/frontend/src/hooks/useAgentState.ts",
+    "skills/agentic-hub/SKILL.md (NEW)",
+    "docs/agentic-hub-ui-prompt.json (NEW)",
+    "docs/AIArchGuide-plan.md (NEW)"
+  ],
+  "next_action": "Review all new files, then: (1) Wire ProjectSwitcher+PhaseCard into App.tsx. (2) Set up Tailscale. (3) Copy mcp_config.json to Claude Desktop. (4) Run verification steps from plan."
+}

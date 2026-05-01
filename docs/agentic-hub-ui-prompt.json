@@ -1,0 +1,65 @@
+{
+  "_description": "Paste this JSON into Lovable, Replit, or ChatGPT to generate 3 side-by-side UI mockup variants for the AgenticOS Universal Hub. Pick the variant you like, paste the design code back into Claude Code, and we wire the backend.",
+  "task": "Generate 3 side-by-side UI mockup variants for the AgenticOS Universal Hub dashboard",
+  "generate_count": 3,
+  "variant_labels": ["Tactical Dark", "Neon Glass", "Military Terminal"],
+  "layout_requirements": {
+    "structure": "Three-panel layout: left sidebar (ProjectSwitcher 200px), center main (AgentCards grid), right panel (PhaseCard + approval)",
+    "top_bar": "Connection status LED, project name, agent count badge, Tailscale indicator",
+    "sidebar": "Scrollable project list with status dots, active project highlighted, skill badges below name",
+    "main_area": "Agent cards in 2-col grid, each card shows: agent_id, status pill, progress bar, stage label, stuck/loop badges",
+    "right_panel": "PhaseCard at top (what to do now, high contrast), MobileApproval buttons below (large, phone-safe tap targets)"
+  },
+  "components": [
+    "ProjectSwitcher — left sidebar with active project highlight and status dots",
+    "PhaseCard — top banner showing current task in large readable text",
+    "AgentCard — grid card with status glow, progress bar, context meter",
+    "ApprovalButtons — three full-width buttons: Approve (green), Research (amber), Review (purple)",
+    "MobileApproval — large-button approval panel optimised for 6-inch phone screen",
+    "SkillBadge — small chips showing active skill packages",
+    "ConnectionStatusBar — WebSocket health indicator with Tailscale dot",
+    "StuckBadge — pulsing red indicator when agent is stuck",
+    "LoopBadge — animated loop icon when agent is in a tight loop"
+  ],
+  "constraints": {
+    "dark_theme": true,
+    "adhd_friendly": true,
+    "mobile_first_approval": true,
+    "color_palette": {
+      "background": "#080b14",
+      "surface": "rgba(15,20,40,0.9)",
+      "border": "rgba(100,120,200,0.18)",
+      "accent_blue": "rgba(100,130,255,0.9)",
+      "accent_green": "#4ade80",
+      "accent_amber": "#fbbf24",
+      "accent_purple": "#a78bfa",
+      "text_primary": "rgba(220,230,255,0.92)",
+      "text_muted": "rgba(160,180,255,0.55)"
+    },
+    "font": "IBM Plex Mono or JetBrains Mono",
+    "card_style": "glassmorphism with subtle border glow matching agent status color",
+    "animations": "minimal — only status transitions and stuck pulse",
+    "no_gradients_on_text": true
+  },
+  "per_variant_style": {
+    "Tactical Dark": {
+      "vibe": "military ops center, dark navy/charcoal, amber accents, no rounded corners",
+      "sidebar_style": "monospace list, rank-badge style project indicators",
+      "card_glow": "amber or red for errors, green for complete"
+    },
+    "Neon Glass": {
+      "vibe": "sci-fi holographic, deep space blue/purple, neon cyan/violet glows",
+      "sidebar_style": "frosted glass panels, floating project pills",
+      "card_glow": "electric blue for active, neon violet for waiting"
+    },
+    "Military Terminal": {
+      "vibe": "CRT terminal aesthetic, dark green on black, scanlines, monospace only",
+      "sidebar_style": "ASCII-bordered menu list, blinking cursor on selected",
+      "card_glow": "phosphor green, status shown as text codes not colors"
+    }
+  },
+  "output_format": "Three side-by-side images (1200x800 each) with variant label below and 2-sentence description per variant. Also provide the React/Tailwind code for the selected variant on request.",
+  "ai_architecture_influence": {
+    "note": "The UI should feel like it was designed by an AI systems architect who knows SSMs, GNNs, and Transformers — each agent card subtly reflects its domain (game-dev gets green, software-eng gets blue, va-advisory gets amber). The PhaseCard is inspired by a naval tactical display: clear, hierarchical, one dominant action."
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "_comment": "Drop this file into %APPDATA%\\Claude\\claude_desktop_config.json (or merge the mcpServers block into an existing config). The server is spawned by Claude Desktop as a subprocess; no port needed.",
+  "mcpServers": {
+    "agentic-os": {
+      "command": "python",
+      "args": ["-m", "AgenticOS.mcp_server"],
+      "cwd": "C:/ClaudeSkills",
+      "env": {
+        "PYTHONPATH": "C:/ClaudeSkills"
+      }
+    }
+  }
+}
