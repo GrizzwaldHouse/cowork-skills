@@ -33,6 +33,7 @@ from AgenticOS.config import (
     REST_PORT,
     SERVER_HOST,
     STATE_DIR,
+    TERMINAL_CONTROL_TERMINATE_CONFIRMATION,
     WEBSOCKET_PORT,
 )
 from AgenticOS.file_watcher import start_file_watcher
@@ -41,6 +42,7 @@ from AgenticOS.models import (
     ApprovalDecision,
     ApprovalKind,
     ApprovalQueueEntry,
+    WorkflowEvent,
 )
 from AgenticOS.reviewer_spawner import (
     ReviewerSpawnError,
@@ -51,6 +53,31 @@ from AgenticOS.state_store import (
     append_approval_entry,
     bootstrap_state_files,
     read_agents,
+)
+from AgenticOS.skill_actions import (
+    dispatch_skill_action,
+    list_skill_actions,
+)
+from AgenticOS.task_store import (
+    TaskConflictError,
+    TaskNotFoundError,
+    TaskRuntimeError,
+    bootstrap_task_runtime,
+    claim_task,
+    complete_task,
+    fail_task,
+    read_snapshot,
+    read_task,
+    read_tasks,
+    reconcile_task_runtime,
+    update_task_checkpoint,
+)
+from AgenticOS.task_watcher import start_task_watcher
+from AgenticOS.terminal_control import (
+    close_terminal_window,
+    focus_terminal_window,
+    list_terminal_windows,
+    terminate_terminal_process,
 )
 from AgenticOS.websocket_broadcaster import (
     WebSocketBroadcaster,
@@ -102,6 +129,10 @@ class _ServerState:
         self.watcher_task: Optional[asyncio.Task] = None
         self.watcher_stop_event: Optional[asyncio.Event] = None
 
+        # Hybrid task runtime watchdog. Observes the canonical lowercase
+        # agentic-os/tasks and agentic-os/locks tree.
+        self.task_observer: Optional[object] = None
+
 
 # ---------------------------------------------------------------------------
 # Broadcast bridge between watchdog events and the broadcaster
@@ -138,6 +169,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # 1. Make sure required directories and seed JSON files exist.
     bootstrap_state_files()
     OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
+    bootstrap_task_runtime()
 
     # 2. Acquire the broadcaster singleton and stash it on app.state.
     state: _ServerState = app.state.runtime
@@ -160,6 +192,15 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         broadcast_callback=on_state_change,
         loop=loop,
         watched_file=AGENTS_JSON,
+    )
+
+    # 5b. Start the canonical task runtime watcher. The watcher reacts
+    # to task and lock file events, reconciles ownership/readiness, then
+    # bridges task cards into agents.json for the existing dashboard.
+    reconcile_task_runtime()
+    state.task_observer = start_task_watcher(
+        broadcast_callback=on_state_change,
+        loop=loop,
     )
 
     # 6. Start the session-discovery bridge as a long-running asyncio
@@ -227,6 +268,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             state.observer.stop()
             state.observer.join()
             state.observer = None
+        if state.task_observer is not None:
+            state.task_observer.stop()
+            state.task_observer.join()
+            state.task_observer = None
         if state.broadcaster is not None:
             await state.broadcaster.reset()
         _logger.info("AgenticOS state bus shut down cleanly")
@@ -381,6 +426,158 @@ def _register_routes(app: FastAPI) -> None:
             # 500 because the server's own state file is malformed,
             # which is a server-side problem from the client's view.
             raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    # -------------------------------------------------------------------
+    # Canonical task runtime routes (Hybrid AgenticOS layer)
+    # -------------------------------------------------------------------
+
+    @app.get("/tasks")
+    async def list_tasks() -> JSONResponse:
+        """Return canonical task files from agentic-os/tasks."""
+        try:
+            tasks = read_tasks()
+            return JSONResponse([task.model_dump(mode="json") for task in tasks])
+        except TaskRuntimeError as exc:
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    @app.get("/tasks/snapshot")
+    async def get_task_snapshot() -> JSONResponse:
+        """Return the latest canonical task runtime snapshot."""
+        try:
+            snapshot = read_snapshot()
+            return JSONResponse(snapshot.model_dump(mode="json"))
+        except TaskRuntimeError as exc:
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    @app.get("/skill-actions")
+    async def get_skill_actions(
+        project_path: str | None = Query(default=None),
+    ) -> JSONResponse:
+        """Return command-panel skill actions for the selected project."""
+        return JSONResponse(list_skill_actions(project_path))
+
+    @app.post("/skill-actions/{slug}/run")
+    async def run_skill_action(slug: str, body: dict) -> JSONResponse:
+        """Create a watched AgenticOS task from a skill command button."""
+        try:
+            dispatch = dispatch_skill_action(
+                slug,
+                objective=body.get("objective"),
+                project_path=body.get("project_path"),
+                project_name=body.get("project_name"),
+            )
+            return JSONResponse(dispatch, status_code=201)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except TaskRuntimeError as exc:
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    @app.get("/tasks/{task_id}")
+    async def get_task(task_id: str) -> JSONResponse:
+        """Return one canonical task document."""
+        try:
+            task = read_task(task_id)
+            return JSONResponse(task.model_dump(mode="json"))
+        except TaskNotFoundError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except TaskRuntimeError as exc:
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    @app.post("/tasks/{task_id}/claim")
+    async def claim_task_endpoint(task_id: str, body: dict) -> JSONResponse:
+        """Claim a pending task for a distributed worker."""
+        agent_id = body.get("agent_id")
+        if not agent_id:
+            raise HTTPException(status_code=422, detail="agent_id is required")
+        try:
+            task = claim_task(task_id, str(agent_id))
+            return JSONResponse(task.model_dump(mode="json"))
+        except TaskNotFoundError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except TaskConflictError as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        except TaskRuntimeError as exc:
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    @app.post("/tasks/{task_id}/checkpoint")
+    async def checkpoint_task(task_id: str, body: dict) -> JSONResponse:
+        """Append a progress checkpoint to the task's current owner."""
+        checkpoint = body.get("checkpoint")
+        if checkpoint is None:
+            raise HTTPException(status_code=422, detail="checkpoint is required")
+        try:
+            task = update_task_checkpoint(task_id, checkpoint)
+            return JSONResponse(task.model_dump(mode="json"))
+        except TaskNotFoundError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except TaskConflictError as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        except TaskRuntimeError as exc:
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    @app.post("/tasks/{task_id}/complete")
+    async def complete_task_endpoint(task_id: str, body: dict) -> JSONResponse:
+        """Mark a claimed task complete and release its lock."""
+        try:
+            task = complete_task(task_id, body.get("output"))
+            return JSONResponse(task.model_dump(mode="json"))
+        except TaskNotFoundError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except TaskConflictError as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        except TaskRuntimeError as exc:
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    @app.post("/tasks/{task_id}/fail")
+    async def fail_task_endpoint(task_id: str, body: dict) -> JSONResponse:
+        """Mark a claimed task failed and release its lock."""
+        if "error_context" not in body:
+            raise HTTPException(status_code=422, detail="error_context is required")
+        try:
+            task = fail_task(task_id, body.get("error_context"))
+            return JSONResponse(task.model_dump(mode="json"))
+        except TaskNotFoundError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except TaskConflictError as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        except TaskRuntimeError as exc:
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    # -------------------------------------------------------------------
+    # Local terminal control routes (Universal Hub operator panel)
+    # -------------------------------------------------------------------
+
+    @app.get("/terminals")
+    async def get_terminals(agent_only: bool = Query(False)) -> JSONResponse:
+        """Return visible command prompt / PowerShell / Windows Terminal windows."""
+        windows = list_terminal_windows(agent_only=agent_only)
+        return JSONResponse([window.model_dump(mode="json") for window in windows])
+
+    @app.post("/terminals/{hwnd}/focus")
+    async def focus_terminal(hwnd: int) -> JSONResponse:
+        """Restore and foreground a terminal window when Windows allows it."""
+        result = focus_terminal_window(hwnd)
+        return JSONResponse(result.model_dump(mode="json"))
+
+    @app.post("/terminals/{hwnd}/close")
+    async def close_terminal(hwnd: int) -> JSONResponse:
+        """Request a graceful terminal window close through WM_CLOSE."""
+        result = close_terminal_window(hwnd)
+        return JSONResponse(result.model_dump(mode="json"))
+
+    @app.post("/terminals/{pid}/terminate")
+    async def terminate_terminal(pid: int, body: dict) -> JSONResponse:
+        """Terminate a terminal process only after an explicit confirmation string."""
+        if body.get("confirm") != TERMINAL_CONTROL_TERMINATE_CONFIRMATION:
+            raise HTTPException(
+                status_code=422,
+                detail=(
+                    "confirm must equal "
+                    f"{TERMINAL_CONTROL_TERMINATE_CONFIRMATION!r}"
+                ),
+            )
+        result = terminate_terminal_process(pid)
+        return JSONResponse(result.model_dump(mode="json"))
 
     @app.post("/approve/{agent_id}")
     async def approve(agent_id: str, body: ApprovalDecision) -> JSONResponse:
@@ -688,6 +885,27 @@ def _register_routes(app: FastAPI) -> None:
             return JSONResponse({"status": "written", "manifest": manifest.to_dict()})
         except Exception as exc:
             raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    # -------------------------------------------------------------------
+    # Workflow events — one-way push from autonomous-workflow skill
+    # -------------------------------------------------------------------
+
+    @app.post("/events")
+    async def receive_workflow_event(body: WorkflowEvent) -> JSONResponse:
+        """Accept a workflow lifecycle event from the autonomous-workflow skill.
+        Appends to workflow_events.json; fire-and-forget from skill side."""
+        events_file = OUTPUTS_DIR / "workflow_events.json"
+        existing: list = []
+        if events_file.exists():
+            try:
+                existing = json.loads(events_file.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, OSError):
+                existing = []
+        existing.append(body.model_dump())
+        tmp = events_file.with_suffix(".tmp")
+        tmp.write_text(json.dumps(existing, indent=2), encoding="utf-8")
+        tmp.replace(events_file)
+        return JSONResponse({"ok": True, "event": body.event})
 
     @app.websocket("/ws")
     async def websocket_endpoint(websocket: WebSocket) -> None:
