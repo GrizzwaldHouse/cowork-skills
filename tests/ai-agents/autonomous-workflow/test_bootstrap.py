@@ -46,3 +46,10 @@ def test_scaffold_is_idempotent(tmp_path):
     scaffold_project(target_dir=tmp_path / "my-project", templates_dir=TEMPLATES_DIR)
     scaffold_project(target_dir=tmp_path / "my-project", templates_dir=TEMPLATES_DIR)
     assert (tmp_path / "my-project" / "workflows" / "workflow.md").exists()
+
+
+def test_validate_target_path_rejects_prefix_sibling(tmp_path):
+    """Sibling directory whose name is a string prefix of base must be rejected."""
+    sibling = "../" + tmp_path.name + "-evil"
+    with pytest.raises(ScaffoldError, match="traversal"):
+        validate_target_path(tmp_path, sibling)

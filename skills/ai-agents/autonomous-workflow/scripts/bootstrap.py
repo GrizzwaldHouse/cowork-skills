@@ -20,7 +20,10 @@ class ScaffoldError(ValueError):
 def validate_target_path(base: Path, relative: str) -> Path:
     """Resolve relative path under base and reject any path traversal."""
     resolved = (base / relative).resolve()
-    if not str(resolved).startswith(str(base.resolve())):
+    base_resolved = base.resolve()
+    try:
+        resolved.relative_to(base_resolved)
+    except ValueError:
         raise ScaffoldError(f"Path traversal detected in: {relative!r}")
     return resolved
 
