@@ -3,9 +3,6 @@
 
 import pytest
 from pathlib import Path
-import sys
-
-sys.path.insert(0, str(Path(__file__).parents[3] / "skills" / "ai-agents" / "autonomous-workflow" / "scripts"))
 
 from bootstrap import scaffold_project, validate_target_path, ScaffoldError
 

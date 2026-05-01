@@ -5,9 +5,6 @@ import json
 import pytest
 from pathlib import Path
 from unittest.mock import patch
-import sys
-
-sys.path.insert(0, str(Path(__file__).parents[3] / "skills" / "ai-agents" / "autonomous-workflow" / "scripts"))
 
 from state_manager import (
     WorkflowState,

@@ -3,11 +3,8 @@
 
 import json
 import pytest
+import requests
 from unittest.mock import patch, MagicMock
-from pathlib import Path
-import sys
-
-sys.path.insert(0, str(Path(__file__).parents[3] / "skills" / "ai-agents" / "autonomous-workflow" / "scripts"))
 
 from agenticos_push import push_event, build_event_payload, EventType
 
@@ -47,7 +44,7 @@ def test_push_event_success(requests_mock):
 
 def test_push_event_silent_failure_on_connection_error():
     with patch("agenticos_push.requests") as mock_requests:
-        mock_requests.post.side_effect = Exception("connection refused")
+        mock_requests.post.side_effect = requests.exceptions.ConnectionError("connection refused")
         result = push_event(
             event_type=EventType.WORKFLOW_STARTED,
             workflow_id="abc-123",
@@ -59,12 +56,23 @@ def test_push_event_silent_failure_on_connection_error():
 
 def test_push_event_silent_failure_on_timeout():
     with patch("agenticos_push.requests") as mock_requests:
-        import requests as req_lib
-        mock_requests.post.side_effect = req_lib.exceptions.Timeout()
+        mock_requests.post.side_effect = requests.exceptions.Timeout()
         result = push_event(
             event_type=EventType.PHASE_COMPLETE,
             workflow_id="abc-123",
             base_url="http://localhost:8000",
             extra={"phase": "brainstorm"},
         )
+    assert result is False
+
+
+def test_push_event_returns_false_on_500(requests_mock):
+    """Non-2xx responses (raise_for_status) must also return False."""
+    requests_mock.post("http://localhost:8000/events", status_code=500)
+    result = push_event(
+        event_type=EventType.WORKFLOW_FAILED,
+        workflow_id="abc-123",
+        base_url="http://localhost:8000",
+        extra={},
+    )
     assert result is False

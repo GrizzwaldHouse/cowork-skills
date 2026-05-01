@@ -5,9 +5,10 @@ import logging
 import os
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 import requests
+from requests.exceptions import RequestException
 
 _logger = logging.getLogger(__name__)
 _TIMEOUT_S = 2
@@ -38,8 +39,8 @@ def build_event_payload(
 def push_event(
     event_type: EventType,
     workflow_id: str,
-    base_url: Optional[str] = None,
-    extra: Optional[dict[str, Any]] = None,
+    base_url: str | None = None,
+    extra: dict[str, Any] | None = None,
 ) -> bool:
     """POST event to AgenticOS. Returns True on success, False on any failure.
     Never raises — AgenticOS unavailability must not block workflow execution."""
@@ -49,6 +50,6 @@ def push_event(
         resp = requests.post(url, json=payload, timeout=_TIMEOUT_S)
         resp.raise_for_status()
         return True
-    except Exception as exc:
+    except (RequestException, OSError) as exc:
         _logger.debug("AgenticOS push failed (non-blocking): %s", exc)
         return False
