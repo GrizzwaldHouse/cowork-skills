@@ -1,0 +1,202 @@
+/* WorkflowStatusPanel.css
+   Developer: Marcus Daley
+   Date: 2026-05-01
+   Purpose: Scoped styles for the workflow HUD panel. All colors reference
+            tokens.css variables; no hex values appear here. */
+
+/* --------------- Panel shell --------------- */
+.workflow-panel {
+  border: 1px solid rgba(139, 116, 53, 0.25);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.workflow-panel__title {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: var(--letter-extra-wide);
+  color: rgba(201, 169, 78, 0.55);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* --------------- Empty state --------------- */
+.workflow-panel--empty {
+  min-height: 48px;
+  justify-content: center;
+}
+
+.workflow-panel__empty-msg {
+  font-size: var(--font-size-xs);
+  letter-spacing: var(--letter-extra-wide);
+  color: rgba(201, 169, 78, 0.3);
+  text-transform: uppercase;
+  margin: 0;
+  text-align: center;
+}
+
+/* --------------- Error state --------------- */
+.workflow-panel__error {
+  font-size: var(--font-size-sm);
+  color: var(--color-error-red);
+  margin: 0;
+}
+
+/* --------------- Workflow section --------------- */
+.workflow-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: rgba(27, 40, 56, 0.6);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(139, 116, 53, 0.15);
+}
+
+.workflow-section__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.workflow-section__id {
+  font-size: var(--font-size-xs);
+  color: rgba(201, 169, 78, 0.6);
+  letter-spacing: var(--letter-wide);
+  font-family: monospace;
+}
+
+.workflow-section__task {
+  font-size: var(--font-size-sm);
+  color: rgba(245, 230, 200, 0.85);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --------------- Status pill --------------- */
+.workflow-pill {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: var(--letter-extra-wide);
+  border-radius: var(--radius-sm);
+  padding: 2px 7px;
+  text-transform: uppercase;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.workflow-pill[data-status='active'] {
+  background: rgba(201, 169, 78, 0.18);
+  color: var(--color-gold-accent);
+  border: 1px solid rgba(201, 169, 78, 0.35);
+}
+
+.workflow-pill[data-status='complete'] {
+  background: rgba(39, 174, 96, 0.15);
+  color: var(--color-success-green);
+  border: 1px solid rgba(39, 174, 96, 0.3);
+}
+
+.workflow-pill[data-status='failed'] {
+  background: rgba(192, 57, 43, 0.15);
+  color: var(--color-error-red);
+  border: 1px solid rgba(192, 57, 43, 0.3);
+}
+
+/* --------------- Phase bar --------------- */
+.workflow-phases {
+  display: flex;
+  gap: 2px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.workflow-phase {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: background var(--motion-medium) var(--ease-standard);
+  padding: 0 4px;
+  overflow: hidden;
+}
+
+.workflow-phase[data-state='pending'] {
+  background: rgba(27, 40, 56, 0.9);
+  color: rgba(201, 169, 78, 0.25);
+  border: 1px solid rgba(139, 116, 53, 0.12);
+}
+
+.workflow-phase[data-state='active'] {
+  background: rgba(201, 169, 78, 0.14);
+  color: var(--color-gold-accent);
+  border: 1px solid rgba(201, 169, 78, 0.3);
+  animation: phase-pulse var(--motion-slow) ease-in-out infinite alternate;
+}
+
+.workflow-phase[data-state='complete'] {
+  background: rgba(77, 182, 172, 0.12);
+  color: var(--color-teal-fg);
+  border: 1px solid rgba(77, 182, 172, 0.25);
+}
+
+.workflow-phase[data-state='voted-pass'] {
+  background: rgba(39, 174, 96, 0.12);
+  color: var(--color-success-green);
+  border: 1px solid rgba(39, 174, 96, 0.25);
+}
+
+.workflow-phase[data-state='voted-fail'] {
+  background: rgba(192, 57, 43, 0.12);
+  color: var(--color-error-red);
+  border: 1px solid rgba(192, 57, 43, 0.25);
+}
+
+@keyframes phase-pulse {
+  from { opacity: 0.7; }
+  to   { opacity: 1.0; }
+}
+
+/* --------------- Vote badge --------------- */
+.vote-badge {
+  font-size: 8px;
+  font-weight: 700;
+  border-radius: 2px;
+  padding: 1px 4px;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.vote-badge[data-result='PASS'] {
+  background: rgba(39, 174, 96, 0.2);
+  color: var(--color-success-green);
+}
+
+.vote-badge[data-result='FAIL'],
+.vote-badge[data-result='BLOCKED'] {
+  background: rgba(192, 57, 43, 0.2);
+  color: var(--color-error-red);
+}
+
+/* --------------- Footer meta --------------- */
+.workflow-section__meta {
+  font-size: var(--font-size-xs);
+  color: rgba(160, 180, 255, 0.35);
+  font-family: monospace;
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
