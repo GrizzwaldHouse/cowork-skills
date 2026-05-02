@@ -908,6 +908,27 @@ def _register_routes(app: FastAPI) -> None:
         tmp.replace(events_file)
         return JSONResponse({"ok": True, "event": body.event})
 
+    @app.get("/workflow-events")
+    async def get_workflow_events(
+        since: int = Query(default=0, ge=0, description="Return events at index >= since"),
+        workflow_id: Optional[str] = Query(default=None, description="Filter to one workflow run"),
+    ) -> JSONResponse:
+        """Return workflow lifecycle events written by the autonomous-workflow skill.
+        Uses a 0-based array-index cursor matching the /progress endpoint convention."""
+        events_file = OUTPUTS_DIR / "workflow_events.json"
+        if not events_file.exists():
+            return JSONResponse({"since": since, "count": 0, "events": []})
+        try:
+            all_events: list = json.loads(events_file.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError) as exc:
+            _logger.warning("Could not read workflow_events.json: %s", exc)
+            return JSONResponse({"since": since, "count": 0, "events": []})
+
+        sliced = all_events[since:]
+        if workflow_id is not None:
+            sliced = [e for e in sliced if e.get("workflow_id") == workflow_id]
+        return JSONResponse({"since": since, "count": len(sliced), "events": sliced})
+
     @app.websocket("/ws")
     async def websocket_endpoint(websocket: WebSocket) -> None:
         """Primary realtime channel. Clients connect, immediately
