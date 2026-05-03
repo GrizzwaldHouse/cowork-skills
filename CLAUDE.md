@@ -1,5 +1,19 @@
 # CLAUDE.md - Claude Skills System
 
+## Communication Style (Hard Rules)
+
+- Never use em-dashes (the long dash, `—`) or en-dashes (`–`) in any output. This applies to chat responses, file content, comments, commit messages, plan files, brainstorm artifacts, and code. Use commas, periods, parentheses, colons, or semicolons instead. This is a universal rule, not limited to brainstorm artifacts.
+
+## Planning Workflow (Hard Rules)
+
+When entering planning mode for any non-trivial task, before producing a plan or writing any code:
+
+1. Invoke the `brainstorm-artifact` skill at `skills/brainstorm-artifact/` to produce the structured `[PROJECT_NAME] BRAINSTORM RESPONSES` artifact, capturing the full scope of the request as scannable checkboxes (decided + open).
+2. Invoke the `superpowers-workflow` skill at `skills/superpowers-workflow/` to apply the workflow patterns (research, multiple approaches, trade-offs, architecture, then implementation) before any code or analysis output.
+3. Confirm the brainstorm artifact with Marcus before proceeding to code, file generation, or any deliverable.
+
+The brainstorm gate is non-negotiable. Even read-only analysis tasks should produce the artifact first when scope is non-trivial, so Marcus can lock the picture before reads happen.
+
 ## Project Overview
 
 A modular system for creating, managing, and syncing Claude AI skill templates. Includes a file watcher, bidirectional sync engine, GitHub integration, and a themed WPF desktop UI with console fallback.
