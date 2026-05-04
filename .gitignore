@@ -53,6 +53,7 @@ AgenticOS/state/progress.log
 AgenticOS/state/agents.json
 AgenticOS/state/approval_queue.json
 AgenticOS/state/outputs/
+security/audit_log.json
 security/audit_log.*.json
 
 # Binary archives
