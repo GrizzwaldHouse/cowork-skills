@@ -76,3 +76,36 @@ def test_push_event_returns_false_on_500(requests_mock):
         extra={},
     )
     assert result is False
+
+
+def test_push_event_falls_back_to_state_route(requests_mock):
+    """Falls back to /state when /events returns 404."""
+    requests_mock.options("http://localhost:8000/events", status_code=404)
+    requests_mock.post("http://localhost:8000/state", json={"ok": True}, status_code=200)
+    # Clear route cache before test
+    import agenticos_push
+    agenticos_push._route_cache.clear()
+    result = push_event(
+        event_type=EventType.WORKFLOW_STARTED,
+        workflow_id="abc-123",
+        base_url="http://localhost:8000",
+        extra={"task": "test"},
+    )
+    assert result is True
+    assert requests_mock.last_request.path == "/state"
+
+
+def test_push_event_uses_cached_route(requests_mock):
+    """Uses cached route on second call without re-probing."""
+    import agenticos_push
+    agenticos_push._route_cache["http://localhost:9999"] = "/events"
+    requests_mock.post("http://localhost:9999/events", json={"ok": True}, status_code=200)
+    result = push_event(
+        event_type=EventType.PHASE_COMPLETE,
+        workflow_id="abc-123",
+        base_url="http://localhost:9999",
+        extra={"phase": "brainstorm"},
+    )
+    assert result is True
+    # OPTIONS should NOT have been called (cached route used)
+    assert not any(r.method == "OPTIONS" for r in requests_mock.request_history)

@@ -30,6 +30,8 @@ def validate_target_path(base: Path, relative: str) -> Path:
 
 def scaffold_project(target_dir: Path, templates_dir: Path) -> None:
     """Create the runtime scaffold directory structure under target_dir."""
+    # Validate target_dir is not attempting traversal relative to its own parent
+    validate_target_path(target_dir.parent, target_dir.name)
     target_dir.mkdir(parents=True, exist_ok=True)
 
     for subdir in SCAFFOLD_DIRS:
