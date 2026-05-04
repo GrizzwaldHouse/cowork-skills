@@ -1,8 +1,11 @@
 # bootstrap.py
 # Marcus Daley — 2026-05-01 — Runtime scaffold generator for autonomous-workflow
 
+import logging
 import shutil
 from pathlib import Path
+
+_logger = logging.getLogger(__name__)
 
 SCAFFOLD_DIRS = ["workflows", "tasks", "skills", "orchestrator", "state"]
 
@@ -30,8 +33,9 @@ def validate_target_path(base: Path, relative: str) -> Path:
 
 def scaffold_project(target_dir: Path, templates_dir: Path) -> None:
     """Create the runtime scaffold directory structure under target_dir."""
-    # Validate target_dir is not attempting traversal relative to its own parent
     validate_target_path(target_dir.parent, target_dir.name)
+    if not templates_dir.exists():
+        raise ScaffoldError(f"templates_dir does not exist: {templates_dir}")
     target_dir.mkdir(parents=True, exist_ok=True)
 
     for subdir in SCAFFOLD_DIRS:
@@ -40,5 +44,8 @@ def scaffold_project(target_dir: Path, templates_dir: Path) -> None:
     for template_file, dest_subdir in TEMPLATE_MAP.items():
         src = templates_dir / template_file
         dst = target_dir / dest_subdir / template_file
-        if src.exists() and not dst.exists():
+        if not src.exists():
+            _logger.warning("Template file not found, skipping: %s", src)
+            continue
+        if not dst.exists():
             shutil.copy2(src, dst)

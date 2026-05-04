@@ -64,17 +64,24 @@ def push_event(
 
 
 def _get_route(base_url: str) -> str:
-    """Detect which route AgenticOS supports; cache result per base_url."""
+    """Detect which route AgenticOS supports; cache result per base_url.
+    Only caches on definitive responses (2xx or 404/405); re-probes on ambiguous errors."""
     if base_url in _route_cache:
         return _route_cache[base_url]
     try:
-        # Use OPTIONS to probe without sending data
         resp = requests.options(f"{base_url}/events", timeout=_TIMEOUT_S)
         if resp.status_code in (404, 405):
             _route_cache[base_url] = "/state"
-        else:
+            return "/state"
+        elif resp.status_code < 400:
             _route_cache[base_url] = "/events"
+            return "/events"
+        # 4xx (not 404/405) or 5xx — ambiguous, don't cache, fall through to default
     except Exception:
-        # Connection failed entirely — default to /events, will fail gracefully later
-        _route_cache[base_url] = "/events"
-    return _route_cache[base_url]
+        pass  # Connection failed — don't cache, fall through
+    return "/events"  # Default: try /events, will fail gracefully if wrong
+
+
+def clear_route_cache() -> None:
+    """Clear the route detection cache. Useful after AgenticOS restarts."""
+    _route_cache.clear()

@@ -6,7 +6,7 @@ import pytest
 import requests
 from unittest.mock import patch, MagicMock
 
-from agenticos_push import push_event, build_event_payload, EventType
+from agenticos_push import push_event, build_event_payload, EventType, clear_route_cache
 
 
 def test_build_event_payload_workflow_started():
@@ -83,8 +83,7 @@ def test_push_event_falls_back_to_state_route(requests_mock):
     requests_mock.options("http://localhost:8000/events", status_code=404)
     requests_mock.post("http://localhost:8000/state", json={"ok": True}, status_code=200)
     # Clear route cache before test
-    import agenticos_push
-    agenticos_push._route_cache.clear()
+    clear_route_cache()
     result = push_event(
         event_type=EventType.WORKFLOW_STARTED,
         workflow_id="abc-123",

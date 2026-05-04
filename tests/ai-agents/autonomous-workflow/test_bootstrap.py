@@ -50,3 +50,9 @@ def test_validate_target_path_rejects_prefix_sibling(tmp_path):
     sibling = "../" + tmp_path.name + "-evil"
     with pytest.raises(ScaffoldError, match="traversal"):
         validate_target_path(tmp_path, sibling)
+
+
+def test_scaffold_raises_if_templates_dir_missing(tmp_path):
+    """ScaffoldError raised if templates_dir does not exist."""
+    with pytest.raises(ScaffoldError, match="templates_dir"):
+        scaffold_project(target_dir=tmp_path / "project", templates_dir=tmp_path / "nonexistent")
