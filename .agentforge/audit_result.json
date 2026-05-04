@@ -1,0 +1,70 @@
+{
+  "repo": "cowork-skills",
+  "auditTimestamp": "2026-05-04T07:30:54.657902+00:00",
+  "agentforgeRole": "BRAIN + SKELETAL",
+  "integrationStatus": "STANDALONE",
+  "readiness": "NOT_READY",
+  "compliance": {
+    "no_polling_loops": true,
+    "polling_violations": [],
+    "no_hardcoded_values": true,
+    "hardcoded_count": 0,
+    "config_file_present": false,
+    "config_files": [],
+    "observer_pattern_used": false,
+    "observer_evidence": [],
+    "vram_watchdog_present": false,
+    "no_em_dashes": true,
+    "em_dash_count": 0,
+    "env_example_present": false
+  },
+  "stats": {
+    "filesScanned": 123,
+    "functionsFound": 0,
+    "openTodos": 0,
+    "testFiles": 28,
+    "prdViolations": 0,
+    "stack": [
+      "Python"
+    ]
+  },
+  "gaps": {
+    "missing_components": [
+      {
+        "component": "OwlWatcher integration",
+        "layer": "NERVOUS_SYSTEM",
+        "reason": "No event bus or observer pattern detected. Required by PRD v2."
+      },
+      {
+        "component": "Config module",
+        "layer": "ENDOCRINE",
+        "reason": "No config file detected. All values must be config-driven per PRD v2."
+      },
+      {
+        "component": "SESSION_HANDOFF.md",
+        "layer": "LYMPHATIC",
+        "reason": "Required by Marcus Check-In Protocol for session continuity"
+      }
+    ],
+    "refactors_required": [],
+    "config_files_needed": [
+      {
+        "filename": "config.json or config.py",
+        "purpose": "All tunable values, API endpoints, model names, thresholds"
+      },
+      {
+        "filename": ".env.example",
+        "purpose": "Secrets template. Required per PRD v2 secrets management rule."
+      }
+    ],
+    "event_contracts_needed": [
+      {
+        "event": "REPO_SPECIFIC_EVENT",
+        "reason": "Need to define what events this repo emits/consumes"
+      }
+    ],
+    "prd_violations": []
+  },
+  "claudeCodeUsed": false,
+  "elapsedSeconds": 268.1
+}
