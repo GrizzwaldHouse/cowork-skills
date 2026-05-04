@@ -5,37 +5,6 @@ description: Generate an interactive React-based brainstorming wizard artifact f
 
 # Brainstorm Artifact Skill
 
-## CRITICAL ENFORCEMENT RULES -- READ BEFORE ANY OTHER SECTION
-
-These rules are non-negotiable. Every brainstorm artifact produced by this skill must satisfy all of them, every time, with no exceptions.
-
-**RULE 1: Use the template. Never improvise the rendering code.**
-The file `templates/wizard.jsx` contains the canonical rendering code for this artifact. You MUST read it before generating any artifact. You copy that rendering code verbatim and only change `BRAINSTORM_DATA`. You do NOT write new rendering code from scratch. You do NOT add new components that are not already in the template. You do NOT improvise a "simpler" version. If the template is unavailable for any reason, say so and stop rather than generating a custom artifact.
-
-**RULE 2: Output a .jsx file artifact, not inline chat content.**
-The artifact is always a React .jsx artifact rendered in the Claude interface. It is NEVER a list of bullet points, NEVER inline markdown, NEVER a plain HTML page unless explicitly asked for the client_form.html variant. The wizard lives in the artifact panel, not in the chat.
-
-**RULE 3: Apply the correct theme. Never invent a palette from scratch.**
-Select `themeKey` from the three shipping themes (`vetassist_tactical`, `game_dev_arcade`, `research_editorial`) or add a new theme to the THEMES constant following the pattern in `references/themes.md`. You do NOT invent bright, saturated, or "loud" palettes that are not grounded in one of these theme families. Default theme calibration: dark background, muted accents, two anchor colors maximum in any one view. The `game_dev_arcade` theme is the loudest permitted palette and is only used for game development work.
-
-**RULE 4: Every question carries all four affordances.**
-Free-text override, voice input, hybrid composer, and feedback flag must appear on every question, every time. They are mandatory. You do NOT simplify questions to just pill buttons without the affordance bar below them.
-
-**RULE 5: No em-dashes anywhere in the artifact.**
-Not in question text, rationale text, labels, comments, or UI copy. Use commas, colons, or parentheses instead.
-
-**RULE 6: All values are config-driven.**
-Colors, labels, rank names, achievement text, XP thresholds, and question content all come from `BRAINSTORM_DATA` and `THEMES`. Nothing is hardcoded inline in JSX.
-
-**WHAT INCONSISTENT OUTPUT LOOKS LIKE -- RECOGNIZE AND AVOID:**
-- Bright neon colors on a non-game-dev artifact (RULE 3 violation)
-- Questions displayed as plain text with a text area and no pills (RULE 1 violation, template not used)
-- Wizard content appearing in chat as bullet points instead of a rendered artifact (RULE 2 violation)
-- Questions missing the affordance bar (RULE 4 violation)
-- "I'll create a simple version for now..." -- this is always wrong, use the template
-
----
-
 This skill produces an interactive brainstorming artifact that captures structured decisions about a project's scope, features, or MVP. The artifact has two modes that share a single schema, an internal mode for working sessions and a client mode for sending to stakeholders. The shared schema means a client's returned answers slot directly into your internal scoping artifact without translation.
 
 ## Why this skill exists
@@ -171,23 +140,14 @@ Two buttons at the bottom of the form. The first downloads the same JSON object 
 
 ## Generating a new brainstorm artifact
 
-When the user asks for a new brainstorm, follow these steps in order. Do not skip steps.
+When the user asks for a new brainstorm:
 
-1. **Read `templates/wizard.jsx` first.** Before writing a single line of output, call the view tool on `templates/wizard.jsx`. This is mandatory. The template is the output. You are not writing new code, you are populating a schema.
-
-2. **Read `references/themes.md`.** Confirm which shipping theme applies. If none fit, define the new theme in the THEMES constant using the token pattern from that file before touching anything else.
-
-3. **Ask which mode** if not obvious from context. Internal for working sessions, client for sending to stakeholders.
-
-4. **Capture metadata** -- project name, session date, any pre-locked context from prior sessions or known constraints.
-
-5. **Draft sections and questions** -- read `references/question_types.md` to pick the right type for each decision. Restructure questions that do not fit a type, do not force a wrong type.
-
-6. **Generate the artifact** by copying `templates/wizard.jsx` verbatim, then replacing only `BRAINSTORM_DATA` with the new content and setting `themeKey` in the metadata. The rendering code (components, hooks, gamification logic, affordance bar) stays unchanged. Create it as a `.jsx` artifact in the chat.
-
-7. **For client mode**, generate a standalone HTML version from `templates/client_form.html` with the same `BRAINSTORM_DATA` inlined. The HTML file is what gets emailed to the client.
-
-**Shortcut that is always wrong:** Generating a minimal custom React component with just text areas and buttons because it seems simpler. The template exists precisely because simpler components do not deliver the wizard experience Marcus needs.
+1. **Ask which mode** if not obvious. Internal for working sessions, client for sending to stakeholders.
+2. **Ask which theme** if not obvious. Default to the project's natural domain. If the project doesn't fit any shipping theme, define a new theme in the THEMES constant before generating the artifact (see references/themes.md for the token list).
+3. **Capture metadata** — project name, session date, any pre-locked context from prior sessions or known constraints.
+4. **Draft the sections and questions** — read references/question_types.md to pick the right type for each decision. Restructure questions that don't fit a type, do not force a wrong type.
+5. **Generate the artifact** by populating BRAINSTORM_DATA in templates/wizard.jsx and creating it as a `.jsx` file artifact in the chat. The rendering code stays unchanged across artifacts, only BRAINSTORM_DATA changes.
+6. **For client mode**, also generate a standalone HTML version (templates/client_form.html) with the same BRAINSTORM_DATA inlined. The HTML file is what gets emailed to the client.
 
 ## Building on prior brainstorms
 

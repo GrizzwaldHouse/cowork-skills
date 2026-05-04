@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Project Brainstorm</title>
+<style>
+  /* Replace these with theme tokens at generation time. Defaults use vetassist_tactical. */
+  :root {
+    --bg-base: #0a0e0a;
+    --bg-surface: #141a14;
+    --bg-raised: #1f2820;
+    --accent: #8a6d3b;
+    --accent-bright: #c9a96e;
+    --text-primary: #e8e0c8;
+    --text-muted: #9aa093;
+    --border: #2a3528;
+    --warning: #c9a96e;
+    --font-display: "Playfair Display", Georgia, serif;
+    --font-body: "Playfair Display", Georgia, serif;
+    --font-mono: "JetBrains Mono", "Courier New", monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    line-height: 1.5;
+    padding: 2rem 1rem;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  header {
+    background: var(--bg-surface);
+    border-left: 4px solid var(--accent);
+    padding: 1rem 1.25rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+  }
+  header h1 { font-family: var(--font-display); color: var(--accent-bright); margin: 0.25rem 0 0; font-size: 1.75rem; }
+  header .meta { font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted); }
+  header p { margin: 0.5rem 0 0; color: var(--text-muted); font-size: 0.95rem; }
+  section.q-section {
+    background: var(--bg-surface);
+    border-left: 3px solid var(--accent);
+    padding: 1rem 1.25rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+  }
+  section.q-section h2 { font-family: var(--font-display); color: var(--accent-bright); margin: 0 0 1rem; font-size: 1.25rem; }
+  .q { margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px dashed var(--border); }
+  .q:last-child { border-bottom: none; }
+  .q-prompt { font-weight: 600; margin-bottom: 0.75rem; }
+  .options { display: flex; flex-direction: column; gap: 0.5rem; }
+  .pill {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    font-size: 0.95rem;
+  }
+  .pill:hover { border-color: var(--accent-bright); }
+  .pill.selected { background: var(--accent); color: var(--bg-base); border-color: var(--accent-bright); }
+  .pill .rationale { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem; }
+  .pill.selected .rationale { color: var(--bg-base); opacity: 0.8; }
+  .tf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .tf-grid .pill { text-align: center; padding: 1.25rem; }
+  .tf-grid .pill .label { font-size: 1.25rem; font-weight: 700; }
+  .grid-row { display: grid; gap: 0.25rem; margin-bottom: 0.5rem; align-items: center; }
+  .grid-row .label { padding: 0.5rem; font-size: 0.9rem; }
+  .grid-cell {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 0.5rem;
+    cursor: pointer;
+    font-family: inherit;
+    border-radius: 4px;
+    font-size: 0.85rem;
+  }
+  .grid-cell.selected { background: var(--accent); color: var(--bg-base); border-color: var(--accent-bright); }
+  .scale-labels { font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 0.25rem; }
+  .ranked-row { display: flex; gap: 0.5rem; align-items: center; padding: 0.5rem; background: var(--bg-raised); border-radius: 4px; margin-bottom: 0.25rem; border: 1px solid var(--border); }
+  .ranked-row .rank-num { font-family: var(--font-mono); color: var(--accent-bright); font-weight: 700; width: 1.5rem; text-align: center; }
+  .ranked-row .rank-label { flex: 1; }
+  .ranked-row button { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.25rem; padding: 0 0.5rem; }
+  .legend { background: var(--bg-raised); padding: 0.5rem 0.75rem; border-radius: 4px; margin-bottom: 0.75rem; font-size: 0.85rem; }
+  .legend strong { color: var(--accent-bright); }
+  .affordances { margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed var(--border); }
+  .aff-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem; }
+  .aff-btn {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 0.35rem 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-family: inherit;
+  }
+  .aff-btn.flag { color: var(--warning); }
+  .aff-btn.listening { background: var(--accent); color: var(--bg-base); }
+  textarea {
+    width: 100%;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    resize: vertical;
+  }
+  footer { display: flex; gap: 0.75rem; margin-top: 2rem; flex-wrap: wrap; }
+  .primary {
+    background: var(--accent);
+    color: var(--bg-base);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1rem;
+  }
+  .secondary {
+    background: var(--bg-raised);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1rem;
+  }
+  .ctx-tags { margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .ctx-tag { background: var(--bg-raised); color: var(--text-muted); font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 4px; }
+  @media print {
+    body { background: white; color: black; padding: 1rem; }
+    .affordances, footer, .aff-buttons, .legend { display: none; }
+    section.q-section, header { background: white; border: 1px solid #ccc; }
+    h1, h2 { color: black; }
+    .pill { border: 1px solid #999; background: white; color: black; }
+    .pill.selected { background: #333; color: white; }
+    .grid-cell.selected { background: #333; color: white; }
+    textarea { border: 1px solid #999; background: white; color: black; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="meta" id="meta-line"></div>
+    <h1 id="project-title"></h1>
+    <p id="intro-text">Please answer the questions below. Your responses are saved in your browser as you go. When you're done, use Export JSON to send your answers back, or Save as PDF for your records.</p>
+    <div class="ctx-tags" id="ctx-tags"></div>
+  </header>
+  <main id="sections"></main>
+  <footer>
+    <button class="primary" onclick="exportJson()">Export JSON</button>
+    <button class="secondary" onclick="window.print()">Save as PDF</button>
+    <button class="secondary" onclick="resetAll()">Reset</button>
+  </footer>
+</div>
+
+<script>
+/* =========================================================================
+   BRAINSTORM_DATA: replace this block per project at generation time.
+   Schema is identical to the React wizard, set mode to "client".
+   ========================================================================= */
+const BRAINSTORM_DATA = {
+  metadata: {
+    projectName: "Sample Project",
+    sessionDate: "2026-05-01",
+    themeKey: "vetassist_tactical",
+    mode: "client",
+    preLockedContext: []
+  },
+  sections: [
+    {
+      id: "scope",
+      title: "Scope",
+      questions: [
+        {
+          id: "primary_goal",
+          type: "single",
+          prompt: "What is the primary goal of this project for your organization?",
+          options: [
+            { label: "Internal efficiency", rationale: "Reduce time spent on repetitive tasks." },
+            { label: "Customer-facing product", rationale: "New revenue or retention driver." },
+            { label: "Compliance or regulatory", rationale: "Meet a specific external requirement." },
+            { label: "Other", rationale: "Use the override field below to describe." }
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+const STORAGE_KEY = "brainstorm_client:" + BRAINSTORM_DATA.metadata.projectName;
+let answers = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(answers)); }
+function ans(qid) { if (!answers[qid]) answers[qid] = {}; return answers[qid]; }
+function setAns(qid, patch) { answers[qid] = Object.assign({}, ans(qid), patch); save(); render(); }
+
+function renderHeader() {
+  document.getElementById("project-title").textContent = BRAINSTORM_DATA.metadata.projectName + " Brainstorm";
+  document.getElementById("meta-line").textContent = "\u25C6 " + BRAINSTORM_DATA.metadata.sessionDate;
+  const ctx = document.getElementById("ctx-tags");
+  ctx.innerHTML = "";
+  (BRAINSTORM_DATA.metadata.preLockedContext || []).forEach((c) => {
+    const span = document.createElement("span");
+    span.className = "ctx-tag";
+    span.textContent = c.label + ": " + c.value;
+    ctx.appendChild(span);
+  });
+}
+
+function renderQuestion(q) {
+  const wrap = document.createElement("div");
+  wrap.className = "q";
+  const prompt = document.createElement("div");
+  prompt.className = "q-prompt";
+  prompt.textContent = q.prompt;
+  wrap.appendChild(prompt);
+
+  const a = ans(q.id);
+
+  if (q.type === "single" || q.type === "true_false") {
+    const opts = document.createElement("div");
+    opts.className = q.type === "true_false" ? "tf-grid" : "options";
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement("button");
+      btn.className = "pill" + (a.selectedIndex === i ? " selected" : "");
+      btn.innerHTML = "<div class='label'>" + esc(opt.label) + "</div>" + (opt.rationale ? "<div class='rationale'>" + esc(opt.rationale) + "</div>" : "");
+      btn.onclick = () => setAns(q.id, { selectedIndex: i });
+      opts.appendChild(btn);
+    });
+    wrap.appendChild(opts);
+  } else if (q.type === "multi") {
+    const opts = document.createElement("div");
+    opts.className = "options";
+    const sel = a.selectedIndices || [];
+    q.options.forEach((opt, i) => {
+      const checked = sel.indexOf(i) !== -1;
+      const btn = document.createElement("button");
+      btn.className = "pill" + (checked ? " selected" : "");
+      btn.innerHTML = "<div class='label'>" + (checked ? "[x] " : "[ ] ") + esc(opt.label) + "</div>" + (opt.rationale ? "<div class='rationale'>" + esc(opt.rationale) + "</div>" : "");
+      btn.onclick = () => {
+        const next = checked ? sel.filter((x) => x !== i) : sel.concat([i]);
+        setAns(q.id, { selectedIndices: next });
+      };
+      opts.appendChild(btn);
+    });
+    wrap.appendChild(opts);
+  } else if (q.type === "ranked") {
+    const order = a.order || q.options.map((_, i) => i);
+    order.forEach((optIdx, pos) => {
+      const row = document.createElement("div");
+      row.className = "ranked-row";
+      row.innerHTML =
+        "<span class='rank-num'>" + (pos + 1) + "</span>" +
+        "<span class='rank-label'>" + esc(q.options[optIdx].label) + "</span>";
+      const up = document.createElement("button");
+      up.textContent = "\u25B2";
+      up.onclick = () => {
+        if (pos === 0) return;
+        const n = order.slice();
+        [n[pos], n[pos - 1]] = [n[pos - 1], n[pos]];
+        setAns(q.id, { order: n });
+      };
+      const down = document.createElement("button");
+      down.textContent = "\u25BC";
+      down.onclick = () => {
+        if (pos === order.length - 1) return;
+        const n = order.slice();
+        [n[pos], n[pos + 1]] = [n[pos + 1], n[pos]];
+        setAns(q.id, { order: n });
+      };
+      row.appendChild(up);
+      row.appendChild(down);
+      wrap.appendChild(row);
+    });
+    if (!a.order) setAns(q.id, { order: order });
+  } else if (q.type === "numeric_scale") {
+    const labelsRow = document.createElement("div");
+    labelsRow.className = "grid-row";
+    labelsRow.style.gridTemplateColumns = "1fr repeat(" + q.scale.labels.length + ", minmax(0, 1fr))";
+    labelsRow.appendChild(document.createElement("div"));
+    q.scale.labels.forEach((lab) => {
+      const d = document.createElement("div");
+      d.className = "scale-labels";
+      d.textContent = lab;
+      labelsRow.appendChild(d);
+    });
+    wrap.appendChild(labelsRow);
+    const values = a.values || {};
+    q.rows.forEach((row) => {
+      const r = document.createElement("div");
+      r.className = "grid-row";
+      r.style.gridTemplateColumns = "1fr repeat(" + q.scale.labels.length + ", minmax(0, 1fr))";
+      const lab = document.createElement("div");
+      lab.className = "label";
+      lab.textContent = row.label;
+      r.appendChild(lab);
+      q.scale.labels.forEach((_, i) => {
+        const v = q.scale.min + i;
+        const btn = document.createElement("button");
+        btn.className = "grid-cell" + (values[row.id] === v ? " selected" : "");
+        btn.textContent = v;
+        btn.onclick = () => setAns(q.id, { values: Object.assign({}, values, { [row.id]: v }) });
+        r.appendChild(btn);
+      });
+      wrap.appendChild(r);
+    });
+  } else if (q.type === "abc_match") {
+    const legend = document.createElement("div");
+    legend.className = "legend";
+    legend.innerHTML = q.categories.map((c) => "<div><strong>" + esc(c.label) + ":</strong> " + esc(c.description || "") + "</div>").join("");
+    wrap.appendChild(legend);
+    const assignments = a.assignments || {};
+    q.rows.forEach((row) => {
+      const r = document.createElement("div");
+      r.className = "grid-row";
+      r.style.gridTemplateColumns = "1fr repeat(" + q.categories.length + ", minmax(0, 1fr))";
+      const lab = document.createElement("div");
+      lab.className = "label";
+      lab.textContent = row.label;
+      r.appendChild(lab);
+      q.categories.forEach((cat) => {
+        const btn = document.createElement("button");
+        btn.className = "grid-cell" + (assignments[row.id] === cat.id ? " selected" : "");
+        btn.textContent = cat.label;
+        btn.onclick = () => setAns(q.id, { assignments: Object.assign({}, assignments, { [row.id]: cat.id }) });
+        r.appendChild(btn);
+      });
+      wrap.appendChild(r);
+    });
+  }
+
+  // affordances
+  const aff = document.createElement("div");
+  aff.className = "affordances";
+  const buttons = document.createElement("div");
+  buttons.className = "aff-buttons";
+
+  const overrideBtn = document.createElement("button");
+  overrideBtn.className = "aff-btn";
+  overrideBtn.textContent = "+ Override";
+  overrideBtn.onclick = () => setAns(q.id, { overrideOpen: !a.overrideOpen });
+  buttons.appendChild(overrideBtn);
+
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SR) {
+    const voiceBtn = document.createElement("button");
+    voiceBtn.className = "aff-btn" + (a.listening ? " listening" : "");
+    voiceBtn.textContent = a.listening ? "Listening..." : "\uD83C\uDFA4 Voice";
+    voiceBtn.onclick = () => startVoice(q.id);
+    buttons.appendChild(voiceBtn);
+  }
+
+  const hybridBtn = document.createElement("button");
+  hybridBtn.className = "aff-btn";
+  hybridBtn.textContent = "+ Hybrid";
+  hybridBtn.onclick = () => setAns(q.id, { hybridOpen: !a.hybridOpen });
+  buttons.appendChild(hybridBtn);
+
+  const flagBtn = document.createElement("button");
+  flagBtn.className = "aff-btn flag";
+  flagBtn.textContent = "\u2691 Flag";
+  flagBtn.onclick = () => setAns(q.id, { flagOpen: !a.flagOpen });
+  buttons.appendChild(flagBtn);
+
+  aff.appendChild(buttons);
+
+  if (a.overrideOpen) aff.appendChild(textarea("override", q.id, a, "Free-text override (replaces preset answer)"));
+  if (a.hybridOpen) aff.appendChild(textarea("hybrid", q.id, a, "Hybrid composer (preset plus your constraints)"));
+  if (a.flagOpen) aff.appendChild(textarea("flag", q.id, a, "Flag this question (ambiguous, missing options, etc.)"));
+
+  wrap.appendChild(aff);
+  return wrap;
+}
+
+function textarea(field, qid, a, placeholder) {
+  const t = document.createElement("textarea");
+  t.placeholder = placeholder;
+  t.rows = 3;
+  t.value = a[field] || "";
+  t.oninput = (e) => {
+    answers[qid] = Object.assign({}, ans(qid), { [field]: e.target.value });
+    save();
+  };
+  return t;
+}
+
+function startVoice(qid) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return;
+  setAns(qid, { listening: true, overrideOpen: true });
+  const r = new SR();
+  r.continuous = false;
+  r.interimResults = false;
+  r.onresult = (e) => {
+    const t = e.results[0][0].transcript;
+    const cur = ans(qid).override || "";
+    setAns(qid, { override: cur + (cur ? " " : "") + t, listening: false });
+  };
+  r.onend = () => setAns(qid, { listening: false });
+  r.onerror = () => setAns(qid, { listening: false });
+  r.start();
+}
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function render() {
+  renderHeader();
+  const main = document.getElementById("sections");
+  main.innerHTML = "";
+  BRAINSTORM_DATA.sections.forEach((s) => {
+    const sec = document.createElement("section");
+    sec.className = "q-section";
+    const h = document.createElement("h2");
+    h.textContent = s.title;
+    sec.appendChild(h);
+    s.questions.forEach((q) => sec.appendChild(renderQuestion(q)));
+    main.appendChild(sec);
+  });
+}
+
+function exportJson() {
+  const out = {
+    metadata: BRAINSTORM_DATA.metadata,
+    sections: BRAINSTORM_DATA.sections,
+    answers,
+    exportedAt: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(out, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "brainstorm-" + BRAINSTORM_DATA.metadata.projectName + "-" + BRAINSTORM_DATA.metadata.sessionDate + ".json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function resetAll() {
+  if (!confirm("Clear all answers? This cannot be undone.")) return;
+  answers = {};
+  save();
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
