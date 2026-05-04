@@ -22,6 +22,8 @@ Skills install to `~/.claude/skills/` and are available in **all** Claude Code s
 
 To update: `git pull && ./setup.sh`
 
+Single reference for repos, Clauditor, Hugging Face, and sync cadence: [`docs/CANONICAL_SOURCES.md`](docs/CANONICAL_SOURCES.md).
+
 ## Skills
 
 ### Background Skills (auto-loaded)

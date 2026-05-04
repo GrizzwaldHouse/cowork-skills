@@ -1,0 +1,241 @@
+/* panels.css / Developer: Marcus Daley / Date: 2026-04-30 / Description: Component-level styles for Agentic OS — glass morphism cards, agent card anatomy, status dots, progress bars, log entries, and the tool-approval overlay. */
+
+@import url('variables.css');
+
+/* .card — glass morphism base used by all surface panels */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  transition: background var(--transition);
+}
+
+.card:hover {
+  background: var(--surface-hover);
+}
+
+/* .agent-card — extends .card with vertical flex layout for agent status display.
+   Apply as class="card agent-card" so base .card tokens are inherited and only
+   additive layout rules are declared here. This avoids silent divergence if
+   .card token values change later. */
+.agent-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* .agent-header — row that holds status dot, agent name, and optional badges */
+.agent-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* .status-dot — 8px circle indicator; colour + animation communicates agent state */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-dot.idle {
+  background: var(--text-muted);
+}
+
+/* running and blocked pulse to signal active / attention-needed states */
+.status-dot.running {
+  background: var(--accent2);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.status-dot.blocked {
+  background: var(--warning);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.status-dot.done {
+  background: var(--accent);
+}
+
+.status-dot.error {
+  background: var(--danger);
+}
+
+.agent-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text);
+}
+
+/* .agent-task — secondary line describing what the agent is currently working on */
+.agent-task {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-left: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Progress bar — thin 3px strip under each agent card */
+.progress-bar-wrap {
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+/* .agent-actions — row of action buttons (approve, pause, etc.) */
+.agent-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* .btn-approve — primary CTA for approving a pending tool call */
+.btn-approve {
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity var(--transition);
+}
+
+.btn-approve:hover {
+  opacity: 0.85;
+}
+
+/* .btn-deny — secondary destructive action for rejecting a tool call */
+.btn-deny {
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--danger);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity var(--transition);
+}
+
+.btn-deny:hover {
+  opacity: 0.85;
+}
+
+/* .panel-section — right-panel section with bottom divider */
+.panel-section {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* .panel-title — small all-caps label heading each right-panel section */
+.panel-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+/* .log-card — scrollable monospace activity log container */
+.log-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* .log-entry — single line in the activity log; type variant sets colour */
+.log-entry {
+  font-size: 11px;
+  font-family: 'Menlo', 'Consolas', monospace;
+  padding: 2px 0;
+  line-height: 1.4;
+}
+
+.log-entry.user  { color: var(--text); }
+.log-entry.agent { color: var(--accent2); }
+.log-entry.warn  { color: var(--warning); }
+.log-entry.err   { color: var(--danger); }
+
+/* .progress-ring-wrap — centred container for the SVG progress ring widget */
+.progress-ring-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+}
+
+/* .tool-approval-overlay — full-screen blur overlay shown when an agent requests tool permission */
+.tool-approval-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 13, 20, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* .tool-approval-card — centred dialog card inside the overlay */
+.tool-approval-card {
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Tool approval card internals */
+.tool-approval-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.tool-approval-body {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.tool-approval-code {
+  font-family: 'Menlo', 'Consolas', monospace;
+  font-size: 11px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  color: var(--accent2);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.tool-approval-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}

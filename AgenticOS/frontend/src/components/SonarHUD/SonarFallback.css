@@ -1,0 +1,179 @@
+/* SonarFallback.css
+   Developer: Marcus Daley
+   Date: 2026-04-29
+   Purpose: CSS-only animated sonar rings used when WebGL is unavailable.
+            The rendering must look intentional, not degraded; we mirror
+            the Spline scene palette token-for-token via tokens.css so the
+            visual language reads as one continuous instrument panel. */
+
+/* ---------------------------------------------------------------------------
+   Container
+   The fallback occupies the same physical footprint as the Spline canvas so
+   the surrounding grid does not reflow when the fallback path activates.
+--------------------------------------------------------------------------- */
+
+.sonar-fallback {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  background-color: var(--color-deep-navy);
+  border: 1px solid var(--color-border-gold);
+  border-radius: var(--radius-md);
+  min-height: 320px;
+  align-content: flex-start;
+  /* Same fade-in motion as the Spline path so the user does not perceive a
+     hard switch between the two render strategies. */
+  animation: sonar-fallback-fade-in var(--motion-medium) var(--ease-standard);
+}
+
+.sonar-fallback__label {
+  width: 100%;
+  font-size: var(--font-size-xs);
+  color: var(--color-border-gold);
+  letter-spacing: var(--letter-extra-wide);
+  text-transform: uppercase;
+  margin-bottom: var(--space-2);
+  /* Communicates the degraded mode without alarming the operator. */
+  opacity: 0.8;
+}
+
+/* ---------------------------------------------------------------------------
+   Slot
+   A single instrument panel: ring + identifier + status word. Eight of
+   these tile across the fallback container regardless of how many agents
+   are currently filled.
+--------------------------------------------------------------------------- */
+
+.sonar-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  width: 80px;
+}
+
+.sonar-ring {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  /* Smooth color transitions so a status flip does not snap. */
+  transition: border-color var(--motion-medium) var(--ease-standard),
+              box-shadow var(--motion-medium) var(--ease-standard);
+}
+
+/* Inactive: dark, no animation. Sits in the background like a powered-down
+   console light. */
+.sonar-ring--inactive {
+  border-color: var(--color-gold-hairline);
+  background-color: var(--color-well);
+  opacity: 0.4;
+}
+
+/* active: fast gold pulse, mirrors the Spline ring behavior. */
+.sonar-ring--active {
+  border-color: var(--color-gold-accent);
+  color: var(--color-gold-accent);
+  animation: sonar-pulse-fast 0.5s ease-in-out infinite;
+}
+
+/* waiting_approval: slow amber pulse, signals "human attention needed". */
+.sonar-ring--waiting_approval {
+  border-color: var(--color-amber);
+  color: var(--color-amber);
+  animation: sonar-pulse-slow 2s ease-in-out infinite;
+}
+
+/* waiting_review: double-pulse teal, distinguishes reviewer wait from
+   approval wait visually. */
+.sonar-ring--waiting_review {
+  border-color: var(--color-teal-fg);
+  color: var(--color-teal-fg);
+  animation: sonar-double-pulse 1.6s ease-in-out infinite;
+}
+
+/* complete: solid dim green, no animation; signals "done, no action". */
+.sonar-ring--complete {
+  border-color: var(--color-success-green);
+  color: var(--color-success-green);
+  background-color: rgba(39, 174, 96, 0.08);
+}
+
+/* error: rapid red flash; deliberately the loudest visual state. */
+.sonar-ring--error {
+  border-color: var(--color-error-red);
+  color: var(--color-error-red);
+  animation: sonar-flash 0.1s step-end infinite;
+}
+
+/* Progress arc inside each ring. Driven by the --progress CSS custom
+   property set inline by the React component; conic-gradient turns the
+   property into a clockwise sweep. currentColor ties the arc to the
+   ring's status color without redeclaring the palette per state. */
+.sonar-ring__progress {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: conic-gradient(
+    currentColor calc(var(--progress, 0) * 1%),
+    transparent 0
+  );
+  opacity: 0.25;
+}
+
+.sonar-slot__id {
+  font-size: var(--font-size-xs);
+  color: var(--color-parchment);
+  letter-spacing: var(--letter-wide);
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.sonar-slot__status {
+  font-size: 0.6rem;
+  color: var(--color-border-gold);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: var(--letter-tight);
+}
+
+/* ---------------------------------------------------------------------------
+   Keyframes
+--------------------------------------------------------------------------- */
+
+@keyframes sonar-fallback-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Fast pulse, gold halo. Used by the active state; 0.5s cycle is short
+   enough to read as "live data" without flickering. */
+@keyframes sonar-pulse-fast {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(201, 169, 78, 0.6); }
+  50%      { box-shadow: 0 0 0 8px rgba(201, 169, 78, 0); }
+}
+
+/* Slow pulse, amber halo. 2s cycle suggests "waiting" rather than "running". */
+@keyframes sonar-pulse-slow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(243, 156, 18, 0.6); }
+  50%      { box-shadow: 0 0 0 8px rgba(243, 156, 18, 0); }
+}
+
+/* Double pulse, teal halo. Two quick expansions, then a longer rest period.
+   The pattern is more recognizable than a single varying frequency. */
+@keyframes sonar-double-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(77, 182, 172, 0.7); }
+  15%  { box-shadow: 0 0 0 6px rgba(77, 182, 172, 0); }
+  30%  { box-shadow: 0 0 0 0 rgba(77, 182, 172, 0.7); }
+  45%  { box-shadow: 0 0 0 6px rgba(77, 182, 172, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(77, 182, 172, 0); }
+}
+
+/* Rapid flash. step-end makes the transition discrete rather than tweened
+   so the visual reads as alarm instead of breathing. */
+@keyframes sonar-flash {
+  0%  { opacity: 1; }
+  50% { opacity: 0; }
+}

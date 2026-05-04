@@ -1,0 +1,56 @@
+/* base.css / Developer: Marcus Daley / Date: 2026-04-30 / Description: CSS reset and global element defaults for Agentic OS. Imports variables, applies box-model reset, body lock, custom gold scrollbar, and bare element defaults. */
+
+@import url('variables.css');
+
+/* Universal box-model reset — prevents sizing surprises across all elements */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Root document — full-viewport lock, no scrollbars on the outer shell */
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom scrollbar — thin gold thumb on transparent track, used inside scrollable panels */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gold);
+  border-radius: 2px;
+}
+
+/* Links — use accent colour, no underline by default */
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* Buttons — strip all browser chrome; styling applied via component classes */
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}

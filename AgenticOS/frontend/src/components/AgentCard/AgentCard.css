@@ -1,0 +1,142 @@
+/* AgentCard.css
+   Developer: Marcus Daley
+   Date: 2026-04-29
+   Purpose: Card chrome for one agent's instrument panel. Gold border on
+            deep navy fill, status-driven outer glow, responsive interior
+            padding. Lives inside the responsive grid in App.css. */
+
+.agent-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-deep-navy);
+  border: 1px solid var(--color-border-gold);
+  border-radius: var(--radius-md);
+  /* Idle glow keeps the card lifted off the page background. */
+  box-shadow: var(--shadow-card-idle);
+  /* Animate the glow when status flips so transitions feel alive. */
+  transition:
+    box-shadow var(--motion-medium) var(--ease-standard),
+    border-color var(--motion-medium) var(--ease-standard);
+  /* min-width: 0 so the card can shrink in CSS grid without overflowing. */
+  min-width: 0;
+}
+
+/* ---- Status-driven glow and border tweaks ---- */
+
+.agent-card[data-status='active'] {
+  box-shadow: var(--shadow-card-active);
+}
+
+.agent-card[data-status='waiting_approval'] {
+  box-shadow: var(--shadow-card-approval);
+}
+
+.agent-card[data-status='waiting_review'] {
+  box-shadow: var(--shadow-card-review);
+  border-color: var(--color-teal-fg);
+}
+
+.agent-card[data-status='error'] {
+  box-shadow: var(--shadow-card-error);
+  border-color: var(--color-error-red);
+}
+
+.agent-card[data-status='complete'] {
+  border-color: var(--color-success-green);
+}
+
+/* ---- Header ---- */
+
+.agent-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.agent-card__identity {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.agent-card__id {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-gold-accent);
+  letter-spacing: var(--letter-tight);
+  /* Truncate long IDs gracefully rather than breaking the layout. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agent-card__domain {
+  /* Domain color from DOMAIN_COLORS map injected as a CSS custom property.
+     Falls back to the gold border token if the domain is unknown. */
+  color: var(--domain-color, var(--color-border-gold));
+  flex-shrink: 0;
+}
+
+/* ---- Divider ---- */
+
+.agent-card__divider {
+  border: none;
+  border-top: 1px solid var(--color-gold-hairline);
+  margin: var(--space-1) 0;
+  opacity: 0.6;
+}
+
+/* ---- Stage line and task description ---- */
+
+.agent-card__stage-line {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--color-parchment);
+}
+
+.agent-card__task {
+  font-size: var(--font-size-sm);
+  color: var(--color-border-gold);
+  /* Allow up to two visual lines before truncating; long tasks should
+     get an ellipsis rather than push the SonarHUD out of view. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---- Telemetry row (context meter + timestamp) ---- */
+
+.agent-card__telemetry {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.agent-card__telemetry-label {
+  color: var(--color-border-gold);
+  flex-shrink: 0;
+}
+
+.agent-card__updated {
+  font-size: var(--font-size-xs);
+  color: var(--color-gold-hairline);
+  flex-shrink: 0;
+}
+
+/* ---- Error banner ---- */
+
+.agent-card__error {
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: rgba(192, 57, 43, 0.12);
+  border-left: 3px solid var(--color-error-red);
+  color: var(--color-error-red);
+  font-size: var(--font-size-sm);
+  border-radius: var(--radius-sm);
+}

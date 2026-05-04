@@ -19,7 +19,10 @@ A modular system for creating, managing, and syncing Claude AI skill templates. 
 - `cloud/` - Sync registry (main_cloud.json stores metadata/hashes/timestamps)
 - `config/` - Configuration (watch_config.json)
 - `UI_Templates/` - WPF XAML templates
-- `skills/` - Active skill packages (canva-designer, design-system, document-designer, universal-coding-standards, architecture-patterns, dev-workflow, enterprise-secure-ai-engineering, desktop-ui-designer, pyqt6-ui-debugger, python-code-reviewer, vault-analysis, verified-build-gate)
+- `skills/` - Active skill packages (canva-designer, design-system, document-designer, universal-coding-standards, architecture-patterns, dev-workflow, enterprise-secure-ai-engineering, desktop-ui-designer, pyqt6-ui-debugger, python-code-reviewer, vault-analysis, verified-build-gate, ai-agents/agentic-parallel)
+- `tasks/` - Reusable task checklists (agentic-parallel, ai-workflows, app-development)
+- `AgenticOS/` - AgenticOS Command Center (FastAPI state bus, WPF tray launcher, React + Vite frontend with Spline 3D HUD)
+- `docs/superpowers/plans/` - Locked plan files (state-bus, wpf-launcher, react-frontend, spline-integration, skill-templates, cowork-three-audience-setup)
 - `Prompts/` - Prompt templates
 - `security/` - Security audit logs
 
@@ -50,7 +53,17 @@ python scripts/main.py --rollback <ts>     # Restore from backup
 - Timestamped backups are created before overwrites
 - Skill files prefer local copy during conflict resolution
 - Base directory is hardcoded as `C:/ClaudeSkills`
-- GitHub remote: `https://github.com/GrizzwaldHouse/cowork-skills.git` (branch: main)
+- GitHub remote: `https://github.com/GrizzwaldHouse/cowork-skills.git` (branch: master)
+
+## Canonical agent sources (binding)
+
+Consult before improvising standards or workflows. Full table and sync cadence: [`docs/CANONICAL_SOURCES.md`](docs/CANONICAL_SOURCES.md).
+
+- **Skills & templates (Git):** https://github.com/GrizzwaldHouse/cowork-skills.git — edit locally at `C:\ClaudeSkills`, sync with `git pull` and `setup.ps1` / `setup.sh`.
+- **Workflow skills (Git):** https://github.com/obra/superpowers.git — align brainstorming/TDD/verification when not conflicting with Marcus Universal Coding Standards or `brainstorm-artifact`; on conflict, those win (see `docs/CANONICAL_SOURCES.md` precedence).
+- **Claude Code session tooling:** https://github.com/IyadhKhalfallah/clauditor.git — protects quota/context window in Claude Code (install via npm package `@iyadhk/clauditor`, run `clauditor install`).
+- **ML Hub:** https://huggingface.co/ — use Hugging Face MCP (`plugin-huggingface-skills-huggingface-skills`) for Hub-related tasks instead of guessing APIs.
+- **Brainstorm skill:** `skills/brainstorm-artifact/` — scope-lock checklist; locked docs `docs/BRAINSTORM_[YYYY-MM-DD].md`; no implementation until Marcus confirms (see **Brainstorming Artifact Standard** below).
 
 ## Development Notes
 

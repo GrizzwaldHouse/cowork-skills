@@ -1,0 +1,49 @@
+/* ViewModeToggle.css */
+/* Developer: Marcus Daley */
+/* Date: 2026-04-29 */
+/* Purpose: Compact top-right radio group for switching between grid
+   and brain view modes. Visual style mirrors the StatusPill so the
+   header bar feels cohesive: pill-shaped buttons with a brushed-brass
+   accent for the active option. */
+
+.view-mode-toggle {
+  display: inline-flex;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid rgba(201, 169, 78, 0.35);
+  border-radius: 999px;
+  background: rgba(20, 22, 28, 0.85);
+}
+
+.view-mode-toggle__option {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: rgba(232, 230, 225, 0.65);
+  padding: 4px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.12s ease-out, color 0.12s ease-out;
+}
+
+.view-mode-toggle__option:hover {
+  color: #f5f3ee;
+}
+
+.view-mode-toggle__option[data-active='true'] {
+  background: linear-gradient(
+    180deg,
+    rgba(201, 169, 78, 0.95) 0%,
+    rgba(165, 138, 60, 0.95) 100%
+  );
+  color: #1a1c22;
+  font-weight: 600;
+}
+
+.view-mode-toggle__option:focus-visible {
+  outline: 2px solid rgba(201, 169, 78, 0.85);
+  outline-offset: 2px;
+}

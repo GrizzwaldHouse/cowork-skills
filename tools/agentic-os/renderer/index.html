@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agentic OS</title>
+
+    <!--
+      Content Security Policy — explicitly permits only the two external origins
+      this app requires. All other origins are blocked by default-src 'self'.
+      External origins:
+        unpkg.com            — Spline viewer web component script
+        prod.spline.design   — Spline scene file (.splinecode) and assets
+      unsafe-inline in style-src is required because index.html uses inline
+      style= attributes on <spline-viewer> and <div id="app">.
+      worker-src blob: is required because the Spline runtime spins up a
+      Web Worker via a blob URL to parse the scene off the main thread.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' https://unpkg.com;
+      connect-src 'self' https://prod.spline.design https://unpkg.com;
+      style-src 'self' 'unsafe-inline';
+      img-src 'self' data: blob:;
+      font-src 'self';
+      worker-src blob:;
+    " />
+
+    <!--
+      Spline viewer web component — loaded from unpkg CDN so the 3D background
+      renders without bundling the full runtime locally.
+      Network destination: unpkg.com (one-time asset load, no telemetry).
+    -->
+    <script
+      type="module"
+      src="https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js"
+    ></script>
+
+    <!-- CSS load order matters: variables first so all tokens resolve correctly -->
+    <link rel="stylesheet" href="styles/variables.css" />
+    <link rel="stylesheet" href="styles/base.css" />
+    <link rel="stylesheet" href="styles/layout.css" />
+    <link rel="stylesheet" href="styles/panels.css" />
+    <link rel="stylesheet" href="styles/animations.css" />
+  </head>
+  <body>
+
+    <!--
+      Spline 3D background — fixed full-bleed plane behind all UI layers.
+      opacity 0.45 keeps it atmospheric without overpowering the data panels.
+      pointer-events: none ensures it never captures mouse interactions.
+    -->
+    <spline-viewer
+      id="spline-bg"
+      url="https://prod.spline.design/Br27NbfHDDCwGKwN/scene.splinecode"
+      style="position:fixed;inset:0;width:100%;height:100%;opacity:0.45;z-index:0;pointer-events:none;"
+    ></spline-viewer>
+
+    <!-- Dashboard UI — layered above Spline via z-index: 1 on #app -->
+    <div id="app" style="position:relative;z-index:1;">
+
+      <!-- Titlebar — frameless window drag region with traffic lights -->
+      <div id="titlebar">
+        <div class="traffic-lights">
+          <button class="btn-close" title="Close"></button>
+          <button class="btn-min" title="Minimize"></button>
+          <button class="btn-max" title="Maximize"></button>
+        </div>
+        <span class="app-title">Agentic OS</span>
+        <span class="app-version">v1.0.0</span>
+        <div class="spacer"></div>
+        <!-- Compact overall-progress widget injected here by render.js -->
+        <div id="overall-progress-wrap"></div>
+      </div>
+
+      <!-- Phase strip — horizontal pill row; populated by render.js renderPhaseStrip() -->
+      <div id="phase-strip">
+      </div>
+
+      <!-- Main two-column layout -->
+      <div id="main">
+
+        <!-- Left column: scrollable list of agent cards -->
+        <div id="agent-panel">
+          <!-- Populated by render.js renderAgents() -->
+        </div>
+
+        <!-- Right column: summary widgets and activity log -->
+        <div id="right-panel">
+
+          <div class="panel-section">
+            <div class="panel-title">Overall Progress</div>
+            <!-- SVG progress ring injected by components/progress-ring.js -->
+            <!-- progressRing() factory returns its own .progress-ring-wrap wrapper div,
+                 so this container must not also carry that class or the flex/padding
+                 rules from panels.css would apply twice, misaligning the ring. -->
+            <div id="progress-ring-container"></div>
+          </div>
+
+          <div class="panel-section">
+            <div class="panel-title">Activity Log</div>
+            <!-- Log entries appended by components/log-entry.js via render.js -->
+            <div id="log-container" class="log-card"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!--
+        Tool approval overlay — hidden by default.
+        render.js renderToolApproval() sets display:flex and populates
+        #tool-approval-card when an agent requests permission for a tool call.
+      -->
+      <div id="tool-approval-overlay" class="tool-approval-overlay" style="display:none;">
+        <div class="tool-approval-card" id="tool-approval-card">
+          <!-- Populated dynamically by render.js renderToolApproval() -->
+        </div>
+      </div>
+
+    </div>
+
+    <!--
+      Script load order: component factory files first so their constructors
+      are defined before render.js calls them on DOMContentLoaded.
+    -->
+    <script src="components/agent-card.js"></script>
+    <script src="components/phase-pill.js"></script>
+    <script src="components/log-entry.js"></script>
+    <script src="components/progress-ring.js"></script>
+
+    <!-- Core renderer modules loaded after component factories are available -->
+    <script src="scripts/state.js"></script>
+    <script src="scripts/render.js"></script>
+    <script src="scripts/ipc.js"></script>
+    <script src="scripts/spline.js"></script>
+    <script src="scripts/actions.js"></script>
+
+  </body>
+</html>

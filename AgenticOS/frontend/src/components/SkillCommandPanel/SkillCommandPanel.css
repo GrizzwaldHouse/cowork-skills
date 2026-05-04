@@ -1,0 +1,225 @@
+/* SkillCommandPanel.css
+   Developer: Marcus Daley
+   Date: 2026-05-01
+   Purpose: Compact command controls for dispatching watched skill tasks. */
+
+.skill-command-panel {
+  background: rgba(7, 14, 26, 0.92);
+  border: 1px solid rgba(201, 169, 78, 0.38);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 0;
+}
+
+.skill-command-panel__header,
+.skill-command-panel__watch-header,
+.skill-command-panel__task {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.skill-command-panel__title {
+  color: var(--color-gold-accent);
+  font-size: var(--font-size-sm);
+  letter-spacing: var(--letter-extra-wide);
+  margin: 0;
+}
+
+.skill-command-panel__project,
+.skill-command-panel__count {
+  color: var(--color-border-gold);
+  font-size: var(--font-size-xs);
+  opacity: 0.72;
+  margin: 2px 0 0;
+}
+
+.skill-command-panel__objective {
+  width: 100%;
+  resize: vertical;
+  min-height: 54px;
+  max-height: 120px;
+  background: rgba(3, 8, 16, 0.9);
+  border: 1px solid rgba(201, 169, 78, 0.28);
+  border-radius: var(--radius-sm);
+  color: var(--color-parchment);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+  padding: var(--space-2);
+}
+
+.skill-command-panel__objective:focus {
+  outline: 1px solid var(--color-gold-accent);
+  border-color: var(--color-gold-accent);
+}
+
+.skill-command-panel__actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.skill-command-panel__button,
+.skill-command-panel__refresh {
+  border: 1px solid rgba(201, 169, 78, 0.4);
+  background: rgba(201, 169, 78, 0.08);
+  color: var(--color-gold-accent);
+  cursor: pointer;
+  font-family: inherit;
+  transition:
+    border-color var(--motion-fast) var(--ease-standard),
+    background-color var(--motion-fast) var(--ease-standard);
+}
+
+.skill-command-panel__button {
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+  min-height: 54px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+}
+
+.skill-command-panel__button:hover,
+.skill-command-panel__refresh:hover {
+  border-color: var(--color-gold-accent);
+  background: rgba(201, 169, 78, 0.14);
+}
+
+.skill-command-panel__button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+.skill-command-panel__button-label {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+.skill-command-panel__button-meta {
+  color: var(--color-border-gold);
+  font-size: var(--font-size-xs);
+  opacity: 0.68;
+}
+
+.skill-command-panel__error {
+  color: var(--color-error-red);
+  font-size: var(--font-size-sm);
+  margin: 0;
+}
+
+.skill-command-panel__watch {
+  border-top: 1px solid rgba(201, 169, 78, 0.22);
+  padding-top: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-height: 0;
+}
+
+.skill-command-panel__watch-header {
+  color: var(--color-border-gold);
+  font-size: var(--font-size-xs);
+}
+
+.skill-command-panel__refresh {
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  letter-spacing: var(--letter-wide);
+  padding: 3px 9px;
+}
+
+.skill-command-panel__empty {
+  color: var(--color-border-gold);
+  font-size: var(--font-size-xs);
+  margin: var(--space-2) 0 0;
+  opacity: 0.52;
+}
+
+.skill-command-panel__task-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.skill-command-panel__task {
+  background: rgba(3, 8, 16, 0.78);
+  border: 1px solid rgba(201, 169, 78, 0.18);
+  border-left: 3px solid var(--color-border-gold);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+}
+
+.skill-command-panel__task[data-status='complete'] {
+  border-left-color: var(--color-success-green);
+}
+
+.skill-command-panel__task[data-status='failed'] {
+  border-left-color: var(--color-error-red);
+}
+
+.skill-command-panel__task[data-status='in_progress'] {
+  border-left-color: var(--color-amber);
+}
+
+.skill-command-panel__task-main {
+  min-width: 0;
+}
+
+.skill-command-panel__task-title,
+.skill-command-panel__task-note {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.skill-command-panel__task-title {
+  color: var(--color-parchment);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+.skill-command-panel__task-note {
+  color: var(--color-border-gold);
+  font-size: var(--font-size-xs);
+  opacity: 0.72;
+  margin-top: 2px;
+}
+
+.skill-command-panel__task-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  color: var(--color-border-gold);
+  font-size: var(--font-size-xs);
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .skill-command-panel__actions {
+    grid-template-columns: 1fr;
+  }
+
+  .skill-command-panel__task {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .skill-command-panel__task-meta {
+    align-items: flex-start;
+  }
+}

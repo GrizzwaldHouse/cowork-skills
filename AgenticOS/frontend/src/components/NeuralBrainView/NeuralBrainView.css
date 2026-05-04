@@ -1,0 +1,84 @@
+/* NeuralBrainView.css */
+/* Developer: Marcus Daley */
+/* Date: 2026-04-29 */
+/* Purpose: Layout and pulsing keyframes for the neural-brain view.
+   The Spline scene fills the container; the SVG overlay is absolutely
+   positioned on top so the two render in the same coordinate system.
+   No hardcoded colors in JS or TSX -- BRAIN_NODE_COLORS in config.ts
+   is the single source of truth and the JSX writes those values
+   directly into svg fill attributes. */
+
+.neural-brain {
+  position: relative;
+  width: 100%;
+  height: 700px;
+  border: 1px solid rgba(201, 169, 78, 0.25);
+  border-radius: 8px;
+  overflow: hidden;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(20, 22, 28, 1) 0%,
+    rgba(10, 12, 18, 1) 70%
+  );
+}
+
+.neural-brain__scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.neural-brain__fallback-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(45, 50, 65, 1) 0%,
+    rgba(10, 12, 18, 1) 80%
+  );
+  pointer-events: none;
+}
+
+.neural-brain__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.neural-brain__loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(232, 230, 225, 0.6);
+  font-family: monospace;
+}
+
+.neural-brain__node {
+  cursor: pointer;
+  transition: transform 0.12s ease-out;
+}
+
+.neural-brain__node:hover {
+  transform-origin: center;
+  filter: brightness(1.25);
+}
+
+.neural-brain__node[data-pulsing='true'] circle {
+  animation: brain-pulse 1.2s ease-in-out infinite;
+}
+
+.neural-brain__node-label {
+  pointer-events: none;
+  font-family: 'JetBrains Mono', monospace;
+  user-select: none;
+}
+
+@keyframes brain-pulse {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(231, 76, 60, 0.6)); }
+  50%      { filter: drop-shadow(0 0 16px rgba(231, 76, 60, 1.0)); }
+}

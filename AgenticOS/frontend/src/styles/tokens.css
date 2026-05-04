@@ -1,0 +1,117 @@
+/* tokens.css
+   Developer: Marcus Daley
+   Date: 2026-04-29
+   Purpose: Design tokens for the AgenticOS Command Center. Centralizes
+            colors, spacing, radii, shadows, and motion so component CSS
+            never hardcodes a hex or pixel value. The hex values here mirror
+            the THEME object referenced in src/config.ts; if a token color
+            changes, the matching JS constant must change in the same edit. */
+
+:root {
+  /* ---------- Palette: submarine + Harry Potter brass on deep navy ----- */
+
+  /* Core background. Deep navy reads as both submarine hull and night sky. */
+  --color-deep-navy: #1B2838;
+
+  /* Slightly darker shade for status bar and HUD tray, gives layering. */
+  --color-status-bar-bg: #0F1A24;
+
+  /* Even darker shade for inset wells (progress track empty, meter track). */
+  --color-well: #0A121A;
+
+  /* Primary gold accent. Card borders, agent IDs, active indicators. */
+  --color-gold-accent: #C9A94E;
+
+  /* Dim gold used for borders and secondary text. Reads as brushed brass. */
+  --color-border-gold: #8B7435;
+
+  /* Even dimmer gold for hairlines and disabled chrome. */
+  --color-gold-hairline: #5A4B22;
+
+  /* Dark teal accent for waiting_review state, signals "external review". */
+  --color-dark-teal: #1A3C40;
+
+  /* Lighter teal used as foreground against deep navy when teal is active. */
+  --color-teal-fg: #4DB6AC;
+
+  /* Parchment cream, primary text color. Echoes Harry Potter scroll work. */
+  --color-parchment: #F5E6C8;
+
+  /* Amber warning, used between WARN and CRIT thresholds on the meter. */
+  --color-amber: #F39C12;
+
+  /* Error red, shared by error_msg, ContextMeter critical, alert banners. */
+  --color-error-red: #C0392B;
+
+  /* Success green, shown only in the COMPLETE pill and connected dot. */
+  --color-success-green: #27AE60;
+
+  /* ---------- Spacing scale (4px base) -------------------------------- */
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* ---------- Radii --------------------------------------------------- */
+
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+
+  /* ---------- Typography sizes --------------------------------------- */
+
+  --font-size-xs: 0.65rem;
+  --font-size-sm: 0.72rem;
+  --font-size-md: 0.78rem;
+  --font-size-lg: 0.9rem;
+  --font-size-xl: 1.1rem;
+  --font-size-2xl: 1.4rem;
+
+  /* ---------- Letter spacing for tactical / instrument text --------- */
+
+  --letter-tight: 0.04em;
+  --letter-wide: 0.08em;
+  --letter-extra-wide: 0.12em;
+
+  /* ---------- Shadows / glows --------------------------------------- */
+
+  /* Idle card glow: faint gold, lifts the card off the navy background. */
+  --shadow-card-idle: 0 0 12px rgba(201, 169, 78, 0.08);
+
+  /* Active card glow: brighter gold for ACTIVE status. */
+  --shadow-card-active: 0 0 18px rgba(201, 169, 78, 0.18);
+
+  /* Approval-waiting glow: amber, distinct from gold to draw attention. */
+  --shadow-card-approval: 0 0 18px rgba(243, 156, 18, 0.22);
+
+  /* Reviewer-waiting glow: teal, distinct from both above. */
+  --shadow-card-review: 0 0 18px rgba(77, 182, 172, 0.22);
+
+  /* Error glow: red, paired with red border via attribute selector. */
+  --shadow-card-error: 0 0 18px rgba(192, 57, 43, 0.32);
+
+  /* ---------- Motion ------------------------------------------------ */
+
+  /* Standard easing for progress fills, glow transitions, and chevrons. */
+  --ease-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
+
+  /* Standard durations. Short for hover, medium for state, long for glow. */
+  --motion-fast: 150ms;
+  --motion-medium: 300ms;
+  --motion-slow: 500ms;
+
+  /* ---------- Layout ------------------------------------------------ */
+
+  /* Mirror of CARD_MIN_WIDTH_PX in src/config.ts. */
+  --card-min-width: 360px;
+}
+
+/* The app default is dark; we expose a class hook should a future theme
+   toggle want to invert. No light theme is implemented in Plan 3. */
+:root[data-theme='light'] {
+  /* Reserved for a future light theme. Plan 3 ships dark only. */
+}

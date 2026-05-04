@@ -92,6 +92,40 @@ OUTPUTS_DIR: Final[Path] = STATE_DIR / "outputs"
 
 
 # ---------------------------------------------------------------------------
+# Canonical distributed task runtime (Hybrid AgenticOS layer)
+# ---------------------------------------------------------------------------
+
+# Lowercase runtime root. This is the filesystem contract shared by
+# distributed workers; the Python AgenticOS package remains the dashboard
+# and state-bus host.
+AGENTIC_TASK_RUNTIME_DIR: Final[Path] = BASE_DIR / "agentic-os"
+
+# Task documents are the source of truth for distributed work ownership.
+TASK_RUNTIME_TASKS_DIR: Final[Path] = AGENTIC_TASK_RUNTIME_DIR / "tasks"
+
+# Lock files are authoritative: if a task is in_progress without a matching
+# lock, the watcher recovers it to pending.
+TASK_RUNTIME_LOCKS_DIR: Final[Path] = AGENTIC_TASK_RUNTIME_DIR / "locks"
+
+# Append-only audit logs for meaningful task transitions and errors.
+TASK_RUNTIME_LOGS_DIR: Final[Path] = AGENTIC_TASK_RUNTIME_DIR / "logs"
+TASK_RUNTIME_EVENTS_LOG: Final[Path] = TASK_RUNTIME_LOGS_DIR / "events.log"
+TASK_RUNTIME_ERRORS_LOG: Final[Path] = TASK_RUNTIME_LOGS_DIR / "errors.log"
+
+# Snapshot consumed by dashboards, tools, and file-based supervisors.
+TASK_RUNTIME_STATE_DIR: Final[Path] = AGENTIC_TASK_RUNTIME_DIR / "state"
+TASK_RUNTIME_SNAPSHOT_JSON: Final[Path] = TASK_RUNTIME_STATE_DIR / "snapshot.json"
+
+# Registry/config files kept inside the canonical runtime tree.
+TASK_RUNTIME_AGENTS_DIR: Final[Path] = AGENTIC_TASK_RUNTIME_DIR / "agents"
+TASK_RUNTIME_AGENT_REGISTRY_JSON: Final[Path] = (
+    TASK_RUNTIME_AGENTS_DIR / "agent-registry.json"
+)
+TASK_RUNTIME_CONFIG_DIR: Final[Path] = AGENTIC_TASK_RUNTIME_DIR / "config"
+TASK_RUNTIME_SYSTEM_JSON: Final[Path] = TASK_RUNTIME_CONFIG_DIR / "system.json"
+
+
+# ---------------------------------------------------------------------------
 # Atomic write tuning
 # ---------------------------------------------------------------------------
 
@@ -253,6 +287,41 @@ PROCESS_SCAN_INTERVAL_S: Final[float] = 10.0
 
 # How long (seconds) a project must be unseen before it is marked inactive.
 PROJECT_STALE_THRESHOLD_S: Final[int] = 300
+
+
+# ---------------------------------------------------------------------------
+# Terminal control (Universal Hub operator panel)
+# ---------------------------------------------------------------------------
+
+# Process names treated as operator terminals. Windows Terminal owns the
+# visible top-level frame while OpenConsole/conhost/cmd/powershell are the
+# backing console processes; all are kept here so the inventory policy is
+# auditable without touching Win32 code.
+TERMINAL_CONTROL_PROCESS_NAMES: Final[set[str]] = {
+    "cmd.exe",
+    "powershell.exe",
+    "pwsh.exe",
+    "windowsterminal.exe",
+    "wt.exe",
+    "openconsole.exe",
+    "conhost.exe",
+}
+
+# Title keywords that hint a terminal is running an agent workflow. The
+# panel still lists all terminal windows, but these entries get highlighted
+# so Marcus can find CLAW/Codex/Claude/Ollama sessions quickly.
+TERMINAL_CONTROL_AGENT_TITLE_KEYWORDS: Final[tuple[str, ...]] = (
+    "agent",
+    "agenticos",
+    "claude",
+    "claw",
+    "codex",
+    "ollama",
+)
+
+# Destructive process termination requires this exact confirmation string
+# in the REST body. Graceful window close remains available separately.
+TERMINAL_CONTROL_TERMINATE_CONFIRMATION: Final[str] = "TERMINATE"
 
 
 # ---------------------------------------------------------------------------

@@ -37,12 +37,14 @@ from PyQt6.QtWidgets import QApplication, QMessageBox
 from gui.constants import QSETTINGS_APP, QSETTINGS_ORG
 from gui.main_window import MainWindow
 from gui.owl_state_machine import OwlState, OwlStateMachine
+from gui.notification_policy import NotificationPolicy
 from gui.paths import ASSETS_DIR, BASE_DIR
 from gui.security_engine import SecurityEngine
 from gui.sound_manager import SoundManager
 from gui.speech_messages import get_alert_message, get_message
 from gui.tray_icon import OwlTrayIcon
 from gui.watcher_thread import WatcherThread
+from config_manager import load_config
 from log_config import configure_logging
 
 from session_observer import SessionObserver
@@ -146,6 +148,11 @@ class OwlWatcherApp:
 
         # -- Security engine (shared instance) --------------------------------
         self._security_engine = SecurityEngine()
+
+        # -- Notification policy ----------------------------------------------
+        # Alerts still go to the dashboard and audit log; this policy only
+        # decides which alerts deserve a tray balloon.
+        self._notification_policy = NotificationPolicy(load_config())
 
         # -- Intelligence pipeline (safety guard first) -----------------------
         self._intelligence_enabled = getattr(args, 'intelligence', False)
@@ -464,6 +471,7 @@ class OwlWatcherApp:
         """Start the file watcher thread if not already running."""
         if self._watcher.isRunning():
             return
+        self._notification_policy = NotificationPolicy(load_config())
         # QThread instances cannot be restarted after they finish,
         # so create a fresh instance each time.
         self._watcher = WatcherThread()
@@ -543,16 +551,12 @@ class OwlWatcherApp:
         """Show a tray balloon notification for security alerts."""
         if self._tray is None:
             return
-        level = alert.get("level", "INFO")
-        message = alert.get("message", "Security alert")
-        icon_map = {
-            "INFO": "info",
-            "WARNING": "warning",
-            "CRITICAL": "critical",
-        }
-        icon_type = icon_map.get(level, "info")
-        self._tray.notify(f"OwlWatcher [{level}]", message, icon_type)
-        self._tray.add_unacked_alert(level)
+        decision = self._notification_policy.evaluate(alert)
+        if not decision.should_notify:
+            logger.debug("Suppressed tray notification: %s", decision.reason)
+            return
+        self._tray.notify(decision.title, decision.message, decision.icon_type)
+        self._tray.add_unacked_alert(str(alert.get("level", "INFO")))
 
     def _quit(self) -> None:
         """Gracefully shut down the application."""

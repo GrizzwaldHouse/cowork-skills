@@ -17,5 +17,23 @@
   ],
   "recovery_command": "python detect_interruption.py --project-root {project_root} --format json --output recovery_report.json",
   "notification_webhook": "",
-  "session_log_file": "session_history.jsonl"
+  "session_log_file": "session_history.jsonl",
+  "notification_policy": {
+    "desktop_enabled": true,
+    "min_level": "WARNING",
+    "cooldown_seconds": 60,
+    "critical_cooldown_seconds": 15,
+    "duplicate_window_seconds": 300,
+    "max_message_chars": 160
+  },
+  "ollama_guard": {
+    "enabled": true,
+    "agent_id": "ollama",
+    "scope_file": "C:/ClaudeSkills/agentic-os/state/ollama_scope.json",
+    "allow_deletes": false,
+    "allowed_paths": [],
+    "allowed_globs": [],
+    "delete_allowed_paths": [],
+    "delete_allowed_globs": []
+  }
 }

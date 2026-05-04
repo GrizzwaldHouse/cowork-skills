@@ -1,0 +1,165 @@
+/* App.css
+   Developer: Marcus Daley
+   Date: 2026-04-29
+   Purpose: Layout and chrome for the application shell: header bar,
+            responsive agent grid, footer status bar. Component-specific
+            styles live with their components. Tokens come from
+            styles/tokens.css; this file only composes them. */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 100vh;
+  background: var(--color-deep-navy);
+}
+
+/* ---- Header ---- */
+
+.app__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3) var(--space-5);
+  background: var(--color-status-bar-bg);
+  border-bottom: 1px solid var(--color-border-gold);
+  flex-shrink: 0;
+}
+
+.app__title {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-gold-accent);
+  letter-spacing: var(--letter-extra-wide);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.app__header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.app__connection-dot {
+  display: inline-block;
+  width: 0.55em;
+  height: 0.55em;
+  border-radius: 50%;
+  background: var(--color-error-red);
+  box-shadow: 0 0 6px currentColor;
+  font-size: var(--font-size-md);
+  /* Color is the dot color via background; data-connected swaps it. */
+  transition: background-color var(--motion-medium) var(--ease-standard);
+}
+
+.app__connection-dot[data-connected='true'] {
+  background: var(--color-success-green);
+}
+
+.app__connection-label {
+  color: var(--color-border-gold);
+}
+
+.app__sequence {
+  font-size: var(--font-size-xs);
+  color: var(--color-gold-hairline);
+  letter-spacing: var(--letter-wide);
+}
+
+/* ---- WebSocket error banner ---- */
+
+.app__ws-error {
+  flex-shrink: 0;
+  padding: var(--space-2) var(--space-5);
+  background: rgba(192, 57, 43, 0.18);
+  border-bottom: 1px solid var(--color-error-red);
+  color: var(--color-error-red);
+  font-size: var(--font-size-sm);
+}
+
+/* ---- Body: sidebar + content split ---- */
+
+.app__body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.app__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5) 0;
+}
+
+/* ---- Guide link in header ---- */
+
+.app__guide-link {
+  background: transparent;
+  border: 1px solid var(--color-gold-hairline);
+  border-radius: var(--radius-sm);
+  color: var(--color-border-gold);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--font-size-xs);
+  letter-spacing: var(--letter-wide);
+  padding: 3px 10px;
+  transition:
+    border-color var(--motion-fast) var(--ease-standard),
+    color var(--motion-fast) var(--ease-standard);
+}
+
+.app__guide-link:hover {
+  border-color: var(--color-gold-accent);
+  color: var(--color-gold-accent);
+}
+
+/* ---- Agent grid ---- */
+
+.app__grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(var(--card-min-width), 1fr)
+  );
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  align-content: start;
+  overflow-y: auto;
+}
+
+.app__empty-state {
+  /* Stretch across all columns so the message centers in the grid. */
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--color-border-gold);
+  font-size: var(--font-size-md);
+  padding: var(--space-8) 0;
+  opacity: 0.7;
+}
+
+.app__truncated-note {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--color-amber);
+  font-size: var(--font-size-sm);
+  padding: var(--space-2) 0;
+}
+
+/* ---- Footer ---- */
+
+.app__status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2) var(--space-5);
+  background: var(--color-status-bar-bg);
+  border-top: 1px solid var(--color-border-gold);
+  font-size: var(--font-size-xs);
+  color: var(--color-border-gold);
+  flex-shrink: 0;
+}

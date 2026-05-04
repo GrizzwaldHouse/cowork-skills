@@ -27,6 +27,9 @@ export interface Project {
 interface ProjectSwitcherProps {
   readonly selectedId: string | null;
   readonly onSelect: (id: string | null) => void;
+  // Called after every successful fetch with (id, fullProjectList) so the
+  // parent can resolve a project object without duplicating fetch logic.
+  readonly onSelectWithProjects?: (id: string | null, projects: Project[]) => void;
   readonly apiBase?: string;
 }
 
@@ -83,21 +86,29 @@ function useProjects(apiBase: string): {
 export function ProjectSwitcher({
   selectedId,
   onSelect,
+  onSelectWithProjects,
   apiBase = DEFAULT_API_BASE,
 }: ProjectSwitcherProps) {
   const { projects, loading, error } = useProjects(apiBase);
+
+  const handleSelect = useCallback((id: string | null): void => {
+    onSelect(id);
+    onSelectWithProjects?.(id, projects);
+  }, [onSelect, onSelectWithProjects, projects]);
 
   return (
     <aside
       style={{
         width: 220,
-        minHeight: '100vh',
+        minHeight: '100%',
         background: 'rgba(10,10,20,0.92)',
         borderRight: '1px solid rgba(100,120,200,0.18)',
         display: 'flex',
         flexDirection: 'column',
         padding: '16px 0',
         gap: 4,
+        flexShrink: 0,
+        overflowY: 'auto',
       }}
     >
       <div
@@ -122,7 +133,7 @@ export function ProjectSwitcher({
         isActive={false}
         isSelected={selectedId === null}
         phaseHint={null}
-        onSelect={onSelect}
+        onSelect={handleSelect}
       />
 
       {loading && (
@@ -145,7 +156,7 @@ export function ProjectSwitcher({
           isActive={p.is_active}
           isSelected={selectedId === p.id}
           phaseHint={p.phase_hint}
-          onSelect={onSelect}
+          onSelect={handleSelect}
         />
       ))}
     </aside>

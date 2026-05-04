@@ -1,0 +1,92 @@
+/* reset.css
+   Developer: Marcus Daley
+   Date: 2026-04-29
+   Purpose: Modern, opinionated CSS reset. Smaller than normalize because we
+            do not need cross-browser parity beyond the WebView2 Chromium
+            host the WPF shell embeds. Keeps element defaults predictable
+            so component CSS only adds, never undoes. */
+
+/* Universal box-sizing avoids the classic padding-vs-width surprise. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Drop browser default margins; layout is owned by the components. */
+* {
+  margin: 0;
+}
+
+/* Make root containers fill the viewport so the app shell can flex. */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+/* Anti-aliased text reads better on dark navy than the default. */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Images and media respect their container width. */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* Form inputs inherit typography rather than browser defaults. */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+/* Buttons get a transparent background by default; components opt in to
+   chrome rather than fighting browser defaults. */
+button {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* Focus visible ring uses gold accent globally for consistency. */
+:focus-visible {
+  outline: 2px solid var(--color-gold-accent);
+  outline-offset: 2px;
+}
+
+/* Anchor color falls through to currentColor; components decorate. */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Lists collapse to plain elements; nav and footer choose their style. */
+ol,
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+/* Reduced motion users get instant transitions everywhere. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

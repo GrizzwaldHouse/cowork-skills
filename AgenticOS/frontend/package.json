@@ -1,0 +1,44 @@
+{
+  "name": "agenticos-command-center-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "AgenticOS Command Center React frontend (Plan 3 scaffold). Submarine + Harry Potter themed instrument panel for parallel Claude Code sub-agents.",
+  "author": "Marcus Daley",
+  "license": "UNLICENSED",
+  "scripts": {
+    "dev": "vite",
+    "build": "npx tsc --noEmit && npx vite build",
+    "preview": "npx vite preview",
+    "test": "npx vitest run",
+    "test:watch": "npx vitest",
+    "typecheck": "npx tsc --noEmit",
+    "lint": "npx eslint src/ tests/ --ext .ts,.tsx"
+  },
+  "dependencies": {
+    "@splinetool/react-spline": "2.2.6",
+    "@splinetool/runtime": "0.9.490",
+    "d3-force": "^3.0.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "6.4.6",
+    "@testing-library/react": "16.0.0",
+    "@testing-library/user-event": "14.5.2",
+    "@types/d3-force": "^3.0.10",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "@typescript-eslint/eslint-plugin": "7.11.0",
+    "@typescript-eslint/parser": "7.11.0",
+    "@vitejs/plugin-react": "4.3.1",
+    "@vitest/coverage-v8": "1.6.0",
+    "eslint": "8.57.0",
+    "eslint-plugin-react-hooks": "4.6.2",
+    "eslint-plugin-react-refresh": "0.4.7",
+    "jsdom": "24.1.0",
+    "typescript": "5.4.5",
+    "vite": "5.2.12",
+    "vitest": "1.6.0"
+  }
+}

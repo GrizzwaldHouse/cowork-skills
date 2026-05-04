@@ -1,0 +1,222 @@
+/* SubagentActivityPanel.css
+   Developer: Marcus Daley
+   Date: 2026-04-30
+   Purpose: Styles for the SubagentActivityPanel — live read-only mission
+            log of spawned sub-agents. Follows the submarine instrument
+            panel aesthetic: deep navy, gold accents, mono text. */
+
+/* ── Panel shell ──────────────────────────────────────────────────────── */
+
+.subagent-panel {
+  background: var(--color-status-bar-bg);
+  border: 1px solid var(--color-border-gold);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.subagent-panel--empty {
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
+  opacity: 0.45;
+}
+
+.subagent-panel__empty-msg {
+  color: var(--color-border-gold);
+  letter-spacing: var(--letter-extra-wide);
+  font-size: var(--font-size-sm);
+  margin: 0;
+}
+
+.subagent-panel__title {
+  color: var(--color-gold-accent);
+  font-size: var(--font-size-sm);
+  letter-spacing: var(--letter-extra-wide);
+  margin: 0 0 var(--space-2) 0;
+  border-bottom: 1px solid var(--color-gold-hairline);
+  padding-bottom: var(--space-2);
+}
+
+/* ── Mission section (one per parent agent) ───────────────────────────── */
+
+.subagent-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.subagent-section__header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-1) 0;
+  border-bottom: 1px solid var(--color-gold-hairline);
+}
+
+.subagent-section__parent-id {
+  color: var(--color-gold-accent);
+  font-size: var(--font-size-md);
+  letter-spacing: var(--letter-wide);
+  flex-shrink: 0;
+}
+
+.subagent-section__parent-task {
+  color: var(--color-parchment);
+  font-size: var(--font-size-sm);
+  opacity: 0.7;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.subagent-section__count {
+  color: var(--color-border-gold);
+  font-size: var(--font-size-xs);
+  letter-spacing: var(--letter-extra-wide);
+  flex-shrink: 0;
+}
+
+.subagent-section__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* ── Sub-agent row ────────────────────────────────────────────────────── */
+
+.subagent-row {
+  display: grid;
+  /* identity | progress | meta */
+  grid-template-columns: minmax(160px, 1fr) minmax(120px, 2fr) auto;
+  grid-template-rows: auto auto;
+  column-gap: var(--space-4);
+  align-items: center;
+  background: var(--color-deep-navy);
+  border: 1px solid var(--color-gold-hairline);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  transition: border-color var(--motion-fast) var(--ease-standard),
+              box-shadow var(--motion-medium) var(--ease-standard);
+}
+
+/* Status-driven border glow — mirrors AgentCard's attribute selectors */
+.subagent-row[data-status='active'] {
+  border-color: var(--color-border-gold);
+  box-shadow: 0 0 8px rgba(201, 169, 78, 0.15);
+}
+
+.subagent-row[data-status='waiting_approval'] {
+  border-color: var(--color-amber);
+  box-shadow: 0 0 8px rgba(243, 156, 18, 0.18);
+}
+
+.subagent-row[data-status='waiting_review'] {
+  border-color: var(--color-teal-fg);
+  box-shadow: 0 0 8px rgba(77, 182, 172, 0.18);
+}
+
+.subagent-row[data-status='complete'] {
+  border-color: var(--color-success-green);
+  opacity: 0.75;
+}
+
+.subagent-row[data-status='error'] {
+  border-color: var(--color-error-red);
+  box-shadow: 0 0 8px rgba(192, 57, 43, 0.25);
+}
+
+/* ── Row columns ──────────────────────────────────────────────────────── */
+
+.subagent-row__identity {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  grid-column: 1;
+}
+
+.subagent-row__id {
+  color: var(--color-gold-accent);
+  font-size: var(--font-size-md);
+  letter-spacing: var(--letter-wide);
+}
+
+.subagent-row__domain {
+  color: var(--color-border-gold);
+  font-size: var(--font-size-xs);
+  letter-spacing: var(--letter-extra-wide);
+}
+
+.subagent-row__stage-label {
+  color: var(--color-parchment);
+  font-size: var(--font-size-sm);
+  opacity: 0.85;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.subagent-row__progress {
+  grid-column: 2;
+}
+
+.subagent-row__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-1);
+  grid-column: 3;
+}
+
+.subagent-row__context {
+  font-size: var(--font-size-xs);
+  letter-spacing: var(--letter-wide);
+}
+
+/* Context severity colors via data attribute */
+.subagent-row__context[data-level='ok']   { color: var(--color-border-gold); }
+.subagent-row__context[data-level='warn'] { color: var(--color-amber); }
+.subagent-row__context[data-level='crit'] { color: var(--color-error-red); }
+
+.subagent-row__updated {
+  color: var(--color-border-gold);
+  font-size: var(--font-size-xs);
+  opacity: 0.6;
+}
+
+/* Error banner spans all columns */
+.subagent-row__error {
+  grid-column: 1 / -1;
+  color: var(--color-error-red);
+  font-size: var(--font-size-sm);
+  margin: var(--space-1) 0 0 0;
+  border-top: 1px solid rgba(192, 57, 43, 0.3);
+  padding-top: var(--space-1);
+}
+
+/* ── Responsive collapse: stack columns on narrow panels ──────────────── */
+
+@media (max-width: 600px) {
+  .subagent-row {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+  }
+
+  .subagent-row__identity,
+  .subagent-row__progress,
+  .subagent-row__meta {
+    grid-column: 1;
+  }
+
+  .subagent-row__meta {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}

@@ -1,0 +1,77 @@
+/* ApprovalButtons.css
+   Developer: Marcus Daley
+   Date: 2026-04-29
+   Purpose: Tactical-style three-button approval row. PROCEED and
+            RESEARCH MORE share the gold scheme; REVIEW BY AGENT uses
+            the teal scheme so it visually reads as a different action. */
+
+.approval-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  width: 100%;
+  margin-top: var(--space-3);
+}
+
+.approval-btn {
+  /* Equal-flex by default so the three primary buttons stretch evenly. */
+  flex: 1 1 0;
+  min-width: 96px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-gold);
+  background: transparent;
+  color: var(--color-gold-accent);
+  cursor: pointer;
+  /* Standard motion on the two properties that visibly change on hover. */
+  transition:
+    background-color var(--motion-fast) var(--ease-standard),
+    color var(--motion-fast) var(--ease-standard),
+    border-color var(--motion-fast) var(--ease-standard);
+  border-radius: var(--radius-sm);
+}
+
+.approval-btn:hover:not(:disabled) {
+  background-color: var(--color-gold-accent);
+  color: var(--color-deep-navy);
+}
+
+/* Disabled state: dim and not-allowed cursor. Lowered opacity is the
+   single signal users learn to read. */
+.approval-btn:disabled {
+  opacity: 0.32;
+  cursor: not-allowed;
+}
+
+/* REVIEW BY AGENT uses the teal accent so the user can tell at a glance
+   that it spawns an external reviewer rather than continuing the flow. */
+.approval-btn--review {
+  border-color: var(--color-dark-teal);
+  color: var(--color-teal-fg);
+}
+
+.approval-btn--review:hover:not(:disabled) {
+  background-color: var(--color-dark-teal);
+  color: var(--color-parchment);
+  border-color: var(--color-teal-fg);
+}
+
+.approval-buttons__loading {
+  /* Aligns vertically with the buttons; tactical label class controls
+     font and tracking so the indicator reads as part of the row. */
+  flex: 0 0 auto;
+  color: var(--color-gold-accent);
+  opacity: 0.85;
+  padding: 0 var(--space-2);
+}
+
+.approval-buttons__error {
+  width: 100%;
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: rgba(192, 57, 43, 0.12);
+  border-left: 3px solid var(--color-error-red);
+  color: var(--color-error-red);
+  font-size: var(--font-size-sm);
+  border-radius: var(--radius-sm);
+}

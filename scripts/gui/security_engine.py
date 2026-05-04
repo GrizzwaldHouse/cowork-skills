@@ -14,8 +14,11 @@ or attribute changes on Windows. Generates Markdown audit reports on demand.
 from __future__ import annotations
 
 import hashlib
+import contextlib
+import fnmatch
 import json
 import logging
+import os
 import stat
 import time
 from collections import defaultdict
@@ -33,6 +36,11 @@ from gui.constants import (
     SUSPICIOUS_EXTENSIONS,
 )
 from watcher_core import SECURITY_DIR, is_security_dir, is_transient
+
+try:
+    from config_manager import load_config
+except ImportError:  # pragma: no cover - defensive fallback for frozen builds
+    load_config = None  # type: ignore[assignment]
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -93,10 +101,29 @@ def _read_json(path: Path) -> Any:
 
 
 def _write_json(path: Path, data: Any) -> None:
-    """Write JSON data to *path*, creating parent directories as needed."""
+    """Atomically write JSON data to *path*, creating parents as needed."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as fh:
-        json.dump(data, fh, indent=2, default=str)
+    temp_path = path.with_name(f"{path.name}.tmp.{os.getpid()}.{time.time_ns()}")
+    try:
+        with temp_path.open("w", encoding="utf-8") as fh:
+            json.dump(data, fh, indent=2, default=str)
+            fh.flush()
+            os.fsync(fh.fileno())
+        for attempt in range(3):
+            try:
+                os.replace(temp_path, path)
+                break
+            except PermissionError:
+                if attempt == 2:
+                    with path.open("w", encoding="utf-8") as fallback:
+                        json.dump(data, fallback, indent=2, default=str)
+                    temp_path.unlink(missing_ok=True)
+                    break
+                time.sleep(0.05)
+    except Exception:
+        with contextlib.suppress(OSError):
+            temp_path.unlink()
+        raise
 
 
 # ---------------------------------------------------------------------------
@@ -310,7 +337,15 @@ class SecurityEngine:
         }
         self._append_audit_entry(audit_entry)
 
-        # 1. Suspicious extension check
+        # 1. Ollama scope guard. This makes the local model observable by
+        # Claude Code/Codex: once a scope file declares the assigned file(s),
+        # edits outside that scope and any unapproved deletes become critical.
+        ollama_alert = _evaluate_ollama_scope(event_type, path, now_iso)
+        if ollama_alert is not None:
+            logger.critical("Ollama scope guard alert: %s", ollama_alert.message)
+            return ollama_alert
+
+        # 2. Suspicious extension check
         suffix = path.suffix.lower()
         if suffix in SUSPICIOUS_EXTENSIONS:
             level = AlertLevel.CRITICAL if event_type == "created" else AlertLevel.WARNING
@@ -328,7 +363,7 @@ class SecurityEngine:
             logger.warning("Suspicious file: %s (%s)", path, suffix)
             return alert
 
-        # 2. Hidden file check
+        # 3. Hidden file check
         if path.name.startswith(".") and event_type == "created":
             alert = SecurityAlert(
                 level=AlertLevel.WARNING,
@@ -340,7 +375,7 @@ class SecurityEngine:
             logger.warning("Hidden file created: %s", path)
             return alert
 
-        # 3. Burst detection
+        # 4. Burst detection
         parent_dir = str(path.parent)
         if self._check_burst(parent_dir):
             alert = SecurityAlert(
@@ -358,7 +393,7 @@ class SecurityEngine:
             logger.warning("Burst detected in %s", parent_dir)
             return alert
 
-        # 4. Large file check
+        # 5. Large file check
         if size is not None and size > self.large_file_threshold:
             alert = SecurityAlert(
                 level=AlertLevel.WARNING,
@@ -374,7 +409,7 @@ class SecurityEngine:
             logger.warning("Large file: %s (%d bytes)", path, size)
             return alert
 
-        # 5. Integrity check on modification
+        # 6. Integrity check on modification
         if event_type == "modified" and file_hash is not None:
             db = self._load_integrity_db()
             key = str(path)
@@ -687,6 +722,141 @@ class SecurityEngine:
 def _now_iso() -> str:
     """Return the current UTC time as an ISO-8601 string."""
     return datetime.now(timezone.utc).isoformat()
+
+
+def _load_ollama_guard_config() -> dict[str, Any]:
+    """Load the config-driven Ollama file-scope guard."""
+    config: dict[str, Any] = {}
+    if load_config is not None:
+        try:
+            config = load_config()
+        except Exception as exc:  # pragma: no cover - defensive
+            logger.debug("Could not load watch config for Ollama guard: %s", exc)
+
+    guard = config.get("ollama_guard", {})
+    if not isinstance(guard, dict):
+        guard = {}
+
+    scope_file = Path(
+        guard.get(
+            "scope_file",
+            str(BASE_DIR / "agentic-os" / "state" / "ollama_scope.json"),
+        )
+    )
+    if scope_file.exists():
+        try:
+            data = json.loads(scope_file.read_text(encoding="utf-8"))
+            if isinstance(data, dict):
+                merged = {**guard, **data}
+                guard = merged
+        except (json.JSONDecodeError, OSError) as exc:
+            logger.warning("Could not read Ollama scope file %s: %s", scope_file, exc)
+
+    return guard
+
+
+def _normalise_paths(values: Any) -> list[str]:
+    """Return a clean string list from config values."""
+    if not isinstance(values, list):
+        return []
+    return [str(value) for value in values if str(value).strip()]
+
+
+def _path_is_under(candidate: Path, root: Path) -> bool:
+    """True when candidate is root or a descendant of root."""
+    try:
+        candidate_resolved = candidate.resolve(strict=False)
+        root_resolved = root.resolve(strict=False)
+        if candidate_resolved == root_resolved:
+            return True
+        candidate_resolved.relative_to(root_resolved)
+        return True
+    except (OSError, ValueError):
+        return False
+
+
+def _matches_scope(path: Path, roots: list[str], globs: list[str]) -> bool:
+    """Return True when path is covered by explicit roots or glob rules."""
+    path_text = path.as_posix()
+    for root in roots:
+        if _path_is_under(path, Path(root)):
+            return True
+    for pattern in globs:
+        if fnmatch.fnmatch(path_text, Path(pattern).as_posix()):
+            return True
+    return False
+
+
+def _evaluate_ollama_scope(
+    event_type: str,
+    path: Path,
+    now_iso: str,
+    guard: dict[str, Any] | None = None,
+) -> SecurityAlert | None:
+    """Detect Ollama file-scope and destructive-action violations.
+
+    The guard is intentionally inert until at least one allowed path or glob
+    is configured. This prevents a noisy first run while still making an
+    active Ollama assignment strict once Codex/Claude writes the scope file.
+    """
+    guard = guard if guard is not None else _load_ollama_guard_config()
+    if not bool(guard.get("enabled", False)):
+        return None
+
+    allowed_paths = _normalise_paths(guard.get("allowed_paths", []))
+    allowed_globs = _normalise_paths(guard.get("allowed_globs", []))
+    if not allowed_paths and not allowed_globs:
+        return None
+
+    delete_allowed_paths = _normalise_paths(guard.get("delete_allowed_paths", []))
+    delete_allowed_globs = _normalise_paths(guard.get("delete_allowed_globs", []))
+    allow_deletes = bool(guard.get("allow_deletes", False))
+    agent_id = str(guard.get("agent_id", "ollama"))
+
+    in_scope = _matches_scope(path, allowed_paths, allowed_globs)
+    if not in_scope:
+        verb = "deleted" if event_type == "deleted" else "changed"
+        return SecurityAlert(
+            level=AlertLevel.CRITICAL,
+            message=(
+                f"Ollama scope violation: {agent_id} {verb} a file outside "
+                "its assigned scope"
+            ),
+            file_path=str(path),
+            timestamp=now_iso,
+            details={
+                "agent_id": agent_id,
+                "event_type": event_type,
+                "allowed_paths": allowed_paths,
+                "allowed_globs": allowed_globs,
+            },
+        )
+
+    if event_type == "deleted":
+        delete_scope_ok = allow_deletes or _matches_scope(
+            path,
+            delete_allowed_paths,
+            delete_allowed_globs,
+        )
+        if not delete_scope_ok:
+            return SecurityAlert(
+                level=AlertLevel.CRITICAL,
+                message=(
+                    f"Ollama destructive action: {agent_id} deleted a file "
+                    "without delete permission"
+                ),
+                file_path=str(path),
+                timestamp=now_iso,
+                details={
+                    "agent_id": agent_id,
+                    "event_type": event_type,
+                    "allow_deletes": allow_deletes,
+                    "delete_allowed_paths": delete_allowed_paths,
+                    "delete_allowed_globs": delete_allowed_globs,
+                },
+            )
+
+    return None
 
 
 def _is_suspicious_path(path_str: str) -> bool:

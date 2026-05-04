@@ -1,0 +1,127 @@
+{
+  "session_handoff": {
+    "version": "1.0",
+    "created": "2026-05-02",
+    "project": "Graphify Client Portal",
+    "author": "Marcus Daley",
+    "purpose": "Fresh-session continuation prompt. Paste this into a new Claude Code command window. Claude Code will read it, invoke the brainstorming skill, and immediately begin designing Sub-project 1 without re-asking settled questions."
+  },
+
+  "instructions_for_claude": {
+    "step_1": "Read this entire JSON before responding.",
+    "step_2": "Invoke the 'superpowers:brainstorming' skill immediately — do not respond before invoking it.",
+    "step_3": "After the skill loads, announce: 'Starting brainstorm for Sub-project 1 — Graph Compare Viewer. Context loaded from session handoff. Proceeding directly to approach proposals.'",
+    "step_4": "Skip all context-gathering questions — they are answered in locked_decisions below.",
+    "step_5": "Propose 2-3 implementation approaches for Sub-project 1, then present the design section by section per the brainstorming skill process.",
+    "step_6": "After Sub-project 1 design is approved and spec is written, invoke 'superpowers:writing-plans' to produce the implementation plan.",
+    "step_7": "Do NOT begin implementing until Marcus approves the spec."
+  },
+
+  "developer_profile": {
+    "name": "Marcus Daley",
+    "background": "Navy veteran (9 years leadership), Full Sail BS Online Game Development (Feb 6 2026), stay-at-home dad",
+    "focus": "Portfolio-grade software — AAA studio practices applied universally. Quality over speed. Never quick-and-dirty.",
+    "coding_standards": "universal-coding-standards skill at C:/ClaudeSkills/skills/universal-coding-standards/",
+    "brainstorm_standard": "Full UI/UX standard for brainstorm artifacts is locked — see C:/ClaudeSkills/skills/brainstorm-artifact/templates/BRAINSTORM_ARTIFACT_UI_STANDARD.md",
+    "key_rule": "Never suggest minimal or simplified designs. Always research the most advanced, sophisticated approach."
+  },
+
+  "project_overview": {
+    "name": "Graphify Client Portal",
+    "vision": "A multi-tenant client portal delivered as self-contained per-client HTML bundles. Marcus runs a local generator script that takes a client's graph data + branding + brainstorm questions and outputs one standalone HTML file per client. Clients open it in their browser — they see their codebase graph, fill out a brainstorm questionnaire, and download a PRD. Marcus uses the same tool for his own projects. Each client file is fully isolated by design.",
+    "hosting_model": "Static bundle — no server, no auth infrastructure. Isolation is structural (each client has a different file). Marcus shares via email or link.",
+    "design_tool_integration": "Sigma.js preferred (open source, free, better performance than vis-network for large graphs). Evaluate at Sub-project 4.",
+    "brainstorm_artifact_standard": "All brainstorm components must meet the locked UI/UX standard (Part 1-12 of BRAINSTORM_ARTIFACT_UI_STANDARD.md). React 18 + lucide-react only. No external dependencies beyond browser APIs."
+  },
+
+  "locked_decisions": {
+    "portal_architecture": "Hybrid static bundle generator — Option C locked. Python script runs locally, outputs one self-contained HTML per client.",
+    "audience": "Dual — Marcus uses internally AND clients interact directly. Clients see only their project (structural isolation, not auth).",
+    "graph_viewer_foundation": "Current graph.html (graphify-out/) is the base. Fixed version already has: convex hull hyperedge rendering, confidence-coded colors, edge hiding, Export PNG, INFERRED toggle, font scaling, null-guarded neighbors.",
+    "sub_project_order": "1 (Compare Viewer) → 2 (Bundle Generator) → 3 (Brainstorm + PRD) → 4 (Sigma.js upgrade). Each sub-project ships working software independently.",
+    "annotation_system": "Floating sticky-note panel inside the browser view. Persists via localStorage. 'Copy All Notes' button. Client can annotate and copy back to Claude.",
+    "prd_export": "Brainstorm locked answers → PRD document. Downloads as markdown + PDF.",
+    "no_cloud_costs": "All four sub-projects must work with zero ongoing hosting or API costs. Open source only for graph rendering."
+  },
+
+  "current_git_state": {
+    "repo": "C:/ClaudeSkills",
+    "branch": "master",
+    "recent_commits": [
+      "1c3b14e — docs(graph): document mojibake root cause, isolated nodes, edge ID resolution in GRAPH_REPORT",
+      "fd60d3b — fix(graph): add explicit parentheses to edge-hide operator precedence",
+      "3e1b331 — feat(workflow): complete autonomous-workflow skill"
+    ],
+    "pending_tasks": [
+      "Task 1: Browser verification of graph.html fixes (7 visual checks — requires Marcus to confirm in browser)",
+      "Task 4: Final branch cleanup via superpowers:finishing-a-development-branch"
+    ],
+    "plan_file": "C:/ClaudeSkills/docs/superpowers/plans/2026-05-01-graph-html-continuation.md"
+  },
+
+  "sub_projects": {
+    "sub_project_1": {
+      "name": "Graph Compare Viewer",
+      "status": "DESIGN THIS SESSION",
+      "priority": "build first — foundation for all others",
+      "description": "Three-panel standalone HTML tool. Panel 1: fixed graph.html (current version with all 10 fixes). Panel 2: original graph.html (pre-fixes, from git history). Panel 3: GRAPH_REPORT.md rendered as styled HTML. Annotation panel (sticky notes + copy-to-clipboard). Toggle between panels. Diff-focused — shows 'what changed and why'.",
+      "key_files": [
+        "C:/ClaudeSkills/graphify-out/graph.html (fixed — current)",
+        "C:/ClaudeSkills/graphify-out/GRAPH_REPORT.md (render as HTML)",
+        "git show HEAD~2:graphify-out/graph.html (original pre-fixes)"
+      ],
+      "open_design_questions": [
+        "Panel layout: side-by-side iframes vs tab switcher vs split-pane with resizable dividers?",
+        "Annotation panel: always-visible sidebar vs floating overlay vs bottom drawer?",
+        "GRAPH_REPORT.md renderer: marked.js (CDN) vs custom markdown parser vs pre-rendered?",
+        "Original graph recovery: embed git blob directly in the compare tool vs run a script to extract it first?"
+      ],
+      "acceptance_criteria": [
+        "All three panels accessible without page reload",
+        "Annotations persist in localStorage across browser sessions",
+        "Copy All Notes produces clean text for pasting into Claude",
+        "Standalone HTML — no server required, opens directly from filesystem",
+        "Works in Chrome and Brave"
+      ]
+    },
+
+    "sub_project_2": {
+      "name": "Client Bundle Generator",
+      "status": "design after Sub-project 1 ships",
+      "description": "Python script: takes graph.json + branding_config.json + brainstorm_questions.json → outputs client-[name].html. Self-contained bundle. Client sees only their project data.",
+      "key_inputs": ["graph.json", "branding_config.json (logo, colors, client name)", "brainstorm_questions.json (project-specific questions)"],
+      "key_output": "client-[name].html — fully self-contained, no external dependencies"
+    },
+
+    "sub_project_3": {
+      "name": "Brainstorm Artifact + PRD Export",
+      "status": "design after Sub-project 2 ships",
+      "description": "Full interactive React brainstorm component embedded in client bundle. Meets locked UI/UX standard (all 12 parts). PRD generation from locked answers. Downloads as markdown + PDF.",
+      "standard_reference": "C:/ClaudeSkills/skills/brainstorm-artifact/templates/BRAINSTORM_ARTIFACT_UI_STANDARD.md",
+      "theme": "New theme needed — client-portal palette. To be designed during Sub-project 3 brainstorm."
+    },
+
+    "sub_project_4": {
+      "name": "Design Tool Integration (Sigma.js)",
+      "status": "design after Sub-project 3 ships",
+      "description": "Replace or augment vis-network with Sigma.js for better large-graph performance (3227 nodes, 7871 edges). Integrate into both compare viewer and client bundle.",
+      "rationale": "vis-network struggles above ~2000 nodes. Sigma.js is WebGL-accelerated, open source, handles 100K+ nodes. Free, no API key required."
+    }
+  },
+
+  "skills_to_invoke": {
+    "session_start": "superpowers:brainstorming — invoke FIRST before any response",
+    "after_design_approved": "superpowers:writing-plans — produce implementation plan",
+    "after_plan_written": "superpowers:subagent-driven-development — execute plan task by task",
+    "code_standards": "universal-coding-standards — load before any implementation",
+    "brainstorm_artifact": "brainstorm-artifact — load before generating any brainstorm React component"
+  },
+
+  "files_claude_should_read_at_session_start": [
+    "C:/ClaudeSkills/docs/superpowers/plans/2026-05-01-graph-html-continuation.md",
+    "C:/ClaudeSkills/graphify-out/GRAPH_REPORT.md (first 30 lines only for context)",
+    "C:/ClaudeSkills/CLAUDE.md"
+  ],
+
+  "first_message_after_skill_loads": "Skip context questions — all locked decisions are in the JSON. Propose 2-3 layout approaches for the three-panel Graph Compare Viewer (Sub-project 1). Focus on: panel switching mechanism, annotation panel placement, and how to embed the original pre-fix graph without a server. Present trade-offs, give your recommendation, then wait for Marcus to choose."
+}

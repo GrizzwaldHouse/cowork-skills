@@ -1,0 +1,356 @@
+{
+  "plan": {
+    "title": "graph.html — Audit Fixes & Improvements",
+    "description": "Subagent-driven execution plan for all identified bugs and feature improvements in graphify-out/graph.html. Each task is independent and self-contained. Execute sequentially: implementer → spec reviewer → code quality reviewer before advancing.",
+    "source_files": [
+      "C:/ClaudeSkills/graphify-out/graph.html",
+      "C:/ClaudeSkills/graphify-out/GRAPH_REPORT.md",
+      "C:/ClaudeSkills/graphify-out/graph.json"
+    ],
+    "branch_strategy": "Work on a feature branch (graph-fixes) off master. Never commit directly to master.",
+    "model_guidance": {
+      "implementer": "claude-haiku-4-5-20251001 for isolated JS/CSS tasks; claude-sonnet-4-6 for multi-section integration tasks",
+      "spec_reviewer": "claude-sonnet-4-6",
+      "code_quality_reviewer": "claude-sonnet-4-6",
+      "final_reviewer": "claude-sonnet-4-6"
+    }
+  },
+
+  "tasks": [
+    {
+      "id": "task-01",
+      "title": "Fix — Convex Hull for Hyperedge Polygons",
+      "status": "completed",
+      "priority": "critical",
+      "model": "claude-haiku-4-5-20251001",
+      "files_touched": ["graphify-out/graph.html"],
+      "section": "afterDrawing canvas renderer (lines ~238–275)",
+
+      "context": "The graph.html embeds a vis-network interactive graph of the ClaudeSkills codebase. Hyperedges (group relationships between nodes) were rendered as raw insertion-order polygons using ctx.lineTo, which self-intersects for any non-convex node cluster. The fix is a Graham scan convex hull computed before rendering.",
+
+      "spec": [
+        "Add a convexHull(pts) function using the Graham scan algorithm (sort by x, build lower + upper chains, O(n log n))",
+        "Replace the raw lineTo loop in afterDrawing with convexHull(expanded) before drawing",
+        "Expand points 1.18x from centroid BEFORE hull computation so the region surrounds nodes",
+        "Function must return pts unchanged when pts.length < 3 (degenerate case)"
+      ],
+
+      "acceptance_criteria": [
+        "convexHull([]) returns []",
+        "convexHull([{x:0,y:0}]) returns single point",
+        "convexHull([{x:0,y:0},{x:1,y:1},{x:0,y:1},{x:1,y:0}]) returns 4 hull points (square)",
+        "Non-convex star shape no longer self-intersects visually",
+        "ctx.moveTo/lineTo uses hull array, not expanded array directly"
+      ],
+
+      "implementer_prompt": "You are implementing a convex hull fix in a standalone HTML file. The file is at C:/ClaudeSkills/graphify-out/graph.html. It uses vis-network and renders hyperedge group regions in an afterDrawing canvas callback. The current code draws points in insertion order (self-intersecting). Replace it with a Graham scan convex hull. See the spec field for exact requirements. Do NOT modify anything outside the afterDrawing block and the new convexHull function. The file is ~3.2MB — use Grep to find the exact line ranges before reading, then Edit for targeted patches only.",
+
+      "notes": "Already applied manually — verify the implementation matches spec exactly before marking done."
+    },
+
+    {
+      "id": "task-02",
+      "title": "Fix — Confidence-Coded Hyperedge Colors",
+      "status": "completed",
+      "priority": "high",
+      "model": "claude-haiku-4-5-20251001",
+      "files_touched": ["graphify-out/graph.html"],
+      "section": "afterDrawing canvas renderer + HYPEREDGE_COLORS const",
+
+      "context": "All 28 hyperedges previously rendered in a single hardcoded color (#6366f1 indigo) regardless of whether the relationship was EXTRACTED (high confidence, direct code evidence), INFERRED (model-reasoned, avg confidence 0.55), or AMBIGUOUS (low confidence). This destroys the trust signal.",
+
+      "spec": [
+        "Add const HYPEREDGE_COLORS = { EXTRACTED: {fill, stroke, label}, INFERRED: {fill, stroke, label}, AMBIGUOUS: {fill, stroke, label} }",
+        "EXTRACTED: fill=#6366f1 stroke=#818cf8 label=#a5b4fc (indigo)",
+        "INFERRED: fill=#d97706 stroke=#fbbf24 label=#fde68a (amber)",
+        "AMBIGUOUS: fill=#dc2626 stroke=#f87171 label=#fca5a5 (red)",
+        "afterDrawing reads palette = HYPEREDGE_COLORS[h.confidence] || HYPEREDGE_COLORS.EXTRACTED",
+        "ctx.fillStyle, ctx.strokeStyle, and label fillStyle all use palette values"
+      ],
+
+      "acceptance_criteria": [
+        "HYPEREDGE_COLORS object present with all three keys",
+        "Each key has fill, stroke, label sub-properties",
+        "afterDrawing uses palette.fill for ctx.fillStyle",
+        "afterDrawing uses palette.stroke for ctx.strokeStyle",
+        "afterDrawing uses palette.label for label ctx.fillStyle",
+        "Fallback to EXTRACTED when confidence key is missing"
+      ],
+
+      "implementer_prompt": "You are patching the afterDrawing block in C:/ClaudeSkills/graphify-out/graph.html to add confidence-coded colors for hyperedge regions. See the spec field. Use Grep to locate the exact lines, then Edit for targeted patches. Do not modify anything outside the afterDrawing block and the new HYPEREDGE_COLORS const.",
+
+      "notes": "Already applied manually — verify implementation."
+    },
+
+    {
+      "id": "task-03",
+      "title": "Fix — Edge Hiding on Community Toggle",
+      "status": "completed",
+      "priority": "critical",
+      "model": "claude-sonnet-4-6",
+      "files_touched": ["graphify-out/graph.html"],
+      "section": "toggleAllCommunities() and legend item onclick (lines ~201–248)",
+
+      "context": "vis-network tracks node and edge visibility independently. When nodes were hidden via nodesDS.update(), their connected edges remained visible as orphaned floating lines. Both toggleAllCommunities() and the per-community legend onclick needed to also update edgesDS.",
+
+      "spec": [
+        "toggleAllCommunities(hide): after nodesDS.update(), also call edgesDS.update(RAW_EDGES.map((e,i) => ({id:i, hidden:hide})))",
+        "Per-community onclick: compute communityNodeIds Set, update nodeUpdates, then compute edgeUpdates by checking if either endpoint (e.from or e.to) belongs to a hidden community",
+        "Edge is hidden if hiddenCommunities contains the community of e.from OR e.to",
+        "Use nodesDS.get(id)._community to look up a node's community",
+        "Guard against nodesDS.get() returning null"
+      ],
+
+      "acceptance_criteria": [
+        "Clicking Hide All: all edges disappear alongside nodes",
+        "Clicking Show All: all edges reappear",
+        "Clicking a single community in legend: edges connecting to nodes outside that community are hidden only if both endpoints are in hidden communities",
+        "No null reference errors when node id not found in dataset"
+      ],
+
+      "implementer_prompt": "You are fixing edge visibility in C:/ClaudeSkills/graphify-out/graph.html. The vis-network graph has a community toggle sidebar. Hiding a community hides its nodes but orphan edges remain. You need to also update edgesDS. RAW_EDGES is the source array; edgesDS is the vis DataSet. See spec for exact logic. Use Grep to locate exact line ranges before editing.",
+
+      "notes": "Already applied — verify the edge hiding logic handles the cross-community case correctly."
+    },
+
+    {
+      "id": "task-04",
+      "title": "Fix — Mojibake Arrow Characters in Hyperedge Labels",
+      "status": "completed",
+      "priority": "medium",
+      "model": "claude-haiku-4-5-20251001",
+      "files_touched": ["graphify-out/graph.html"],
+      "section": "afterDrawing label rendering",
+
+      "context": "Hyperedge label strings contain 'â†'' which is the UTF-8 byte sequence for → (U+2192) misread as Latin-1. Specifically: â=0xE2, †=0x80, '=0x99 encode the 3-byte UTF-8 sequence for →. The fix replaces these at render time.",
+
+      "spec": [
+        "In afterDrawing, before ctx.fillText(), add: const cleanLabel = h.label.replace(/â†'/g, '→')",
+        "Pass cleanLabel to ctx.fillText() instead of h.label",
+        "Do not modify the hyperedges data array itself"
+      ],
+
+      "acceptance_criteria": [
+        "Labels containing 'â†'' render as '→' in the canvas",
+        "Labels without the pattern are unaffected",
+        "hyperedges array is not mutated"
+      ],
+
+      "implementer_prompt": "In C:/ClaudeSkills/graphify-out/graph.html, the afterDrawing canvas block renders hyperedge labels. Some labels contain mojibake 'â†'' that should render as '→'. Add a cleanLabel replacement before ctx.fillText. See spec. Single targeted Edit only.",
+
+      "notes": "Already applied."
+    },
+
+    {
+      "id": "task-05",
+      "title": "Fix — Null Guard in Neighbor Node Rendering",
+      "status": "completed",
+      "priority": "high",
+      "model": "claude-haiku-4-5-20251001",
+      "files_touched": ["graphify-out/graph.html"],
+      "section": "showInfo() function (~line 120)",
+
+      "context": "showInfo() calls nodesDS.get(nid) for each neighbor. If a neighbor ID exists in the edges dataset but not in nodesDS (can happen with INFERRED edges referencing concept nodes), nb is null and nb.color.background throws a TypeError, crashing the info panel.",
+
+      "spec": [
+        "In the neighborIds.map() callback: if (!nb) return ''",
+        "Guard nb.color access: use (nb.color && nb.color.background) ? nb.color.background : '#555'",
+        "Add .filter(Boolean) after .map() before .join('') to remove empty strings",
+        "Use nb.label directly instead of nb ? nb.label : nid (after the null guard)"
+      ],
+
+      "acceptance_criteria": [
+        "Clicking a node whose neighbor has no dataset entry does not throw",
+        "Neighbor list renders correctly for nodes with valid neighbors",
+        "Empty strings filtered from neighbor HTML"
+      ],
+
+      "implementer_prompt": "Fix a null crash in showInfo() in C:/ClaudeSkills/graphify-out/graph.html. The neighborIds.map() accesses nb.color.background without null-guarding nb. Apply the fix per the spec. Single targeted Edit.",
+
+      "notes": "Already applied."
+    },
+
+    {
+      "id": "task-06",
+      "title": "Fix — Stats Bar Community Count",
+      "status": "completed",
+      "priority": "low",
+      "model": "claude-haiku-4-5-20251001",
+      "files_touched": ["graphify-out/graph.html"],
+      "section": "#stats div (line ~60)",
+
+      "context": "The stats bar hardcodes '163 communities' but the GRAPH_REPORT.md states 135 communities were detected. The extractor's community detection produced 135; the HTML was generated with a stale count.",
+
+      "spec": [
+        "Change '163 communities' to '135 communities' in the #stats div"
+      ],
+
+      "acceptance_criteria": [
+        "Stats bar reads: '3227 nodes · 7871 edges · 135 communities'"
+      ],
+
+      "implementer_prompt": "One-line fix in C:/ClaudeSkills/graphify-out/graph.html: change 163 to 135 in the #stats div. Use Edit with the exact old_string.",
+
+      "notes": "Already applied."
+    },
+
+    {
+      "id": "task-07",
+      "title": "Feature — Export PNG Button",
+      "status": "completed",
+      "priority": "medium",
+      "model": "claude-haiku-4-5-20251001",
+      "files_touched": ["graphify-out/graph.html"],
+      "section": "toolbar HTML + JS",
+
+      "context": "Users need to capture the current graph view as a PNG for reports and documentation. vis-network exposes the underlying canvas via network.canvas.frame.canvas which supports toDataURL().",
+
+      "spec": [
+        "Add a #toolbar div below <body> and above <div id='graph'> with three buttons: 'Export PNG', 'Hide INFERRED' / 'Show INFERRED' toggle, 'Fit All'",
+        "exportPNG(): get canvas via network.canvas.frame.canvas, create <a> with download='graph-YYYY-MM-DD.png', set href to canvas.toDataURL('image/png'), trigger click",
+        "Fit All: onclick calls network.fit({animation:true})",
+        "Toolbar CSS: dark theme matching existing sidebar (#0f0f1a bg, #3a3a5e border, hover #4E79A7)"
+      ],
+
+      "acceptance_criteria": [
+        "#toolbar exists in DOM between <body> and <div id='graph'>",
+        "Export PNG button triggers file download named graph-YYYY-MM-DD.png",
+        "Fit All recenters the network",
+        "Toolbar styled consistently with dark theme"
+      ],
+
+      "implementer_prompt": "Add an Export PNG button to C:/ClaudeSkills/graphify-out/graph.html. See spec for exact HTML structure, JS function, and CSS. The canvas is accessed via network.canvas.frame.canvas. Use targeted Edit patches.",
+
+      "notes": "Already applied."
+    },
+
+    {
+      "id": "task-08",
+      "title": "Feature — Toggle INFERRED Edges Button",
+      "status": "completed",
+      "priority": "high",
+      "model": "claude-sonnet-4-6",
+      "files_touched": ["graphify-out/graph.html"],
+      "section": "toolbar + JS toggleInferred()",
+
+      "context": "The graph has 7871 edges total, of which 3642 are INFERRED with avg confidence 0.55. On initial load all edges render making the graph visually cluttered. Hiding INFERRED edges by default shows only the 4229 high-confidence EXTRACTED edges, making the graph readable immediately.",
+
+      "spec": [
+        "Add toggleInferred() JS function: flips inferredHidden boolean, updates button label and .active class, calls edgesDS.update(RAW_EDGES.map((e,i) => ({id:i, hidden: inferredHidden && e.confidence === 'INFERRED'})))",
+        "Initial state: inferredHidden = true (INFERRED edges hidden on load)",
+        "Apply initial state via setTimeout(() => toggleInferred(), 800) after network is initialized",
+        "Button label: 'Hide INFERRED' when hidden (active state), 'Show INFERRED' when visible",
+        "Active CSS: border-color #d97706, color #fbbf24 (amber, matching INFERRED hyperedge color)"
+      ],
+
+      "acceptance_criteria": [
+        "On load, INFERRED edges hidden after 800ms",
+        "Button toggles state on click",
+        "Button label updates correctly",
+        "Button has amber active state matching INFERRED color palette",
+        "RAW_EDGES array not mutated"
+      ],
+
+      "implementer_prompt": "Add an INFERRED edge toggle to C:/ClaudeSkills/graphify-out/graph.html. See spec for exact JS and button behavior. The edgesDS vis DataSet is already defined. RAW_EDGES has a 'confidence' field per edge. Use targeted Edit patches only.",
+
+      "notes": "Already applied — note the button starts in 'active/hiding' state since inferredHidden starts true but toggleInferred() flips it, so verify final state is correct."
+    },
+
+    {
+      "id": "task-09",
+      "title": "Feature — Hyperedge Label Font Scaling",
+      "status": "completed",
+      "priority": "low",
+      "model": "claude-haiku-4-5-20251001",
+      "files_touched": ["graphify-out/graph.html"],
+      "section": "afterDrawing label rendering",
+
+      "context": "Hyperedge labels were rendered at a fixed 11px regardless of zoom level. At high zoom (scale > 2) the label becomes enormous and covers all nodes in the cluster. At low zoom (scale < 0.3) the label is unreadably tiny. Font size should scale inversely with network zoom.",
+
+      "spec": [
+        "const scale = network.getScale()",
+        "const fontSize = Math.max(8, Math.min(13, 11 / scale))",
+        "ctx.font = `bold ${fontSize}px sans-serif`"
+      ],
+
+      "acceptance_criteria": [
+        "At scale=1.0, fontSize = 11 (clamped within 8–13)",
+        "At scale=2.0, fontSize = Math.max(8, 5.5) = 8",
+        "At scale=0.5, fontSize = Math.min(13, 22) = 13",
+        "Label remains readable at all tested zoom levels"
+      ],
+
+      "implementer_prompt": "In C:/ClaudeSkills/graphify-out/graph.html, the afterDrawing block renders hyperedge labels. The font size is hardcoded. Add scale-adaptive font sizing per the spec. Single targeted Edit.",
+
+      "notes": "Already applied."
+    },
+
+    {
+      "id": "task-10",
+      "title": "Feature — Neighbor Link Visual Styling",
+      "status": "completed",
+      "priority": "low",
+      "model": "claude-haiku-4-5-20251001",
+      "files_touched": ["graphify-out/graph.html"],
+      "section": "CSS + showInfo()",
+
+      "context": "The neighbor list in the info panel rendered plain spans with no visual treatment. Neighbors need a colored left-border chip style that matches their community color, making the info panel scannable.",
+
+      "spec": [
+        "Add CSS: .neighbor-link { display:inline-block; margin:2px 0; padding:2px 6px; border-left:3px solid #555; border-radius:3px; cursor:pointer; font-size:11px; background:#1a1a2e; }",
+        "Add CSS: .neighbor-link:hover { background: #2a2a4e; }",
+        "The border-left-color is already set inline from nb.color.background in the template literal"
+      ],
+
+      "acceptance_criteria": [
+        ".neighbor-link CSS rule present with all properties",
+        "Hover state CSS present",
+        "Neighbor chips display as inline-block chips with color left border"
+      ],
+
+      "implementer_prompt": "Add .neighbor-link CSS to C:/ClaudeSkills/graphify-out/graph.html. The neighbor spans are rendered in showInfo() with inline border-left-color. Add the base CSS class styling. Single targeted Edit to the <style> block.",
+
+      "notes": "Already applied as part of toolbar CSS edit."
+    }
+  ],
+
+  "execution_order": [
+    "task-01", "task-02", "task-03", "task-04",
+    "task-05", "task-06", "task-07", "task-08",
+    "task-09", "task-10"
+  ],
+
+  "review_gates": {
+    "per_task": {
+      "stage_1": "spec_compliance_reviewer — confirm code matches spec exactly, nothing extra added, nothing missing",
+      "stage_2": "code_quality_reviewer — confirm no regressions, correct JS patterns, no XSS in esc() bypasses, no mutation of source data arrays"
+    },
+    "final": {
+      "reviewer": "code-reviewer subagent",
+      "checklist": [
+        "All 10 tasks implemented per spec",
+        "No regression in existing search, legend, network init, or tooltip behavior",
+        "RAW_NODES / RAW_EDGES source arrays never mutated",
+        "No XSS: all user-visible strings pass through esc()",
+        "Graph renders without console errors on load",
+        "Export PNG produces a valid image file",
+        "INFERRED edges hidden on initial load"
+      ]
+    }
+  },
+
+  "dispatcher_notes": {
+    "context_to_provide_every_subagent": [
+      "File path: C:/ClaudeSkills/graphify-out/graph.html (3.2MB — use Grep to locate sections, never Read the full file)",
+      "Library: vis-network (vis.DataSet, vis.Network) loaded from unpkg CDN",
+      "Data: RAW_NODES (array), RAW_EDGES (array with .confidence field), LEGEND (array), hyperedges (array) are all embedded JS vars in the HTML",
+      "Theme: dark (#0f0f1a bg, #3a3a5e borders, #4E79A7 accent)",
+      "The file has ~276 lines of JS/HTML followed by millions of characters of embedded JSON data — always patch lines 1–310 only"
+    ],
+    "do_not_provide": [
+      "Full file contents (too large)",
+      "graph.json contents (not needed for HTML fixes)",
+      "Session history or prior conversation context"
+    ]
+  }
+}

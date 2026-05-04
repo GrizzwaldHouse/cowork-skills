@@ -1,0 +1,26 @@
+NOTICE - PRIVATE PROPRIETARY REPOSITORY
+
+This is a private working repository belonging to Marcus Daley.
+
+Do not copy. Do not redistribute. Do not train on this content.
+
+By cloning, pulling, fetching, mirroring, or otherwise accessing this
+repository you acknowledge:
+
+  1. You have lawful authorization from Marcus Daley to access it.
+  2. You will not use the contents to train, fine-tune, evaluate, or align
+     any machine-learning system.
+  3. You will not publish any portion of the contents in any public forum,
+     marketplace, gist, social-media post, video, or model dataset.
+  4. You will treat project codenames as confidential trade secrets.
+  5. You will run the publish guard before any operation that copies files
+     out of this repository.
+
+See LICENSE, COPYRIGHT.md, and PRIVACY.md for full terms.
+
+# AI Training Opt-Out (machine-readable)
+# This block follows emerging conventions (ai.txt / TDM Reservation).
+ai-training: disallow
+ai-evaluation: disallow
+ai-fine-tuning: disallow
+public-redistribution: disallow

@@ -1,0 +1,179 @@
+/* TerminalWindowPanel.css
+   Developer: Marcus Daley
+   Date: 2026-05-01
+   Purpose: Compact operator styling for the terminal-control band. */
+
+.terminal-panel {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid rgba(77, 182, 172, 0.35);
+  background: rgba(7, 18, 24, 0.82);
+}
+
+.terminal-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.terminal-panel__title {
+  margin: 0;
+  color: var(--color-gold-accent);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  letter-spacing: var(--letter-wide);
+}
+
+.terminal-panel__meta {
+  margin: 2px 0 0;
+  color: var(--color-teal);
+  font-size: var(--font-size-xs);
+}
+
+.terminal-panel__tools,
+.terminal-panel__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.terminal-panel__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-border-gold);
+  cursor: pointer;
+  font-size: var(--font-size-xs);
+}
+
+.terminal-panel__toggle input {
+  accent-color: var(--color-teal);
+}
+
+.terminal-panel__button {
+  border: 1px solid rgba(77, 182, 172, 0.55);
+  border-radius: var(--radius-sm);
+  background: rgba(77, 182, 172, 0.12);
+  color: var(--color-teal);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: var(--letter-wide);
+  min-width: 68px;
+  padding: 5px 9px;
+}
+
+.terminal-panel__button:hover:not(:disabled) {
+  border-color: var(--color-teal);
+  background: rgba(77, 182, 172, 0.22);
+}
+
+.terminal-panel__button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.terminal-panel__button--danger {
+  border-color: rgba(192, 57, 43, 0.65);
+  background: rgba(192, 57, 43, 0.12);
+  color: var(--color-error-red);
+}
+
+.terminal-panel__button--danger:hover:not(:disabled) {
+  border-color: var(--color-error-red);
+  background: rgba(192, 57, 43, 0.2);
+}
+
+.terminal-panel__notice {
+  margin: 0;
+  font-size: var(--font-size-xs);
+}
+
+.terminal-panel__notice--error {
+  color: var(--color-error-red);
+}
+
+.terminal-panel__notice--ok {
+  color: var(--color-success-green);
+}
+
+.terminal-panel__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 230px;
+  overflow-y: auto;
+}
+
+.terminal-panel__empty {
+  margin: 0;
+  color: var(--color-border-gold);
+  font-size: var(--font-size-sm);
+  opacity: 0.72;
+}
+
+.terminal-panel__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-2);
+  border: 1px solid rgba(201, 169, 78, 0.22);
+  border-left: 3px solid rgba(201, 169, 78, 0.45);
+  background: rgba(10, 20, 28, 0.72);
+}
+
+.terminal-panel__row[data-agent-like='true'] {
+  border-left-color: var(--color-teal);
+}
+
+.terminal-panel__main {
+  min-width: 0;
+}
+
+.terminal-panel__row-title,
+.terminal-panel__row-meta,
+.terminal-panel__cwd {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.terminal-panel__row-title {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+.terminal-panel__row-meta {
+  color: var(--color-border-gold);
+  font-size: var(--font-size-xs);
+}
+
+.terminal-panel__cwd {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+@media (max-width: 860px) {
+  .terminal-panel__header,
+  .terminal-panel__row {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+
+  .terminal-panel__header {
+    flex-direction: column;
+  }
+
+  .terminal-panel__tools,
+  .terminal-panel__actions {
+    flex-wrap: wrap;
+  }
+}

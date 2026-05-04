@@ -2,5 +2,23 @@
   "watched_paths": ["C:/ClaudeSkills"],
   "ignored_patterns": ["__pycache__", ".git", "*.pyc", "backups", "logs", "dist", "security", ".tmp_*", "*.lock"],
   "sync_interval": 5,
-  "enabled_skills": []
+  "enabled_skills": [],
+  "notification_policy": {
+    "desktop_enabled": true,
+    "min_level": "WARNING",
+    "cooldown_seconds": 60,
+    "critical_cooldown_seconds": 15,
+    "duplicate_window_seconds": 300,
+    "max_message_chars": 160
+  },
+  "ollama_guard": {
+    "enabled": true,
+    "agent_id": "ollama",
+    "scope_file": "C:/ClaudeSkills/agentic-os/state/ollama_scope.json",
+    "allow_deletes": false,
+    "allowed_paths": [],
+    "allowed_globs": [],
+    "delete_allowed_paths": [],
+    "delete_allowed_globs": []
+  }
 }

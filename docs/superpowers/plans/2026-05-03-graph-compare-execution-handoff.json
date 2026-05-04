@@ -1,0 +1,120 @@
+{
+  "session_handoff": {
+    "version": "1.0",
+    "created": "2026-05-03",
+    "project": "Graphify Client Portal — Sub-project 1: Graph Compare Viewer",
+    "author": "Marcus Daley",
+    "purpose": "Execution session handoff. Paste into a fresh Claude Code window: 'Read C:/ClaudeSkills/docs/superpowers/plans/2026-05-03-graph-compare-execution-handoff.json then follow instructions_for_claude exactly.'"
+  },
+
+  "instructions_for_claude": {
+    "step_1": "Read this entire JSON before responding.",
+    "step_2": "Announce: 'Graphify Sub-project 1 — Graph Compare Viewer. Execution session. Dispatching Agent 1 (Scaffold & Shell).'",
+    "step_3": "Load the plan file at C:/ClaudeSkills/docs/superpowers/plans/2026-05-03-graph-compare-viewer.md — this contains the full task definitions with exact code for all 6 agents.",
+    "step_4": "Invoke 'superpowers:subagent-driven-development' skill — this governs how each agent is dispatched and reviewed.",
+    "step_5": "Dispatch agents SEQUENTIALLY — Task 2 depends on Task 1's output, Task 3 on Task 2, etc. Do NOT dispatch in parallel.",
+    "step_6": "After each agent completes, do a brief review (check the file was written, no console errors noted), then dispatch the next agent.",
+    "step_7": "Agent 5 (Extraction Script) can run in parallel with Agents 1-4 if the opportunity arises — it owns only scripts/extract_original_graph.py and .gitignore, no overlap with graph-compare.html.",
+    "step_8": "Agent 6 (Integration & Validation) runs LAST — after all other agents are done.",
+    "step_9": "Before each agent writes code, that agent must load 'universal-coding-standards' from C:/ClaudeSkills/skills/universal-coding-standards/.",
+    "step_10": "Do NOT skip verification steps inside each task. Each agent self-verifies before marking complete."
+  },
+
+  "plan_location": "C:/ClaudeSkills/docs/superpowers/plans/2026-05-03-graph-compare-viewer.md",
+  "spec_location": "C:/ClaudeSkills/docs/superpowers/specs/2026-05-02-graph-compare-viewer-design.md",
+
+  "developer_profile": {
+    "name": "Marcus Daley",
+    "background": "Navy veteran (9 years leadership), Full Sail BS Online Game Development (Feb 6 2026), stay-at-home dad",
+    "focus": "Portfolio-grade software — AAA studio practices applied universally. Quality over speed. Never quick-and-dirty.",
+    "key_rule": "Never suggest minimal or simplified designs. Always research the most advanced, sophisticated approach.",
+    "commit_rule": "Never include Co-Authored-By lines referencing Claude or Anthropic. Marcus pushes manually."
+  },
+
+  "agent_sequence": [
+    {
+      "order": 1,
+      "agent": "Agent 1 — Scaffold & Shell",
+      "task_section": "## Task 1 — Scaffold & Shell",
+      "owns": "graphify-out/graph-compare.html — HTML skeleton, CSS flex layout, dark theme, draggable divider",
+      "deliverable": "graph-compare.html renders two empty labeled panes with working drag divider. No graph data.",
+      "dependency": "None — run first",
+      "parallel_eligible": false
+    },
+    {
+      "order": 2,
+      "agent": "Agent 2 — GraphRenderer Interface + vis-network",
+      "task_section": "## Task 2 — GraphRenderer Interface + vis-network",
+      "owns": "graph-compare.html — GraphRenderer object, vis-network CDN tag, fetch() calls, both pane renders",
+      "deliverable": "Both panes render graph data. Left = fixed (graph.json), Right = original (graph-original.json).",
+      "dependency": "Task 1 complete",
+      "parallel_eligible": false
+    },
+    {
+      "order": 3,
+      "agent": "Agent 3 — Right-Pane Switcher + Markdown Parser",
+      "task_section": "## Task 3 — Right-Pane Switcher + Markdown Parser",
+      "owns": "graph-compare.html — switcher button logic, inline markdown parser, GRAPH_REPORT.md fetch",
+      "deliverable": "Right pane switches between graph and GRAPH_REPORT without page reload.",
+      "dependency": "Task 2 complete",
+      "parallel_eligible": false
+    },
+    {
+      "order": 4,
+      "agent": "Agent 4 — Annotation Drawer",
+      "task_section": "## Task 4 — Annotation Drawer",
+      "owns": "graph-compare.html — annotation drawer markup, CSS, localStorage script",
+      "deliverable": "Drawer opens/closes, notes persist across reload, Copy All Notes outputs clean text.",
+      "dependency": "Task 3 complete",
+      "parallel_eligible": false
+    },
+    {
+      "order": 5,
+      "agent": "Agent 5 — Extraction Script",
+      "task_section": "## Task 5 — Extraction Script",
+      "owns": "scripts/extract_original_graph.py, .gitignore",
+      "deliverable": "Script runs, graph-original.json is valid JSON matching graph.json schema.",
+      "dependency": "None — can run in parallel with Agents 1-4",
+      "parallel_eligible": true
+    },
+    {
+      "order": 6,
+      "agent": "Agent 6 — Integration & Validation",
+      "task_section": "## Task 6 — Integration & Validation",
+      "owns": "Read-only verification — walks all 8 acceptance criteria",
+      "deliverable": "Validation report at docs/superpowers/specs/2026-05-03-graph-compare-validation.md",
+      "dependency": "Tasks 1–5 all complete",
+      "parallel_eligible": false
+    }
+  ],
+
+  "acceptance_criteria": [
+    "All three panels accessible without page reload",
+    "Annotations persist in localStorage across browser sessions",
+    "Copy All Notes produces clean plain text for pasting into Claude",
+    "Standalone HTML — opens from filesystem (file:// or python -m http.server)",
+    "Works in Chrome and Brave",
+    "GraphRenderer abstraction in place — vis-network never called from layout code",
+    "No external dependencies except vis-network CDN",
+    "graph-original.json extracted correctly from git history"
+  ],
+
+  "key_files": {
+    "output_html":      "C:/ClaudeSkills/graphify-out/graph-compare.html",
+    "fixed_graph":      "C:/ClaudeSkills/graphify-out/graph.json",
+    "original_graph":   "C:/ClaudeSkills/graphify-out/graph-original.json",
+    "report":           "C:/ClaudeSkills/graphify-out/GRAPH_REPORT.md",
+    "extraction_script":"C:/ClaudeSkills/scripts/extract_original_graph.py"
+  },
+
+  "locked_decisions": {
+    "no_iframes":         "Single rendering host — graph-compare.html owns both graph renders directly",
+    "renderer_interface": "GraphRenderer.init/destroy/fit/on — vis-network never called from layout code",
+    "json_first":         "fetch() at runtime — no embedded RAW_NODES/RAW_EDGES globals",
+    "no_cdn_markdown":    "Inline parser only — no marked.js, no CDN for markdown",
+    "vis_cdn_ok":         "vis-network from unpkg CDN is acceptable — compare tool is a dev tool",
+    "config_object":      "All tuneable values in CONFIG object at top of file — never hardcoded below"
+  },
+
+  "boot_prompt": "Read C:/ClaudeSkills/docs/superpowers/plans/2026-05-03-graph-compare-execution-handoff.json then follow instructions_for_claude exactly."
+}

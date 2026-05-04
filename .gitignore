@@ -37,3 +37,35 @@ anthropic-skills/
 nul
 watcher.log
 .worktrees/
+
+# SQLite runtime state
+*.db
+*.db-shm
+*.db-wal
+
+# Temp and lock files
+*.tmp.*
+*.lock
+*.bak-*
+
+# Runtime logs and state
+AgenticOS/state/progress.log
+AgenticOS/state/agents.json
+AgenticOS/state/approval_queue.json
+AgenticOS/state/outputs/
+security/audit_log.*.json
+
+# Binary archives
+*.zip
+
+# Generated cache
+graphify-out/cache/
+
+# Local tool state
+.omc/
+**/.omc/
+.cursor/
+.merge-tmp/
+
+# Node
+node_modules/

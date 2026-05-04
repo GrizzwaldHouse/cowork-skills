@@ -1,0 +1,137 @@
+{
+  "_comment": "Sensitivity ruleset consumed by both publish_guard.ps1 and publish_guard.sh. Each entry has: pattern (regex), label (human-readable), critical (true=block even in install mode), category (personal_markers|codenames|secrets).",
+  "rules": [
+    {
+      "pattern": "(?i)\\bMarcus\\s+Daley\\b",
+      "label": "Owner full name (Marcus Daley)",
+      "critical": false,
+      "category": "personal_markers"
+    },
+    {
+      "pattern": "(?i)\\bdaleym12@gmail\\.com\\b",
+      "label": "Owner personal email",
+      "critical": false,
+      "category": "personal_markers"
+    },
+    {
+      "pattern": "(?i)\\bNavy\\s+veteran\\b",
+      "label": "Veteran biographical marker",
+      "critical": false,
+      "category": "personal_markers"
+    },
+    {
+      "pattern": "(?i)\\bFull\\s+Sail\\b",
+      "label": "Full Sail University attribution",
+      "critical": false,
+      "category": "personal_markers"
+    },
+    {
+      "pattern": "(?i)\\bstay-at-home\\s+dad\\b",
+      "label": "Personal life-status marker",
+      "critical": false,
+      "category": "personal_markers"
+    },
+    {
+      "pattern": "(?i)\\bNick\\s+Penney\\b",
+      "label": "Instructor name (Nick Penney)",
+      "critical": false,
+      "category": "personal_markers"
+    },
+    {
+      "pattern": "\\bBob\\b",
+      "label": "Codename: Bob",
+      "critical": false,
+      "category": "codenames"
+    },
+    {
+      "pattern": "(?i)\\bSentinelMail\\b",
+      "label": "Codename: SentinelMail",
+      "critical": false,
+      "category": "codenames"
+    },
+    {
+      "pattern": "(?i)\\bAgentForge\\b",
+      "label": "Codename: AgentForge",
+      "critical": false,
+      "category": "codenames"
+    },
+    {
+      "pattern": "(?i)\\bMCP\\s+Command\\s+Panel\\b",
+      "label": "Codename: MCP Command Panel",
+      "critical": false,
+      "category": "codenames"
+    },
+    {
+      "pattern": "(?i)\\bQuidditch\\s+AI\\b",
+      "label": "Codename: Quidditch AI",
+      "critical": false,
+      "category": "codenames"
+    },
+    {
+      "pattern": "(?i)\\bIslandEscape\\b",
+      "label": "Codename: IslandEscape",
+      "critical": false,
+      "category": "codenames"
+    },
+    {
+      "pattern": "(?i)\\bVetAssist\\b",
+      "label": "Codename: VetAssist",
+      "critical": false,
+      "category": "codenames"
+    },
+    {
+      "pattern": "(?i)\\bOWL\\s+Watcher\\b",
+      "label": "Codename: OWL Watcher",
+      "critical": false,
+      "category": "codenames"
+    },
+    {
+      "pattern": "(?i)\\bOwlWatcher\\b",
+      "label": "Codename: OwlWatcher",
+      "critical": false,
+      "category": "codenames"
+    },
+    {
+      "pattern": "(?i)\\bDeepCommand\\b",
+      "label": "Codename: DeepCommand",
+      "critical": false,
+      "category": "codenames"
+    },
+    {
+      "pattern": "\\bsk-[A-Za-z0-9_-]{20,}\\b",
+      "label": "OpenAI/Anthropic style API key (sk-...)",
+      "critical": true,
+      "category": "secrets"
+    },
+    {
+      "pattern": "\\bghp_[A-Za-z0-9]{30,}\\b",
+      "label": "GitHub personal access token (ghp_...)",
+      "critical": true,
+      "category": "secrets"
+    },
+    {
+      "pattern": "\\bAKIA[0-9A-Z]{16}\\b",
+      "label": "AWS access key ID (AKIA...)",
+      "critical": true,
+      "category": "secrets"
+    },
+    {
+      "pattern": "(?i)\\bAPI_KEY\\s*=\\s*[\"']?[A-Za-z0-9_\\-]{8,}[\"']?",
+      "label": "Generic API_KEY assignment",
+      "critical": true,
+      "category": "secrets"
+    },
+    {
+      "pattern": "(?i)\\bBearer\\s+[A-Za-z0-9._\\-]{20,}\\b",
+      "label": "Bearer token",
+      "critical": true,
+      "category": "secrets"
+    },
+    {
+      "pattern": "-----BEGIN[ A-Z]*PRIVATE KEY-----",
+      "label": "PEM private key block",
+      "critical": true,
+      "category": "secrets"
+    }
+  ]
+}

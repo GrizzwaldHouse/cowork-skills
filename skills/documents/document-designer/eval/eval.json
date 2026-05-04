@@ -1,0 +1,166 @@
+{
+  "skill_name": "document-designer",
+  "version": "1.0.0",
+  "test_cases": [
+    {
+      "id": 1,
+      "prompt": "Create an Excel report showing Q4 2025 sales data by region (North America, Europe, Asia-Pacific) with monthly breakdowns and year-over-year comparison.",
+      "expected_output": "Structured Excel workbook plan with summary dashboard and data sheets",
+      "assertions": [
+        {
+          "id": "summary_sheet_first",
+          "check": "Output includes a Summary or Dashboard sheet as the first sheet in the workbook",
+          "category": "structure"
+        },
+        {
+          "id": "headers_with_units",
+          "check": "Output includes units in column headers (e.g., 'Revenue ($M)', 'Growth (%)') rather than bare column names",
+          "category": "format"
+        },
+        {
+          "id": "totals_row",
+          "check": "Output includes a totals row at the bottom of numerical data or explicitly mentions summing/aggregating values",
+          "category": "structure"
+        },
+        {
+          "id": "meaningful_sort",
+          "check": "Output describes a meaningful data sort order (by date, region, or value) rather than leaving data unsorted",
+          "category": "quality"
+        },
+        {
+          "id": "no_placeholder_data",
+          "check": "Output does NOT use placeholder text like 'data here', 'TBD', or 'insert values' in the actual data cells",
+          "category": "quality"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Write a professional memo to the engineering team about the new code review policy taking effect April 1, 2026.",
+      "expected_output": "Structured Word document following memo format standards",
+      "assertions": [
+        {
+          "id": "heading_level_one",
+          "check": "Output starts with a heading level 1 for the document title or memo subject",
+          "category": "structure"
+        },
+        {
+          "id": "no_back_to_back_headings",
+          "check": "Output does NOT place two headings back-to-back without content paragraphs between them",
+          "category": "compliance"
+        },
+        {
+          "id": "active_voice",
+          "check": "Output uses predominantly active voice ('The team will implement' rather than 'The policy will be implemented by the team')",
+          "category": "quality"
+        },
+        {
+          "id": "front_loaded",
+          "check": "Output front-loads the most important information (the policy change and effective date) in the opening paragraph or summary",
+          "category": "structure"
+        },
+        {
+          "id": "descriptive_table_headers",
+          "check": "If the output includes tables, they have descriptive headers (not 'Column A', 'Column B') or the output contains no tables at all",
+          "category": "format"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Create a PowerPoint presentation for an investor pitch about a mobile health app startup. Include 8 slides covering problem, solution, market, business model, traction, team, financials, and ask.",
+      "expected_output": "Structured presentation with title slide, body slides, and CTA",
+      "assertions": [
+        {
+          "id": "title_slide_first",
+          "check": "Output specifies the first slide as a title layout with the presentation title and context",
+          "category": "structure"
+        },
+        {
+          "id": "six_by_six_rule",
+          "check": "Output follows the 6x6 rule (max 6 bullets per slide, max 6 words per bullet) or explicitly limits bullet content per slide",
+          "category": "compliance"
+        },
+        {
+          "id": "one_idea_per_slide",
+          "check": "Each slide focuses on a single topic (problem, solution, market, etc.) rather than combining multiple topics on one slide",
+          "category": "structure"
+        },
+        {
+          "id": "cta_or_ask_slide",
+          "check": "Output ends with a clear call-to-action, ask amount, or next steps slide",
+          "category": "content"
+        },
+        {
+          "id": "no_lorem_ipsum",
+          "check": "Output does NOT contain 'Lorem ipsum', placeholder body text, or 'Your text here' in any slide content",
+          "category": "quality"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Create a PDF invoice for a freelance web development project. Client: Acme Corp. Total: $12,500. Include itemized services, payment terms, and contact info.",
+      "expected_output": "Structured PDF with heading/paragraph pairs, proper formatting",
+      "assertions": [
+        {
+          "id": "heading_paragraph_pairs",
+          "check": "Output structures the PDF as heading/paragraph pairs with content between each heading",
+          "category": "structure"
+        },
+        {
+          "id": "currency_formatted",
+          "check": "Output formats currency values with proper notation (e.g., $12,500.00 with commas and decimal places)",
+          "category": "format"
+        },
+        {
+          "id": "itemized_services",
+          "check": "Output includes an itemized breakdown of services with individual costs rather than just a single total",
+          "category": "content"
+        },
+        {
+          "id": "paragraph_length",
+          "check": "Paragraphs in the output are kept concise (not exceeding approximately 100 words each for PDF readability)",
+          "category": "compliance"
+        },
+        {
+          "id": "accessibility_considered",
+          "check": "Output uses descriptive section titles (e.g., 'Services Rendered', 'Payment Terms') rather than generic labels like 'Section 1'",
+          "category": "quality"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Create a multi-sheet Excel workbook tracking a 12-week project plan with tasks, owners, status, and a Gantt-style timeline view.",
+      "expected_output": "Multi-sheet Excel workbook with project tracking and visual timeline",
+      "assertions": [
+        {
+          "id": "multiple_sheets",
+          "check": "Output describes multiple sheets or tabs in the workbook (not everything on a single sheet)",
+          "category": "structure"
+        },
+        {
+          "id": "column_headers_descriptive",
+          "check": "Output uses descriptive column headers like 'Task Name', 'Owner', 'Status', 'Start Date' rather than 'A', 'B', 'C'",
+          "category": "format"
+        },
+        {
+          "id": "dates_formatted",
+          "check": "Output specifies date formatting (ISO 8601 in data or localized in display) for timeline/date columns",
+          "category": "compliance"
+        },
+        {
+          "id": "status_categories",
+          "check": "Output defines specific status categories or values (e.g., 'Not Started', 'In Progress', 'Complete', 'Blocked') rather than freeform text",
+          "category": "content"
+        },
+        {
+          "id": "logical_reading_order",
+          "check": "Output maintains a logical reading order with summary or dashboard information accessible before detailed data",
+          "category": "quality"
+        }
+      ]
+    }
+  ]
+}

@@ -40,7 +40,8 @@ Get-ChildItem -Path $SkillsTarget -Directory | ForEach-Object { Write-Host "  $(
 Write-Host ""
 Write-Host "Done! Skills are now available in all Claude Code sessions." -ForegroundColor Green
 Write-Host "Background skills (design-system, document-designer, universal-coding-standards,"
-Write-Host "  architecture-patterns, dev-workflow, enterprise-secure-ai-engineering) auto-load."
+Write-Host "  architecture-patterns, dev-workflow, enterprise-secure-ai-engineering,"
+Write-Host "  brainstorm-artifact) auto-load."
 Write-Host "User skills: /canva-designer, /desktop-ui-designer, /pyqt6-ui-debugger, /python-code-reviewer"
 Write-Host ""
 Write-Host "To update: git pull; .\setup.ps1" -ForegroundColor Cyan

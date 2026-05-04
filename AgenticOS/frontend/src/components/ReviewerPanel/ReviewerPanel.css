@@ -1,0 +1,54 @@
+/* ReviewerPanel.css
+   Developer: Marcus Daley
+   Date: 2026-04-29
+   Purpose: Collapsible reviewer verdict block. Sits beneath the approval
+            buttons inside an AgentCard. Border-top hairline visually
+            separates it from the buttons while keeping the card cohesive. */
+
+.reviewer-panel {
+  width: 100%;
+  margin-top: var(--space-3);
+  border-top: 1px solid var(--color-border-gold);
+}
+
+.reviewer-panel__toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: var(--space-2) 0;
+  color: var(--color-gold-accent);
+  cursor: pointer;
+  /* Hover transitions feel tactile without being distracting. */
+  transition: color var(--motion-fast) var(--ease-standard);
+}
+
+.reviewer-panel__toggle:hover {
+  color: var(--color-parchment);
+}
+
+.reviewer-panel__chevron {
+  display: inline-block;
+  font-size: var(--font-size-xs);
+  /* Default points down; rotate 180 degrees via data attribute when
+     the panel is open. */
+  transition: transform var(--motion-medium) var(--ease-standard);
+}
+
+.reviewer-panel__chevron[data-open='true'] {
+  transform: rotate(180deg);
+}
+
+.reviewer-panel__body {
+  padding: var(--space-2) 0 var(--space-1) 0;
+}
+
+.reviewer-panel__text {
+  /* pre-wrap keeps the reviewer's line breaks while wrapping long lines. */
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: var(--font-stack-mono);
+  font-size: var(--font-size-sm);
+  color: var(--color-parchment);
+  line-height: 1.55;
+}

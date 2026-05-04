@@ -1,0 +1,68 @@
+/* animations.css / Developer: Marcus Daley / Date: 2026-04-30 / Description: Keyframe definitions and animation utility classes for Agentic OS. All motion referenced by panels.css status dots and shimmer skeletons lives here. */
+
+@import url('variables.css');
+
+/* pulse — used on running/blocked status dots to draw attention without being distracting */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.3);
+  }
+}
+
+/* shimmer — horizontal gradient sweep used for loading skeleton states */
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* glow-alert — accent-coloured pulsing box-shadow for cards that need acknowledgement */
+@keyframes glow-alert {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(108, 99, 255, 0);
+  }
+  50% {
+    box-shadow: 0 0 16px 4px rgba(108, 99, 255, 0.5);
+  }
+}
+
+/* fade-in — subtle entrance animation for dynamically inserted cards and log entries */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Utility classes — apply these directly to elements that need the animation */
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--surface) 25%,
+    var(--surface-hover) 50%,
+    var(--surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.glow-alert {
+  animation: glow-alert 2s ease-in-out infinite;
+}
+
+.fade-in {
+  animation: fade-in 0.2s ease forwards;
+}

@@ -1,0 +1,138 @@
+# Skills Taxonomy — Source of Truth
+#
+# Categories are folder names under skills/. Add a new top-level category by
+# adding an entry here AND creating the matching folder. The installer walks
+# the tree recursively for SKILL.md, so nesting depth is unrestricted.
+#
+# Skills must live in exactly ONE category. If a skill spans multiple, place
+# it in its primary discipline and reference the others in its SKILL.md
+# `cross-references` section.
+
+version: 1
+maintainer: Marcus Daley
+visibility: private  # private | restricted | public
+
+# Top-level categories. Order is documentation order, not load order.
+categories:
+
+  _core:
+    purpose: Universal standards and methodology that apply to every project Marcus touches.
+    auto_load: true
+    members:
+      - universal-coding-standards
+      - architecture-patterns
+      - dev-workflow
+      - brainstorm-artifact
+      - enterprise-secure-ai-engineering
+      - context-optimization
+
+  game-dev:
+    purpose: Game engine and gameplay-system skills. Subdivide by engine.
+    auto_load: false
+    subcategories:
+      ue5:
+        members:
+          - ue5-blueprint-organization
+          - ue5-build-verify
+      # unity: future
+      # godot: future
+
+  software-dev:
+    purpose: Application and systems development. Subdivide by language or stack.
+    auto_load: false
+    subcategories:
+      python:
+        members:
+          - python-code-reviewer
+          - pyqt6-ui-debugger
+          - desktop-ui-designer
+      web:
+        members:
+          - frontend-design
+      # cpp: future (non-game C++)
+      # rust: future
+      # go: future
+
+  ai-agents:
+    purpose: Multi-agent orchestration, MCP integration, prompt engineering, agent pipelines.
+    auto_load: false
+    members:
+      - agentforge-autopilot
+      - agentic-parallel
+      - automation-orchestration
+      - mcp-integration-guide
+      - multi-agent-pipeline
+      - ollama-audit-training
+      - prompt-engineering
+      - session-recovery
+
+  research:
+    purpose: Research pipelines, idea generation, autonomous experiment loops.
+    auto_load: false
+    members:
+      - deep-research
+      - autoresearch
+      - idea-intelligence-system
+
+  documents:
+    purpose: File-format generation and editing (PDF, Excel, Word, PowerPoint).
+    auto_load: true
+    members:
+      - pdf
+      - xlsx
+      - pptx
+      - document-designer
+      - doc-coauthoring
+
+  design:
+    purpose: Visual design, brand systems, video, generative art.
+    auto_load: false
+    members:
+      - design-system
+      - canva-designer
+      - graphify
+      - video-generation
+
+  knowledge:
+    purpose: Knowledge management, vault organization, note systems.
+    auto_load: false
+    members:
+      - obsidian-knowledge
+      - vault-analysis
+
+  qa-testing:
+    purpose: Quality gates, build verification, test runners, beta agents.
+    auto_load: false
+    members:
+      - superpowers-workflow
+      - verified-build-gate
+      - visual-test-runner
+      - impeccable
+      - beta-team-button-pusher
+      - beta-team-code-debugger
+      - beta-team-db-tester
+      - beta-team-path-tester
+      - beta-team-ui-tester
+
+  marketing:
+    purpose: Growth, SEO, copy, customer research.
+    auto_load: false
+    members:
+      - marketing-toolkit
+      - claude-seo
+
+  meta:
+    purpose: Skills about skills — creating, improving, evaluating skill packages.
+    auto_load: false
+    members:
+      - skill-creator
+      - skill-self-improver
+
+# How to add a new discipline
+# ---------------------------
+# 1. Create a folder under skills/ matching the category name.
+# 2. Add the category entry above with a one-line purpose.
+# 3. Drop the skill folder (must contain SKILL.md) inside it.
+# 4. Run setup.ps1 / setup.sh — the installer auto-discovers it.
+# 5. Update README.md skill table if the skill is publishable
+#    (see skills/_security/PUBLISH_GUARD.md before publishing anything).

@@ -58,9 +58,13 @@ export function SkillBadgeList({ skills, max = 8, onClickSkill }: SkillBadgeList
 
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-      {visible.map((s) => (
-        <SkillBadge key={s} slug={s} onClick={onClickSkill} />
-      ))}
+      {visible.map((s) =>
+        onClickSkill !== undefined ? (
+          <SkillBadge key={s} slug={s} onClick={onClickSkill} />
+        ) : (
+          <SkillBadge key={s} slug={s} />
+        )
+      )}
       {overflow > 0 && (
         <span
           style={{

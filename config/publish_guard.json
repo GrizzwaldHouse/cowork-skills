@@ -1,0 +1,120 @@
+{
+  "_comment": "publish_guard.json - configuration for the publish-guard system. Edit personal_markers / project_codenames / destinations here. Do not store secrets in this file.",
+  "_developer": "Marcus Daley",
+  "_purpose": "Single source of truth for redline patterns and destination policy. Both publish_guard.ps1 and publish_guard.sh consume this file so behavior stays identical across shells.",
+
+  "schema_version": "1.0.0",
+
+  "personal_markers": [
+    "(?i)\\bMarcus\\s+Daley\\b",
+    "(?i)daleym12@gmail\\.com",
+    "(?i)\\bdaleym12\\b",
+    "(?i)\\bNavy\\s+veteran\\b",
+    "(?i)\\bFull\\s+Sail\\b",
+    "(?i)\\bNick\\s+Penney\\b",
+    "(?i)stay-?at-?home\\s+dad",
+    "(?i)\\bGrizzwald(House)?\\b",
+    "(?i)\\bFeb(ruary)?\\s+6\\s*,?\\s*2026\\b",
+    "(?i)BS\\s+Online\\s+Game\\s+Development",
+    "(?i)9\\s+years\\s+leadership",
+    "(?i)\\bdaley\\b\\s*[\\.,]?\\s*marcus",
+    "(?i)C:\\\\Users\\\\daley\\\\"
+  ],
+
+  "project_codenames": [
+    "Bob",
+    "SentinelMail",
+    "AgentForge",
+    "MCP Command Panel",
+    "MCPCommandPanel",
+    "Quidditch AI",
+    "QuidditchAI",
+    "IslandEscape",
+    "Island Escape",
+    "VetAssist",
+    "Vet Assist",
+    "OWL Watcher",
+    "OwlWatcher",
+    "OWLWatcher",
+    "DeepCommand",
+    "Deep Command",
+    "GrizzwaldHouse",
+    "Grizzwald House",
+    "AgenticOS",
+    "Agentic OS",
+    "agentic-parallel",
+    "Cowork Setup Orchestrator"
+  ],
+
+  "blocked_destinations": [
+    "(?i)github\\.com[:/]anthropics/skills",
+    "(?i)github\\.com[:/]anthropic-experimental/",
+    "(?i)gist\\.github\\.com",
+    "(?i)huggingface\\.co/(?!.*GrizzwaldHouse)",
+    "(?i)gitlab\\.com/public/",
+    "(?i)bitbucket\\.org/public/",
+    "(?i)pastebin\\.com",
+    "(?i)pages\\.dev",
+    "(?i)vercel\\.app",
+    "(?i)netlify\\.app",
+    "(?i)marketplace\\.visualstudio\\.com",
+    "(?i)claude\\.ai/skills/marketplace"
+  ],
+
+  "allowed_destinations": [
+    "(?i)github\\.com[:/]GrizzwaldHouse/cowork-skills(\\.git)?$",
+    "(?i)github\\.com[:/]GrizzwaldHouse/[A-Za-z0-9_.\\-]+\\.git$"
+  ],
+
+  "excluded_paths": [
+    "CLAUDE.md",
+    "COPYRIGHT.md",
+    "PRIVACY.md",
+    "NOTICE",
+    "NOTICE.md",
+    "LICENSE",
+    "LICENSE.md",
+    ".env",
+    ".env.local",
+    ".env.example",
+    ".merge-tmp/",
+    "backups/",
+    "logs/",
+    "security/",
+    "config/publish_guard.json",
+    "scripts/publish_guard.ps1",
+    "scripts/publish_guard.sh",
+    "anthropic-skills/",
+    ".git/",
+    ".pytest_cache/",
+    "__pycache__/",
+    "node_modules/",
+    "dist/",
+    "build/"
+  ],
+
+  "binary_extensions": [
+    ".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico",
+    ".pdf", ".zip", ".tar", ".gz", ".7z",
+    ".exe", ".dll", ".so", ".dylib",
+    ".woff", ".woff2", ".ttf", ".otf",
+    ".mp3", ".mp4", ".wav", ".mov"
+  ],
+
+  "severity_levels": {
+    "warn": {
+      "exit_code": 0,
+      "label": "WARN",
+      "description": "Local install or audit context. Prints findings but does not abort the operation."
+    },
+    "block": {
+      "exit_code": 1,
+      "label": "BLOCK",
+      "description": "Public push context. Halts the operation if any redline pattern matches outside excluded paths."
+    }
+  },
+
+  "log_path": "logs/publish_guard.log",
+  "max_file_size_bytes": 2097152,
+  "scan_root": "."
+}

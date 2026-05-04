@@ -202,9 +202,26 @@ def snapshot_current_work(
 
 def handoff_status_payload() -> dict[str, Any]:
     """Read the current manifest and return a summary dict for the REST API."""
-    manifest = read_handoff()
+    # Check for agent-style manifest first (write_handoff_manifest schema).
+    agent_manifest = read_handoff_manifest()
+    if agent_manifest is not None:
+        return {
+            "status": agent_manifest.get("status", "unknown"),
+            "manifest_version": agent_manifest.get("manifest_version"),
+            "agent_id": agent_manifest.get("agent_id"),
+            "domain": agent_manifest.get("domain"),
+            "task": agent_manifest.get("task"),
+            "last_completed_stage": agent_manifest.get("last_completed_stage"),
+            "total_stages": agent_manifest.get("total_stages"),
+            "ollama_model": agent_manifest.get("ollama_model"),
+            "ollama_output_ref": agent_manifest.get("ollama_output_ref"),
+            "created_at": agent_manifest.get("created_at"),
+        }
+    # Fall back to legacy project-snapshot manifest.
+    # Pass HANDOFF_MANIFEST_PATH explicitly so monkeypatching in tests works.
+    manifest = read_handoff(path=HANDOFF_MANIFEST_PATH)
     if manifest is None:
-        return {"status": "no_handoff", "message": "No active handoff manifest found."}
+        return {"status": "none"}
     return {
         "status": "active",
         "written_by": manifest.written_by,
@@ -216,3 +233,135 @@ def handoff_status_payload() -> dict[str, Any]:
         "next_action": manifest.next_action,
         "context_notes": manifest.context_notes,
     }
+
+
+# ---------------------------------------------------------------------------
+# Agent-style handoff manifest (write_handoff_manifest schema)
+#
+# These functions implement the agentic handoff protocol: Claude Code writes
+# a structured manifest at context-limit time, Ollama reads and continues,
+# and Claude Code reviews on resume.  The schema is versioned (manifest_version)
+# and stored at HANDOFF_MANIFEST_PATH alongside the legacy project snapshot.
+# ---------------------------------------------------------------------------
+
+from AgenticOS.config import OLLAMA_HANDOFF_MODEL  # noqa: E402 — appended section
+
+
+def write_handoff_manifest(
+    agent_id: str,
+    domain: str,
+    task: str,
+    last_completed_stage: int,
+    total_stages: int,
+    last_output_ref: Optional[str],
+    resume_instructions: str,
+    claude_session_id: str,
+) -> Path:
+    """Write a versioned handoff manifest so Ollama can continue autonomously.
+
+    Uses an atomic temp-then-rename write identical to write_handoff() so a
+    crash mid-write never leaves a partial file.  Returns the manifest path.
+    """
+    path = HANDOFF_MANIFEST_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    now = datetime.now(timezone.utc).isoformat()
+    manifest: dict[str, Any] = {
+        "manifest_version": 1,
+        "created_at": now,
+        "claude_session_id": claude_session_id,
+        "agent_id": agent_id,
+        "domain": domain,
+        "task": task,
+        "last_completed_stage": last_completed_stage,
+        "total_stages": total_stages,
+        "last_output_ref": last_output_ref,
+        "resume_instructions": resume_instructions,
+        "ollama_model": OLLAMA_HANDOFF_MODEL,
+        "status": "pending_ollama",
+        "ollama_output_ref": None,
+        "ollama_completed_at": None,
+        "claude_reviewed_at": None,
+        "claude_verdict": None,
+    }
+
+    data = json.dumps(manifest, indent=2, ensure_ascii=False)
+    tmp_fd, tmp_path_str = tempfile.mkstemp(
+        dir=path.parent, prefix=".handoff_agent_", suffix=".tmp"
+    )
+    try:
+        with os.fdopen(tmp_fd, "w", encoding="utf-8") as fh:
+            fh.write(data)
+        os.replace(tmp_path_str, str(path))
+    except Exception:
+        try:
+            os.unlink(tmp_path_str)
+        except OSError:
+            pass
+        raise
+
+    _logger.info(
+        "Agent handoff manifest written for agent '%s' (stage %d/%d) to %s",
+        agent_id,
+        last_completed_stage,
+        total_stages,
+        path,
+    )
+    return path
+
+
+def read_handoff_manifest() -> Optional[dict[str, Any]]:
+    """Read the agent-style handoff manifest. Returns None if absent or invalid.
+
+    Distinguishes agent manifests (manifest_version key) from legacy project
+    snapshots (version key) so callers can branch on schema without guessing.
+    """
+    path = HANDOFF_MANIFEST_PATH
+    if not path.exists():
+        return None
+    try:
+        with path.open("r", encoding="utf-8") as fh:
+            data: dict[str, Any] = json.load(fh)
+        # Only return if this is an agent-style manifest.
+        if "manifest_version" not in data:
+            return None
+        return data
+    except (json.JSONDecodeError, OSError) as exc:
+        _logger.warning("Could not parse agent handoff manifest at %s: %s", path, exc)
+        return None
+
+
+def update_handoff_status(status: str, **kwargs: Any) -> None:
+    """Atomically update specific fields in the agent handoff manifest.
+
+    Reads, patches, and rewrites in a single temp-then-rename cycle.
+    Raises FileNotFoundError when no manifest exists yet.
+    """
+    path = HANDOFF_MANIFEST_PATH
+    if not path.exists():
+        raise FileNotFoundError(f"No handoff manifest at {path}")
+
+    with path.open("r", encoding="utf-8") as fh:
+        data: dict[str, Any] = json.load(fh)
+
+    # Apply the status and any additional keyword fields.
+    data["status"] = status
+    for key, value in kwargs.items():
+        data[key] = value
+
+    serialised = json.dumps(data, indent=2, ensure_ascii=False)
+    tmp_fd, tmp_path_str = tempfile.mkstemp(
+        dir=path.parent, prefix=".handoff_upd_", suffix=".tmp"
+    )
+    try:
+        with os.fdopen(tmp_fd, "w", encoding="utf-8") as fh:
+            fh.write(serialised)
+        os.replace(tmp_path_str, str(path))
+    except Exception:
+        try:
+            os.unlink(tmp_path_str)
+        except OSError:
+            pass
+        raise
+
+    _logger.debug("Handoff manifest status updated to '%s' with fields: %s", status, list(kwargs))

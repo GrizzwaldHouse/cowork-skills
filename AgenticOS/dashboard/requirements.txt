@@ -1,0 +1,26 @@
+# requirements.txt
+# Developer: Marcus Daley
+# Date: 2026-04-29
+# Purpose: Runtime dependencies specific to the WPF launcher. Server
+#          dependencies (uvicorn, fastapi, watchdog, pydantic) live in
+#          the parent AgenticOS/requirements.txt so each subsystem
+#          owns its own pin set without duplication.
+
+# pythonnet hosts the .NET CLR inside Python; required to load
+# PresentationFramework, System.Windows.Forms, and the WebView2
+# WPF assembly. Pinned to the minor series that ships with the
+# .NET 8 runtime on Windows 11 to match the supported test matrix.
+pythonnet>=3.0.3,<4
+
+# pywin32 provides the registry helpers used by registry_helper.py
+# on Windows. Listed here even though the standard library winreg
+# module is what we import directly; pywin32 is required for the
+# unit tests that simulate the HKCU sandbox subkey via win32api.
+pywin32>=306; sys_platform == "win32"
+
+# PyQt6 is the active desktop shell for AgenticOS on Marcus's Windows
+# workstation. It replaces the older WPF/pythonnet path, avoiding CLR
+# assembly probing failures while still giving a native window, tray icon,
+# and embedded browser surface.
+PyQt6>=6.7.0,<7
+PyQt6-WebEngine>=6.7.0,<7

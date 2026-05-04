@@ -44,3 +44,11 @@ aiosqlite>=0.20.0,<1.0.0
 # MCP: Model Context Protocol Python SDK. Exposes AgenticOS tools to
 # Claude Desktop so Marcus can approve agents from his iPhone via MCP tools.
 mcp>=1.0.0,<2.0.0
+
+# Requests: HTTP client used by the autonomous-workflow skill to fire events
+# to the AgenticOS state bus (agenticos_push.py).
+requests>=2.31.0,<3.0.0
+
+# Requests-mock: test fixture that intercepts requests calls without hitting
+# the network; used in tests/ai-agents/autonomous-workflow/.
+requests-mock>=1.12.0,<2.0.0

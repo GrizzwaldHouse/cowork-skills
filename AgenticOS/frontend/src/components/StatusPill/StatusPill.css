@@ -1,0 +1,89 @@
+/* StatusPill.css
+   Developer: Marcus Daley
+   Date: 2026-04-29
+   Purpose: Pill chrome for the lifecycle status indicator. Color is
+            selected via [data-status] attribute selectors so the JSX
+            stays declarative and the palette is owned by tokens.css. */
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  font-family: var(--font-stack-body);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: var(--letter-extra-wide);
+  text-transform: uppercase;
+  border: 1px solid var(--color-border-gold);
+  border-radius: var(--radius-lg);
+  background: var(--color-status-bar-bg);
+  color: var(--color-parchment);
+  /* Smooth color and border swap when the status changes mid-card. */
+  transition:
+    border-color var(--motion-medium) var(--ease-standard),
+    color var(--motion-medium) var(--ease-standard);
+}
+
+.status-pill__dot {
+  /* Solid round dot. Sized in em so it scales with label font size. */
+  width: 0.55em;
+  height: 0.55em;
+  border-radius: 50%;
+  background: currentColor;
+  /* Pulse subtly while active; data-status modifiers stop the pulse. */
+  box-shadow: 0 0 6px currentColor;
+}
+
+.status-pill__label {
+  line-height: 1;
+}
+
+/* ---- Per-status color schemes. Token-driven, never hardcoded hex. ---- */
+
+.status-pill[data-status='active'] {
+  color: var(--color-gold-accent);
+  border-color: var(--color-gold-accent);
+}
+
+.status-pill[data-status='waiting_approval'] {
+  color: var(--color-amber);
+  border-color: var(--color-amber);
+}
+
+.status-pill[data-status='waiting_review'] {
+  color: var(--color-teal-fg);
+  border-color: var(--color-teal-fg);
+}
+
+.status-pill[data-status='complete'] {
+  color: var(--color-success-green);
+  border-color: var(--color-success-green);
+}
+
+.status-pill[data-status='error'] {
+  color: var(--color-error-red);
+  border-color: var(--color-error-red);
+}
+
+/* ---- Pulse animation for active state. Reduced-motion users skip. ---- */
+
+@keyframes status-pill-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 4px currentColor;
+  }
+  50% {
+    box-shadow: 0 0 10px currentColor;
+  }
+}
+
+.status-pill[data-status='active'] .status-pill__dot {
+  animation: status-pill-pulse 1.6s var(--ease-standard) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-pill[data-status='active'] .status-pill__dot {
+    animation: none;
+  }
+}

@@ -1,0 +1,41 @@
+/* variables.css / Developer: Marcus Daley / Date: 2026-04-30 / Description: CSS custom property tokens for Agentic OS. Single source of truth for all colours, spacing, and motion timing used across the dashboard. */
+
+:root {
+  /* Core backgrounds */
+  --bg: #0a0d14;
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-hover: rgba(255, 255, 255, 0.07);
+
+  /* Accent palette */
+  --accent: #6c63ff;
+  --accent2: #00d4aa;
+  --gold: #c9a84c;
+  --emerald: #2d6a4f;
+
+  /* Status colours */
+  --danger: #ff4d6a;
+  --warning: #f5a623;
+
+  /* Typography */
+  --text: #e8eaf0;
+  --text-muted: rgba(232, 234, 240, 0.5);
+  --font: 'Inter', system-ui, sans-serif;
+
+  /* Structural borders */
+  --border: rgba(255, 255, 255, 0.08);
+
+  /* Elevation */
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+  /* Shape */
+  --radius: 8px;
+  --radius-sm: 4px;
+
+  /* Motion */
+  --transition: 0.2s ease;
+
+  /* Layout dimensions */
+  --titlebar-h: 44px;
+  --phase-strip-h: 48px;
+  --right-panel-w: 280px;
+}

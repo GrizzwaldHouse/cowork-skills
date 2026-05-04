@@ -1,0 +1,115 @@
+/* TerminalStreamPanel.css */
+/* Developer: Marcus Daley */
+/* Date: 2026-04-29 */
+/* Purpose: Modal overlay terminal styling. Backdrop dims the underlying
+   page; window is centered with a max-height so very chatty agents do
+   not push the close button off screen. */
+
+.terminal-stream-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.terminal-stream-panel__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(2px);
+}
+
+.terminal-stream-panel__window {
+  position: relative;
+  width: min(900px, 90vw);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  background: #0c0e14;
+  border: 1px solid rgba(201, 169, 78, 0.4);
+  border-radius: 8px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+
+.terminal-stream-panel__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(201, 169, 78, 0.25);
+  background: linear-gradient(180deg, #14171d 0%, #0e1116 100%);
+}
+
+.terminal-stream-panel__id {
+  flex: 1;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: #f5f3ee;
+}
+
+.terminal-stream-panel__status {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(201, 169, 78, 0.4);
+}
+
+.terminal-stream-panel__status[data-status='connecting'] {
+  color: #f0c75e;
+}
+.terminal-stream-panel__status[data-status='connected'] {
+  color: #27ae60;
+}
+.terminal-stream-panel__status[data-status='closed'] {
+  color: #c0392b;
+}
+
+.terminal-stream-panel__close {
+  appearance: none;
+  border: 1px solid rgba(201, 169, 78, 0.45);
+  background: transparent;
+  color: rgba(232, 230, 225, 0.85);
+  padding: 4px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.terminal-stream-panel__close:hover {
+  background: rgba(201, 169, 78, 0.15);
+  color: #f5f3ee;
+}
+
+.terminal-stream-panel__scrollback {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #d8d6d0;
+  background: #0a0c11;
+}
+
+.terminal-stream-panel__line {
+  margin: 0;
+  padding: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.terminal-stream-panel__line[data-error='true'] {
+  color: #e07b6f;
+}
+
+.terminal-stream-panel__empty {
+  color: rgba(232, 230, 225, 0.5);
+  font-style: italic;
+  margin: 0;
+}

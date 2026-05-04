@@ -1,0 +1,70 @@
+/* typography.css
+   Developer: Marcus Daley
+   Date: 2026-04-29
+   Purpose: Font stacks and base body typography. Inter for body text gives
+            us a modern humanist sans that pairs well with parchment cream.
+            JetBrains Mono is reserved for agent IDs, timestamps, and
+            anything that should read as "instrument readout". Both fonts
+            are referenced from the host system; the WPF shell ships them
+            with the bundle in Plan 4. Until then we degrade to system UI. */
+
+:root {
+  /* Body / UI font stack. Inter is the design target; system fonts cover
+     the dev-mode experience without a webfont request to a third party. */
+  --font-stack-body:
+    'Inter',
+    'Inter var',
+    'Segoe UI Variable',
+    'Segoe UI',
+    system-ui,
+    -apple-system,
+    sans-serif;
+
+  /* Mono stack for agent IDs and tactical readouts. JetBrains Mono first;
+     consolas/menlo cover the dev fallback path. */
+  --font-stack-mono:
+    'JetBrains Mono',
+    'JetBrains Mono NL',
+    'Cascadia Mono',
+    'Consolas',
+    'Menlo',
+    monospace;
+}
+
+body {
+  font-family: var(--font-stack-body);
+  font-size: var(--font-size-md);
+  line-height: 1.45;
+  color: var(--color-parchment);
+  background-color: var(--color-deep-navy);
+}
+
+/* Headings inherit body font but get tighter line height. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-stack-body);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--color-gold-accent);
+}
+
+/* The .mono class opts an element into the monospace stack used for
+   instrument-style readouts (agent IDs, ISO timestamps, percentages). */
+.mono {
+  font-family: var(--font-stack-mono);
+  font-feature-settings: 'tnum' 1, 'zero' 1;
+}
+
+/* Tactical labels: small, wide-tracked, uppercase. Used by status pills,
+   button labels, panel headings. */
+.tactical-label {
+  font-family: var(--font-stack-body);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: var(--letter-extra-wide);
+  text-transform: uppercase;
+}

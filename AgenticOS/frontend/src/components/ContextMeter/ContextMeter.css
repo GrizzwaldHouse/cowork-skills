@@ -1,0 +1,62 @@
+/* ContextMeter.css
+   Developer: Marcus Daley
+   Date: 2026-04-29
+   Purpose: Three-state gauge for context window usage. Color shifts at
+            the WARN and CRIT thresholds defined in src/config.ts. */
+
+.context-meter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.context-meter__track {
+  flex: 1;
+  height: 6px;
+  background: var(--color-well);
+  border: 1px solid var(--color-gold-hairline);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.context-meter__fill {
+  height: 100%;
+  border-radius: var(--radius-sm);
+  /* Smooth width AND color transition as the threshold flips. */
+  transition:
+    width var(--motion-medium) var(--ease-standard),
+    background-color var(--motion-medium) var(--ease-standard);
+}
+
+.context-meter__readout {
+  min-width: 4ch;
+  text-align: right;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  /* Readout color matches the fill color via threshold attribute. */
+  transition: color var(--motion-medium) var(--ease-standard);
+}
+
+/* ---- Threshold-driven coloring. Tokens, not hex. ---- */
+
+.context-meter[data-threshold='normal'] .context-meter__fill {
+  background-color: var(--color-gold-accent);
+}
+.context-meter[data-threshold='normal'] .context-meter__readout {
+  color: var(--color-gold-accent);
+}
+
+.context-meter[data-threshold='warn'] .context-meter__fill {
+  background-color: var(--color-amber);
+}
+.context-meter[data-threshold='warn'] .context-meter__readout {
+  color: var(--color-amber);
+}
+
+.context-meter[data-threshold='critical'] .context-meter__fill {
+  background-color: var(--color-error-red);
+}
+.context-meter[data-threshold='critical'] .context-meter__readout {
+  color: var(--color-error-red);
+}

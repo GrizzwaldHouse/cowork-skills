@@ -1,0 +1,83 @@
+# =============================================================================
+# .gitattributes
+# Author  : Marcus Daley
+# Date    : 2026-04-29
+# Purpose : Control how `git archive`, `git diff`, and merge handle files in
+#           this repo. Sensitive paths get `export-ignore` so a tarball or
+#           zip distribution cannot leak personal/identity files.
+# =============================================================================
+
+# ----------------------------------------------------------------------------
+# Line endings
+# ----------------------------------------------------------------------------
+* text=auto eol=lf
+
+# Windows-only PowerShell scripts must keep CRLF so PS 5.1 parses them cleanly.
+*.ps1   text eol=crlf
+*.psm1  text eol=crlf
+*.psd1  text eol=crlf
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+
+# Bash scripts always LF.
+*.sh    text eol=lf
+
+# ----------------------------------------------------------------------------
+# Binary skill assets - mark explicitly so git does not try to diff them.
+# ----------------------------------------------------------------------------
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.pdf   binary
+*.zip   binary
+*.tar   binary
+*.gz    binary
+*.7z    binary
+*.exe   binary
+*.dll   binary
+*.so    binary
+*.dylib binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
+*.mp3   binary
+*.mp4   binary
+*.wav   binary
+*.mov   binary
+
+# ----------------------------------------------------------------------------
+# export-ignore: keep these out of `git archive` / GitHub source tarballs.
+# WHY: even though .gitignore prevents commit of secrets, identity files like
+# CLAUDE.md and PRIVACY.md *are* tracked but should never ship in a public
+# distribution. export-ignore is the official mechanism for this.
+# ----------------------------------------------------------------------------
+CLAUDE.md          export-ignore
+COPYRIGHT.md       export-ignore
+PRIVACY.md         export-ignore
+NOTICE             export-ignore
+NOTICE.md          export-ignore
+
+.gitattributes     export-ignore
+.gitignore         export-ignore
+.editorconfig      export-ignore
+
+config/publish_guard.json   export-ignore
+scripts/publish_guard.ps1   export-ignore
+scripts/publish_guard.sh    export-ignore
+
+backups/           export-ignore
+logs/              export-ignore
+.merge-tmp/        export-ignore
+security/          export-ignore
+tests/            export-ignore
+.pytest_cache/    export-ignore
+
+# ----------------------------------------------------------------------------
+# Linguist hints - keep skill payloads from inflating language stats.
+# ----------------------------------------------------------------------------
+Example_Skills/**  linguist-documentation
+UI_Templates/**    linguist-vendored

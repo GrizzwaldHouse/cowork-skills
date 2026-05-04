@@ -1,0 +1,153 @@
+/* SonarHUD.css
+   Developer: Marcus Daley
+   Date: 2026-04-29
+   Purpose: Container, loading, and error-state styles for the SonarHUD
+            Spline scene wrapper. Plan 4 replaces the Plan 3 placeholder
+            chrome; the radial-gradient frame and status-tinted glow that
+            lived here previously now live inside the Spline scene itself.
+            The loading placeholder uses the same submarine palette as the
+            scene so the canvas appears to fade in rather than pop. */
+
+/* ---------------------------------------------------------------------------
+   Container
+   The Spline canvas needs a positioned ancestor so the lazy-loaded scene
+   sizes against this element rather than the document root. min-height
+   matches the fallback so the layout never reflows when the render path
+   switches between Spline and CSS fallback at mount.
+--------------------------------------------------------------------------- */
+
+.sonar-hud {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  background-color: var(--color-deep-navy);
+  border: 1px solid var(--color-border-gold);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  /* Same fade-in window as the fallback so the UI never snap-changes. */
+  animation: sonar-hud-fade-in var(--motion-medium) var(--ease-standard);
+}
+
+/* Canvas itself: filled to the container, block layout to suppress the
+   inline whitespace artifact that browsers add around inline canvas. */
+.sonar-hud__canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ---------------------------------------------------------------------------
+   Loading placeholder
+   Shown via the Suspense fallback while the @splinetool/runtime chunk
+   downloads. Uses the deep navy backdrop and a slow-spinning gold ring so
+   the user perceives a loading state that belongs to the same instrument.
+--------------------------------------------------------------------------- */
+
+.sonar-hud__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  background-color: var(--color-deep-navy);
+}
+
+.sonar-hud__loading-ring {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid var(--color-gold-hairline);
+  /* Single bright segment around an otherwise dim ring; rotation makes it
+     read as a sweep arc rather than a generic spinner. */
+  border-top-color: var(--color-gold-accent);
+  animation: sonar-hud-spin 1.2s linear infinite;
+}
+
+.sonar-hud__loading-text {
+  font-size: var(--font-size-xs);
+  color: var(--color-border-gold);
+  letter-spacing: var(--letter-extra-wide);
+  text-transform: uppercase;
+}
+
+/* ---------------------------------------------------------------------------
+   Error state
+   Rendered by SceneErrorState when the .splinecode file cannot be loaded.
+   The card stays inside the SonarHUD bounds so the surrounding grid does
+   not reflow even when the 3D HUD is unavailable.
+--------------------------------------------------------------------------- */
+
+.sonar-hud__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  background-color: var(--color-deep-navy);
+  border: 1px dashed var(--color-error-red);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  /* Internal padding adjustment so the dashed border does not abut the
+     content. The 1px border is decorative and not load-bearing. */
+  box-sizing: border-box;
+}
+
+.sonar-hud__error-code {
+  font-size: var(--font-size-sm);
+  color: var(--color-error-red);
+  letter-spacing: var(--letter-extra-wide);
+  text-transform: uppercase;
+}
+
+.sonar-hud__error-message {
+  font-size: var(--font-size-md);
+  color: var(--color-parchment);
+  text-align: center;
+  max-width: 320px;
+  line-height: 1.6;
+}
+
+.sonar-hud__error-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-border-gold);
+  text-align: center;
+  letter-spacing: var(--letter-tight);
+}
+
+.sonar-hud__error-hint code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--color-gold-accent);
+  background-color: var(--color-well);
+  padding: 2px var(--space-1);
+  border-radius: var(--radius-sm);
+}
+
+.sonar-hud__error-detail {
+  font-size: var(--font-size-xs);
+  color: var(--color-gold-hairline);
+  text-align: center;
+  max-width: 320px;
+  /* Diagnostic message; dim so it does not compete with the headline. */
+  opacity: 0.6;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/* ---------------------------------------------------------------------------
+   Keyframes
+--------------------------------------------------------------------------- */
+
+@keyframes sonar-hud-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes sonar-hud-spin {
+  to { transform: rotate(360deg); }
+}
