@@ -1,6 +1,6 @@
 {
   "repo": "cowork-skills",
-  "auditTimestamp": "2026-05-04T07:30:54.657902+00:00",
+  "auditTimestamp": "2026-05-04T07:53:00.563043+00:00",
   "agentforgeRole": "BRAIN + SKELETAL",
   "integrationStatus": "STANDALONE",
   "readiness": "NOT_READY",
@@ -19,13 +19,14 @@
     "env_example_present": false
   },
   "stats": {
-    "filesScanned": 123,
+    "filesScanned": 151,
     "functionsFound": 0,
     "openTodos": 0,
-    "testFiles": 28,
+    "testFiles": 32,
     "prdViolations": 0,
     "stack": [
-      "Python"
+      "Python",
+      "TypeScript/React"
     ]
   },
   "gaps": {
@@ -65,6 +66,6 @@
     ],
     "prd_violations": []
   },
-  "claudeCodeUsed": false,
-  "elapsedSeconds": 268.1
+  "claudeCodeUsed": true,
+  "elapsedSeconds": 445.3
 }
