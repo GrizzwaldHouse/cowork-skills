@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python C:/ClaudeSkills/scripts/skill_sync_hook.py --event post-write --file \"${file}\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python C:/ClaudeSkills/scripts/skill_sync_hook.py --event session-end"
+          }
+        ]
+      }
+    ]
+  }
+}
