@@ -1,0 +1,19 @@
+{
+  "id": "task-integrate-agentic-os-projects",
+  "title": "Integrate AgenticOS knowledge across Unreal guidebook and portfolio projects",
+  "status": "pending",
+  "assigned_to": null,
+  "dependencies": [],
+  "priority": 1,
+  "locked_by": null,
+  "created_at": "2026-05-02T08:26:00Z",
+  "updated_at": "2026-05-02T08:26:00Z",
+  "checkpoints": [
+    {
+      "created_at": "2026-05-02T08:26:00Z",
+      "message": "Coordinate active CLAW, Claude, Codex, and Ollama agents into one AgenticOS hub that can talk to C:/Users/daley/UnrealProjects/BaseGame/UnrealEditorGuideBookClaudeDesign and D:/portfolio-website.",
+      "brief_ref": "agentic-os/state/cross_project_integration_brief.md"
+    }
+  ],
+  "output": null
+}

@@ -1,0 +1,44 @@
+{
+  "id": "codex-ops-handoff-setup",
+  "title": "Information class: Operational Setup / AgenticOS handoff enablement",
+  "status": "in_progress",
+  "assigned_to": "codex",
+  "dependencies": [],
+  "priority": 0,
+  "locked_by": "codex",
+  "created_at": "2026-05-01T05:42:08.647Z",
+  "updated_at": "2026-05-01T05:42:08.647Z",
+  "checkpoints": [
+    {
+      "agent_id": "codex",
+      "created_at": "2026-05-01T05:42:08.647Z",
+      "checkpoint": {
+        "message": "Dependencies verified through uv; .env keys added without exposing secrets."
+      }
+    },
+    {
+      "agent_id": "codex",
+      "created_at": "2026-05-01T05:42:08.647Z",
+      "checkpoint": {
+        "message": "Claude Desktop MCP config copied with uv-based launcher."
+      }
+    },
+    {
+      "agent_id": "codex",
+      "created_at": "2026-05-01T05:42:08.647Z",
+      "checkpoint": {
+        "message": "Tailscale installed and logged in on PC; iPhone setup remains manual."
+      }
+    },
+    {
+      "agent_id": "codex",
+      "created_at": "2026-05-01T05:42:08.647Z",
+      "checkpoint": {
+        "message": "Ollama handoff runner completed its 5-task batch; one verification task remains in manifest."
+      }
+    }
+  ],
+  "output": {
+    "next_action": "Restart Claude Desktop, complete iPhone Tailscale setup, then run registry verification."
+  }
+}

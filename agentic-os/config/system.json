@@ -1,0 +1,4 @@
+{
+  "runtime": "agentic-os",
+  "coordination_mode": "file-based-event-driven"
+}

@@ -1,0 +1,9 @@
+{
+  "enabled": true,
+  "agent_id": "ollama",
+  "allowed_paths": [],
+  "allowed_globs": [],
+  "allow_deletes": false,
+  "delete_allowed_paths": [],
+  "delete_allowed_globs": []
+}

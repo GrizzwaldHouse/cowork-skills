@@ -1,0 +1,2 @@
+{"seq": 0, "ts": "2026-04-30T21:26:09.577683+00:00", "kind": "added", "agent_id": "plugin-a/session-x", "session_id": "session-x", "status": "active"}
+{"seq": 1, "ts": "2026-04-30T21:26:13.825728+00:00", "kind": "added", "agent_id": "plugin-a/session-x", "session_id": "session-x", "status": "active"}

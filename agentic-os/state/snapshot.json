@@ -1,0 +1,75 @@
+{
+  "timestamp": "2026-05-02T08:25:37.079312Z",
+  "tasks": [
+    {
+      "id": "codex-ops-handoff-setup",
+      "title": "Information class: Operational Setup / AgenticOS handoff enablement",
+      "status": "in_progress",
+      "assigned_to": "codex",
+      "dependencies": [],
+      "priority": 0,
+      "locked_by": "codex",
+      "created_at": "2026-05-01T05:42:08.647000Z",
+      "updated_at": "2026-05-01T05:42:08.647000Z",
+      "checkpoints": [
+        {
+          "agent_id": "codex",
+          "created_at": "2026-05-01T05:42:08.647Z",
+          "checkpoint": {
+            "message": "Dependencies verified through uv; .env keys added without exposing secrets."
+          }
+        },
+        {
+          "agent_id": "codex",
+          "created_at": "2026-05-01T05:42:08.647Z",
+          "checkpoint": {
+            "message": "Claude Desktop MCP config copied with uv-based launcher."
+          }
+        },
+        {
+          "agent_id": "codex",
+          "created_at": "2026-05-01T05:42:08.647Z",
+          "checkpoint": {
+            "message": "Tailscale installed and logged in on PC; iPhone setup remains manual."
+          }
+        },
+        {
+          "agent_id": "codex",
+          "created_at": "2026-05-01T05:42:08.647Z",
+          "checkpoint": {
+            "message": "Ollama handoff runner completed its 5-task batch; one verification task remains in manifest."
+          }
+        }
+      ],
+      "output": {
+        "next_action": "Restart Claude Desktop, complete iPhone Tailscale setup, then run registry verification."
+      }
+    },
+    {
+      "id": "task-integrate-agentic-os-projects",
+      "title": "Integrate AgenticOS knowledge across Unreal guidebook and portfolio projects",
+      "status": "pending",
+      "assigned_to": null,
+      "dependencies": [],
+      "priority": 1,
+      "locked_by": null,
+      "created_at": "2026-05-02T08:26:00Z",
+      "updated_at": "2026-05-02T08:26:00Z",
+      "checkpoints": [
+        {
+          "created_at": "2026-05-02T08:26:00Z",
+          "message": "Coordinate active CLAW, Claude, Codex, and Ollama agents into one AgenticOS hub that can talk to C:/Users/daley/UnrealProjects/BaseGame/UnrealEditorGuideBookClaudeDesign and D:/portfolio-website.",
+          "brief_ref": "agentic-os/state/cross_project_integration_brief.md"
+        }
+      ],
+      "output": null
+    }
+  ],
+  "locks": [
+    {
+      "task_id": "codex-ops-handoff-setup",
+      "agent_id": "codex",
+      "created_at": "2026-05-01T05:42:08.647000Z"
+    }
+  ]
+}
