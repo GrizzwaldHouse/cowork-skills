@@ -1,29 +1,35 @@
 {
   "repo": "cowork-skills",
-  "auditTimestamp": "2026-05-04T07:53:00.563043+00:00",
+  "auditTimestamp": "2026-05-07T15:52:05.222537+00:00",
   "agentforgeRole": "BRAIN + SKELETAL",
   "integrationStatus": "STANDALONE",
   "readiness": "NOT_READY",
   "compliance": {
-    "no_polling_loops": true,
-    "polling_violations": [],
-    "no_hardcoded_values": true,
-    "hardcoded_count": 0,
+    "no_polling_loops": false,
+    "polling_violations": [
+      "C:\\Users\\daley\\Projects\\cowork-skills/AgenticOS/frontend/src/components/PhaseCard.tsx:46:  const timer = useRef<ReturnType<typeof setInterval> | null>(null);",
+      "C:\\Users\\daley\\Projects\\cowork-skills/AgenticOS/frontend/src/components/PhaseCard.tsx:65:    timer.current = setInterval(load, REFRESH_MS);",
+      "C:\\Users\\daley\\Projects\\cowork-skills/AgenticOS/frontend/src/components/ProjectSwitcher.tsx:52:  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);",
+      "C:\\Users\\daley\\Projects\\cowork-skills/AgenticOS/frontend/src/components/ProjectSwitcher.tsx:70:    timerRef.current = setInterval(fetch, REFRESH_INTERVAL_MS);",
+      "C:\\Users\\daley\\Projects\\cowork-skills/AgenticOS/frontend/src/hooks/useAgentState.ts:8://          can show a live connection indicator without polling."
+    ],
+    "no_hardcoded_values": false,
+    "hardcoded_count": 3,
     "config_file_present": false,
     "config_files": [],
     "observer_pattern_used": false,
     "observer_evidence": [],
     "vram_watchdog_present": false,
-    "no_em_dashes": true,
-    "em_dash_count": 0,
+    "no_em_dashes": false,
+    "em_dash_count": 17,
     "env_example_present": false
   },
   "stats": {
     "filesScanned": 151,
-    "functionsFound": 0,
+    "functionsFound": 73,
     "openTodos": 0,
     "testFiles": 32,
-    "prdViolations": 0,
+    "prdViolations": 27,
     "stack": [
       "Python",
       "TypeScript/React"
@@ -40,11 +46,6 @@
         "component": "Config module",
         "layer": "ENDOCRINE",
         "reason": "No config file detected. All values must be config-driven per PRD v2."
-      },
-      {
-        "component": "SESSION_HANDOFF.md",
-        "layer": "LYMPHATIC",
-        "reason": "Required by Marcus Check-In Protocol for session continuity"
       }
     ],
     "refactors_required": [],
@@ -64,8 +65,49 @@
         "reason": "Need to define what events this repo emits/consumes"
       }
     ],
-    "prd_violations": []
+    "prd_violations": [
+      {
+        "type": "POLLING_LOOP",
+        "location": "C",
+        "fix": "Replace with event listener on OwlWatcher event bus"
+      },
+      {
+        "type": "POLLING_LOOP",
+        "location": "C",
+        "fix": "Replace with event listener on OwlWatcher event bus"
+      },
+      {
+        "type": "POLLING_LOOP",
+        "location": "C",
+        "fix": "Replace with event listener on OwlWatcher event bus"
+      },
+      {
+        "type": "POLLING_LOOP",
+        "location": "C",
+        "fix": "Replace with event listener on OwlWatcher event bus"
+      },
+      {
+        "type": "POLLING_LOOP",
+        "location": "C",
+        "fix": "Replace with event listener on OwlWatcher event bus"
+      },
+      {
+        "type": "HARDCODED_VALUE",
+        "location": "C",
+        "fix": "Move to config file or .env"
+      },
+      {
+        "type": "HARDCODED_VALUE",
+        "location": "C",
+        "fix": "Move to config file or .env"
+      },
+      {
+        "type": "HARDCODED_VALUE",
+        "location": "C",
+        "fix": "Move to config file or .env"
+      }
+    ]
   },
   "claudeCodeUsed": true,
-  "elapsedSeconds": 445.3
+  "elapsedSeconds": 411.1
 }
