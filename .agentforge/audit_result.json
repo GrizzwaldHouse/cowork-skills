@@ -1,35 +1,29 @@
 {
   "repo": "cowork-skills",
-  "auditTimestamp": "2026-05-07T16:00:02.072994+00:00",
+  "auditTimestamp": "2026-05-07T16:02:28.921926+00:00",
   "agentforgeRole": "BRAIN + SKELETAL",
   "integrationStatus": "STANDALONE",
   "readiness": "NOT_READY",
   "compliance": {
-    "no_polling_loops": false,
-    "polling_violations": [
-      "C:\\Users\\daley\\Projects\\cowork-skills/AgenticOS/frontend/src/components/NeuralBrainView/NeuralBrainView.tsx:145:  // not run it on a setInterval; d3-force's internal tick loop is the",
-      "C:\\Users\\daley\\Projects\\cowork-skills/AgenticOS/frontend/src/components/PhaseCard.tsx:46:  const timer = useRef<ReturnType<typeof setInterval> | null>(null);",
-      "C:\\Users\\daley\\Projects\\cowork-skills/AgenticOS/frontend/src/components/PhaseCard.tsx:65:    timer.current = setInterval(load, REFRESH_MS);",
-      "C:\\Users\\daley\\Projects\\cowork-skills/AgenticOS/frontend/src/components/ProjectSwitcher.tsx:55:  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);",
-      "C:\\Users\\daley\\Projects\\cowork-skills/AgenticOS/frontend/src/components/ProjectSwitcher.tsx:73:    timerRef.current = setInterval(fetch, REFRESH_INTERVAL_MS);"
-    ],
-    "no_hardcoded_values": false,
-    "hardcoded_count": 5,
+    "no_polling_loops": true,
+    "polling_violations": [],
+    "no_hardcoded_values": true,
+    "hardcoded_count": 0,
     "config_file_present": false,
     "config_files": [],
     "observer_pattern_used": false,
     "observer_evidence": [],
     "vram_watchdog_present": false,
-    "no_em_dashes": false,
-    "em_dash_count": 24,
+    "no_em_dashes": true,
+    "em_dash_count": 0,
     "env_example_present": false
   },
   "stats": {
     "filesScanned": 238,
-    "functionsFound": 153,
+    "functionsFound": 0,
     "openTodos": 0,
     "testFiles": 50,
-    "prdViolations": 47,
+    "prdViolations": 0,
     "stack": [
       "Python",
       "TypeScript/React"
@@ -65,59 +59,8 @@
         "reason": "Need to define what events this repo emits/consumes"
       }
     ],
-    "prd_violations": [
-      {
-        "type": "POLLING_LOOP",
-        "location": "C",
-        "fix": "Replace with event listener on OwlWatcher event bus"
-      },
-      {
-        "type": "POLLING_LOOP",
-        "location": "C",
-        "fix": "Replace with event listener on OwlWatcher event bus"
-      },
-      {
-        "type": "POLLING_LOOP",
-        "location": "C",
-        "fix": "Replace with event listener on OwlWatcher event bus"
-      },
-      {
-        "type": "POLLING_LOOP",
-        "location": "C",
-        "fix": "Replace with event listener on OwlWatcher event bus"
-      },
-      {
-        "type": "POLLING_LOOP",
-        "location": "C",
-        "fix": "Replace with event listener on OwlWatcher event bus"
-      },
-      {
-        "type": "HARDCODED_VALUE",
-        "location": "C",
-        "fix": "Move to config file or .env"
-      },
-      {
-        "type": "HARDCODED_VALUE",
-        "location": "C",
-        "fix": "Move to config file or .env"
-      },
-      {
-        "type": "HARDCODED_VALUE",
-        "location": "C",
-        "fix": "Move to config file or .env"
-      },
-      {
-        "type": "HARDCODED_VALUE",
-        "location": "C",
-        "fix": "Move to config file or .env"
-      },
-      {
-        "type": "HARDCODED_VALUE",
-        "location": "C",
-        "fix": "Move to config file or .env"
-      }
-    ]
+    "prd_violations": []
   },
   "claudeCodeUsed": true,
-  "elapsedSeconds": 195.5
+  "elapsedSeconds": 496.7
 }
